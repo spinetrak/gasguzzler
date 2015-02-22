@@ -6,11 +6,14 @@ import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 
 public interface SessionDAO
 {
-  @SqlUpdate("insert into st_session (userid, token, created) values (:userid, :token, :created)")
-  void insert(
-    @Bind("userid") int userid,
-    @Bind("token") String token
-    , @Bind("created") java.util.Date created
+  @SqlUpdate("delete from st_session where userid = :userid and token = :token")
+  void delete(
+    @Bind("userid") int userid, @Bind("token") String token
+  );
+
+  @SqlUpdate("delete from st_session where userid = :userid")
+  void delete(
+    @Bind("userid") int userid
   );
 
   @SqlQuery("select token from st_session where userid = :userid and token = :token limit 1")
@@ -18,8 +21,10 @@ public interface SessionDAO
     @Bind("userid") int userid, @Bind("token") String token
   );
 
-  @SqlUpdate("delete from st_session where userid = :userid and token = :token")
-  void delete(
-    @Bind("userid") int userid, @Bind("token") String token
+  @SqlUpdate("insert into st_session (userid, token, created) values (:userid, :token, :created)")
+  void insert(
+    @Bind("userid") int userid,
+    @Bind("token") String token
+    , @Bind("created") java.util.Date created
   );
 }
