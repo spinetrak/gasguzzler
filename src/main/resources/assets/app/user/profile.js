@@ -1,7 +1,6 @@
 define(function (require) {
     var http = require('plugins/http'),
         app = require('durandal/app'),
-        ko = require('knockout'),
         system = require('durandal/system'),
         shell = require('services/shell');
 
@@ -15,7 +14,8 @@ define(function (require) {
                 "token": sessionStorage.getItem("token")
             };
 
-            var url = 'https://localhost:8443/api/session/';
+            var urlRoot = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '');
+            var url = urlRoot + '/api/session';
 
             return http.remove(url,'',logoutModel).then(
                 function (response) {
@@ -40,7 +40,8 @@ define(function (require) {
                 "token": sessionStorage.getItem("token")
             };
 
-            var url = 'https://localhost:8443/api/registration/';
+            var urlRoot = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '');
+            var url = urlRoot + '/api/registration';
 
             return http.remove(url, '', deleteModel).then(
                 function (response) {

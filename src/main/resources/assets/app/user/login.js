@@ -14,13 +14,14 @@ define(function (require) {
         r_email: ko.observable(),
 
         doLogin: function () {
-            var that = this;
+
             var loginModel = {
                 "username": this.l_username,
                 "password": CryptoJS.SHA256(this.r_username+"|"+this.r_email+"|"+this.r_password).toString()
             };
-
-            var url = 'https://localhost:8443/api/session';
+            
+            var urlRoot = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '');
+            var url = urlRoot + '/api/session';
 
             return http.post(url, loginModel).then(
                 function (response) {
@@ -42,13 +43,14 @@ define(function (require) {
         },
 
         doRegister: function () {
-            var that = this;
+
             var registerModel = {
                 "username": this.r_username,
                 "password": CryptoJS.SHA256(this.r_username+"|"+this.r_email+"|"+this.r_password).toString(),
                 "email": this.r_email
             };
-            var url = 'https://localhost:8443/api/registration';
+            var urlRoot = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '');
+            var url = urlRoot + '/api/registration';
 
             return http.post(url, registerModel).then(
                 function (response) {
