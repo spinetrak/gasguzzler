@@ -14,6 +14,5 @@ CREATE TABLE "st_session" (
   "token" varchar(23) NOT NULL,
   "userid" int REFERENCES "st_user" ("userid"),
   "created" timestamp NOT NULL,
-  PRIMARY KEY ("token"),
-  UNIQUE ("userid")
+  PRIMARY KEY ("token")
 );
