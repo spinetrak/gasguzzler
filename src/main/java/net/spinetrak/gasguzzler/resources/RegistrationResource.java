@@ -65,7 +65,7 @@ public class RegistrationResource
   {
     if (!sessionDAO.findSession(user.getUserid(), user.getToken()).isEmpty())
     {
-      sessionDAO.delete(user.getUserid(), user.getToken());
+      sessionDAO.delete(user.getUserid());
     }
     if ( null != userDAO.findUser(user.getUserid()) )
     {
