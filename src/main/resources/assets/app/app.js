@@ -16,8 +16,8 @@ define(function (require) {
 	   dialog = require('plugins/dialog');
  
    system.debug(true);
- 
-   app.title = 'Durandal Starter Kit';
+
+    app.title = 'spinetrak::gasguzzler';
  
    app.configurePlugins({
      router:true,
@@ -25,7 +25,7 @@ define(function (require) {
    });
 	
    app.start().then(function() {
-	 dialog.MessageBox.setDefaults({class: "notice success", buttonClass: "medium green float-right"});
+       dialog.MessageBox.setDefaults({class: "notice success", buttonClass: "small green float-right"});
      app.setRoot('services/shell');
    });
 });

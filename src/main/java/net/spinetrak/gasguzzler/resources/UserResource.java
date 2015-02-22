@@ -27,6 +27,30 @@ public class UserResource
     _userDAO = userDAO_;
   }
 
+  @POST
+  public User add(@Valid User user)
+  {
+    return user;
+  }
+
+  @DELETE
+  @Path("/{userid}")
+  public void delete(@PathParam("userid") String userid)
+  {
+  }
+
+  @GET
+  @Path("/{userid}")
+  public User get(@Auth User user, @PathParam("userid") int userid)
+  {
+    final User u = _userDAO.findUser(userid);
+    if (u.getUserid() != userid)
+    {
+      u.setEmail("private");
+    }
+    return u;
+  }
+
   /*
   * Using the Auth attribute will use the injected provider to authenticate all requests to this path
   * You can also use the principal to apply authorisation in code dynamically
@@ -55,31 +79,10 @@ public class UserResource
     return users;
   }
 
-  @GET
-  @Path("/{userid}")
-  public User get(@PathParam("userid") String userid)
-  {
-    return new User()
-      .setUsername(userid)
-      .setRole("DBA");
-  }
-
-  @POST
-  public User add(@Valid User user)
-  {
-    return user;
-  }
-
   @PUT
   @Path("/{userid}")
   public User update(@PathParam("userid") String userid, @Valid User user)
   {
     return user;
-  }
-
-  @DELETE
-  @Path("/{userid}")
-  public void delete(@PathParam("userid") String userid)
-  {
   }
 }

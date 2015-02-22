@@ -29,18 +29,18 @@ public class SessionResource
   }
 
   @POST
-  public Session login(User user) throws Exception
+  public Session login(User user_) throws Exception
   {
-    String salt = userDAO.getSalt(user.getUsername());
+    String salt = userDAO.getSalt(user_.getUsername());
     if(salt == null)
     {
       throw new WebApplicationException(Response.Status.NOT_FOUND);
     }
-    
-    final String password = Authenticator.getSecurePassword(user.getPassword(),salt);
-    user.setPassword(password);
-    
-    User u = userDAO.findUserByUsernameAndPassword(user.getUsername(), user.getPassword());
+
+    final String password = Authenticator.getSecurePassword(user_.getPassword(), salt);
+    user_.setPassword(password);
+
+    User u = userDAO.findUserByUsernameAndPassword(user_.getUsername(), user_.getPassword());
     if (null == u)
     {
       throw new WebApplicationException(Response.Status.NOT_FOUND);

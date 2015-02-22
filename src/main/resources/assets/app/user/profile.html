@@ -1,10 +1,53 @@
 <section>
-  <h4>Hello!</h4>
-  <form id="logoutForm" class="vertical">
-    <fieldset>
-        <legend>Your Account</legend>
-	   <button class="medium green btn" type="submit" data-bind="click: doDelete">Delete</button>
-       <button class="medium green btn" type="submit" data-bind="click: doLogout">Logout</button>
-    </fieldset>
-  </form>
+    <h4>Hello!</h4>
+
+    <form class="vertical">
+        <fieldset>
+            <legend>Your Account</legend>
+            <table cellspacing="0" cellpadding="0" class="tight">
+                <tbody>
+                <tr>
+                    <th><label for="userid">ID</label></th>
+                    <td><p id="userid" data-bind="text: userid"></p></td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <th><label for="username">Username</label></th>
+                    <td><p id="username" data-bind="text: username"></p></td>
+                    <td>
+                        <div class="right">
+                            <button class="small green btn" type="submit" data-bind="click: doChangeUsername">Change
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th><label for="email">E-Mail</label></th>
+                    <td><p id="email" data-bind="text: email"></p></td>
+                    <td>
+                        <div class="right">
+                            <button class="small green btn" type="submit" data-bind="click: doChangeEmail">Change
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th><label for="password">Password</label></th>
+                    <td><p id="password">xxxxxxxxxxxxx</p></td>
+                    <td>
+                        <div class="right">
+                            <button class="small green btn" type="submit" data-bind="click: doChangePassword">Change
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="right">
+                <button class="small red btn" type="submit" data-bind="click: doDelete">Delete</button>
+                <button class="small orange btn" type="submit" data-bind="click: doLogout">Logout</button>
+            </div>
+        </fieldset>
+    </form>
 </section>

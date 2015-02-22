@@ -15,9 +15,15 @@ define(function (require) {
 
         doLogin: function () {
 
+            var username = this.l_username();
+            var password = this.l_password();
+            var sha256Password = CryptoJS.SHA256(username + "|" + password).toString();
+
+            system.log(sha256Password);
+            
             var loginModel = {
-                "username": this.l_username,
-                "password": CryptoJS.SHA256(this.r_username+"|"+this.r_email+"|"+this.r_password).toString()
+                "username": username,
+                "password": sha256Password
             };
             
             var urlRoot = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '');
@@ -44,10 +50,15 @@ define(function (require) {
 
         doRegister: function () {
 
+            var username = this.r_username();
+            var password = this.r_password();
+            var email = this.r_email();
+            var sha256Password = CryptoJS.SHA256(username + "|" + password).toString();
+            
             var registerModel = {
-                "username": this.r_username,
-                "password": CryptoJS.SHA256(this.r_username+"|"+this.r_email+"|"+this.r_password).toString(),
-                "email": this.r_email
+                "username": username,
+                "password": sha256Password,
+                "email": email
             };
             var urlRoot = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '');
             var url = urlRoot + '/api/registration';
