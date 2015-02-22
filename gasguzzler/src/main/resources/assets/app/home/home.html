@@ -1,0 +1,10 @@
+<section>
+  <h4>Hello! What is your name?</h4>
+  <form class="vertical">
+    <fieldset>
+       <label for="text1">Name</label>
+       <input id="text1" type="text" data-bind="value: name, valueUpdate: 'afterkeydown'"/>
+       <button class="medium green btn" type="submit" data-bind="click: sayHello, enable: name">Click Me</button>
+    </fieldset>
+  </form>
+</section>
