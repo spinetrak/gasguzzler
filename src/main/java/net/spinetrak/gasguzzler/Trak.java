@@ -6,7 +6,6 @@ import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.dropwizard.views.ViewBundle;
-import net.spinetrak.gasguzzler.core.User;
 import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
 import net.spinetrak.gasguzzler.resources.RegistrationResource;
@@ -21,9 +20,19 @@ import org.skife.jdbi.v2.DBI;
  */
 public class Trak extends Application<TrakConfiguration>
 {
+  public Trak()
+  {
+  }
+
   public static void main(String[] args) throws Exception
   {
     new Trak().run(args);
+  }
+
+  @Override
+  public String getName()
+  {
+    return "spinetrak";
   }
 
   @Override
@@ -38,16 +47,6 @@ public class Trak extends Application<TrakConfiguration>
   }
 
   @Override
-  public String getName()
-  {
-    return "spinetrak";
-  }
-
-  public Trak()
-  {
-  }
-
-  @Override
   public void run(TrakConfiguration configuration,
                   Environment environment) throws ClassNotFoundException
   {
@@ -59,6 +58,6 @@ public class Trak extends Application<TrakConfiguration>
     environment.jersey().register(new UserResource(userDAO));
     environment.jersey().register(new SessionResource(userDAO,sessionDAO));
     environment.jersey().register(new RegistrationResource(userDAO,sessionDAO));
-    environment.jersey().register(new SecurityProvider<User>(new Authenticator(sessionDAO)));
+    environment.jersey().register(new SecurityProvider<>(new Authenticator(sessionDAO)));
   }
 }

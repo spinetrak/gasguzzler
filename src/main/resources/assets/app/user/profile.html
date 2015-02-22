@@ -13,30 +13,34 @@
                 </tr>
                 <tr>
                     <th><label for="username">Username</label></th>
-                    <td><p id="username" data-bind="text: username"></p></td>
+                    <td><input type="text" id="username" data-bind="value: username" pattern="[\w]{3,}" required/></td>
                     <td>
                         <div class="right">
-                            <button class="small green btn" type="submit" data-bind="click: doChangeUsername">Change
+                            <button class="small green fa fa-user" type="submit" data-bind="click: doChangeProfile">
+                                Change
                             </button>
                         </div>
                     </td>
                 </tr>
                 <tr>
                     <th><label for="email">E-Mail</label></th>
-                    <td><p id="email" data-bind="text: email"></p></td>
+                    <td><input id="email" name="email" type="email" required data-bind="value: email"/></td>
                     <td>
                         <div class="right">
-                            <button class="small green btn" type="submit" data-bind="click: doChangeEmail">Change
+                            <button class="small green fa fa-envelope" type="submit" data-bind="click: doChangeProfile">
+                                Change
                             </button>
                         </div>
                     </td>
                 </tr>
                 <tr>
                     <th><label for="password">Password</label></th>
-                    <td><p id="password">xxxxxxxxxxxxx</p></td>
+                    <td><input id="password" name="password" type="password" pattern=".{6,}" required
+                               data-bind="value: password"/></td>
                     <td>
                         <div class="right">
-                            <button class="small green btn" type="submit" data-bind="click: doChangePassword">Change
+                            <button class="small green fa fa-key" type="submit" data-bind="click: doChangeProfile">
+                                Change
                             </button>
                         </div>
                     </td>
@@ -45,8 +49,8 @@
             </table>
 
             <div class="right">
-                <button class="small red btn" type="submit" data-bind="click: doDelete">Delete</button>
-                <button class="small orange btn" type="submit" data-bind="click: doLogout">Logout</button>
+                <button class="small red fa fa-trash" type="submit" data-bind="click: doDelete"> Delete</button>
+                <button class="small orange fa fa-unlink" type="submit" data-bind="click: doLogout"> Logout</button>
             </div>
         </fieldset>
     </form>

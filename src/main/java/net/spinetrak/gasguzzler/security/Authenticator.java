@@ -17,49 +17,34 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<Credentia
 {
 
   private SessionDAO sessionDAO;
-  
+
   public Authenticator(SessionDAO sessionDAO_)
   {
     sessionDAO = sessionDAO_;
   }
-  
-  public Authenticator(){};
 
-  @Override
-  public Optional<User> authenticate(Credentials credentials) throws AuthenticationException
+  public Authenticator()
   {
-    if (null == sessionDAO.findSession(credentials.getUserid(),credentials.getToken()))
-    {
-      throw new AuthenticationException("Invalid credentials");
-    }
-    else
-    {
-      User user = new User();
-      user.setUserid(credentials.getUserid());
-      user.setToken(credentials.getToken());
-      user.setRole(credentials.getToken().contains("Admin") ? User.ROLE_ADMIN : User.ROLE_USER);
-
-      return Optional.fromNullable(user);
-    }
   }
-  
-  public static String getSalt()               throws NoSuchAlgorithmException
+
+  public static String getSalt() throws NoSuchAlgorithmException
   {
-      //Always use a SecureRandom generator
-      SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
-      //Create array for salt
-      byte[] salt = new byte[48];
-      //Get a random salt
-      sr.nextBytes(salt);
-      //return salt
-      return salt.toString();
-    
+    //Always use a SecureRandom generator
+    SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
+    //Create array for salt
+    byte[] salt = new byte[48];
+    //Get a random salt
+    sr.nextBytes(salt);
+    //return salt
+    return salt.toString();
+
   }
 
   public static String getSecurePassword(String passwordToHash, String salt)
   {
     String generatedPassword = null;
-    try {
+    try
+    {
       // Create MessageDigest instance for MD5
       MessageDigest md = MessageDigest.getInstance("SHA-256");
       //Add password bytes to digest
@@ -69,16 +54,35 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<Credentia
       //This bytes[] has bytes in decimal format;
       //Convert it to hexadecimal format
       StringBuilder sb = new StringBuilder();
-      for(int i=0; i< bytes.length ;i++)
+      for (final byte aByte : bytes)
       {
-        sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+        sb.append(Integer.toString((aByte & 0xff) + 0x100, 16).substring(1));
       }
       //Get complete hashed password in hex format
       generatedPassword = sb.toString();
     }
-    catch (NoSuchAlgorithmException e) {
+    catch (NoSuchAlgorithmException e)
+    {
       e.printStackTrace();
     }
     return generatedPassword;
+  }
+
+  @Override
+  public Optional<User> authenticate(Credentials credentials) throws AuthenticationException
+  {
+    if (null == sessionDAO.findSession(credentials.getUserid(), credentials.getToken()))
+    {
+      throw new AuthenticationException("Invalid credentials");
+    }
+    else
+    {
+      final User user = new User();
+      user.setUserid(credentials.getUserid());
+      user.setToken(credentials.getToken());
+      user.setRole(credentials.getToken().contains("Admin") ? User.ROLE_ADMIN : User.ROLE_USER);
+
+      return Optional.fromNullable(user);
+    }
   }
 }

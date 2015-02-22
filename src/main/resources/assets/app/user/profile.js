@@ -9,34 +9,62 @@ define(function (require) {
         userid: ko.observable(),
         username: ko.observable(),
         email: ko.observable(),
-
+        password: ko.observable(),
+     
         activate: function () {
 
+            var userid = sessionStorage.getItem("userid");
+            var token = sessionStorage.getItem("token");
+
             var userModel = {
-                "userid": sessionStorage.getItem("userid"),
-                "token": sessionStorage.getItem("token")
+                "userid": userid,
+                "token": token
             };
             var that = this;
-            var myuserid = sessionStorage.getItem("userid");
+
             var urlRoot = location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
-            var url = urlRoot + '/api/user/' + myuserid;
+            var url = urlRoot + '/api/user/' + userid;
 
             return http.get(url, '', userModel).then(function (response) {
-                that.userid = (response.userid);
-                that.username = (response.username);
-                that.email = (response.email);
-            });
+                    that.userid = (response.userid);
+                    that.username = (response.username);
+                    that.email = (response.email);
+                },
+                function (error) {
+                    app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"});
+                });
         },
 
-        doChangeUsername: function () {
+        doChangeProfile: function () {
 
-        },
-        doChangeEmail: function () {
+            var username = this.username;
+            var email = this.email;
+            var password = CryptoJS.SHA256(username + "|" + this.password).toString();
 
-        },
-        doChangePassword: function () {
+            var userid = sessionStorage.getItem("userid");
+            var token = sessionStorage.getItem("token");
 
+            var userModel = {
+                "userid": userid,
+                "token": token,
+                "username": username,
+                "email": email,
+                "password": password
+            };
+
+            var urlRoot = location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
+            var url = urlRoot + '/api/user/' + userid;
+
+            return http.put(url, userModel, userModel).then(
+                function (response) {
+                    app.showMessage("Profile updated!", "", ["Ok"], true, {"class": "notice success"});
+                    shell.router.navigate('profile');
+                },
+                function (error) {
+                    app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"});
+                });
         },
+
 
         doLogout: function () {
 
@@ -50,7 +78,6 @@ define(function (require) {
 
             return http.remove(url, '', logoutModel).then(
                 function (response) {
-                    app.showMessage("Have a nice day and please come back soon!", "Good Bye!", ["Ok"], true, {"class": "notice success"});
 
                     sessionStorage.removeItem("token");
                     sessionStorage.removeItem("userid");
@@ -76,7 +103,6 @@ define(function (require) {
 
             return http.remove(url, '', deleteModel).then(
                 function (response) {
-                    app.showMessage("Sorry to see you go! Have a nice day!!", "Good Bye!", ["Ok"], true, {"class": "notice success"});
 
                     sessionStorage.removeItem("token");
                     sessionStorage.removeItem("userid");
@@ -86,7 +112,7 @@ define(function (require) {
                     shell.router.navigate('login');
                 },
                 function (error) {
-                    app.showMessage("Delete: " + error.statusText, error.statusText, ["Ok"], true, {"class": "notice error"});
+                    app.showMessage(error.statusText, error.statusText, ["Ok"], true, {"class": "notice error"});
                 });
         }
     };

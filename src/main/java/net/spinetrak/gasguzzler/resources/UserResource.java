@@ -17,10 +17,11 @@ import java.util.List;
 public class UserResource
 {
   private UserDAO _userDAO;
-  
+
   protected UserResource()
-  {}
-  
+  {
+  }
+
   public UserResource(UserDAO userDAO_)
   {
     super();
@@ -81,8 +82,9 @@ public class UserResource
 
   @PUT
   @Path("/{userid}")
-  public User update(@PathParam("userid") String userid, @Valid User user)
+  public User update(@PathParam("userid") String userid, @Auth User current, User modified)
   {
-    return user;
+    _userDAO.update(modified.getUsername(), modified.getEmail(), modified.getUserid());
+    return modified;
   }
 }

@@ -31,8 +31,6 @@ define(function (require) {
 
             return http.post(url, loginModel).then(
                 function (response) {
-                    app.showMessage("Hello, and welcome back!", "Hi!", ["Ok"], true, {"class": "notice success"});
-
                     sessionStorage.setItem("token", response.token);
                     sessionStorage.setItem("userid", response.userid);
 
@@ -44,7 +42,6 @@ define(function (require) {
                 },
                 function (error) {
                     app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"});
-
                 });
         },
 
@@ -65,7 +62,6 @@ define(function (require) {
 
             return http.post(url, registerModel).then(
                 function (response) {
-                    app.showMessage("Hello, and have a great day!", "Welcome!", ["Ok"], true, {"class": "notice success"});
 
                     sessionStorage.setItem("token", response.token);
                     sessionStorage.setItem("userid", response.userid);
