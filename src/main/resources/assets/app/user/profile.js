@@ -58,7 +58,7 @@ define(function (require) {
 
             return http.put(url, userModel, userModel).then(
                 function (response) {
-                    app.showMessage("Profile updated!", "", ["Ok"], true, {"class": "notice success"});
+                    app.showMessage("Profile updated!", "gasguzzler", ["Ok"], true, {"class": "notice success"});
                     shell.router.navigate('profile');
                 },
                 function (error) {
@@ -85,7 +85,7 @@ define(function (require) {
 
                     shell.reconfigure();
 
-                    shell.router.navigate('login');
+                    shell.router.navigate('');
                 },
                 function (error) {
                     app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"});
@@ -110,7 +110,7 @@ define(function (require) {
 
                     shell.reconfigure();
 
-                    shell.router.navigate('login');
+                    shell.router.navigate('');
                 },
                 function (error) {
                     app.showMessage(error.statusText, error.statusText, ["Ok"], true, {"class": "notice error"});

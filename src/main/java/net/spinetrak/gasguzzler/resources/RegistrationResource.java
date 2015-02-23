@@ -31,7 +31,7 @@ public class RegistrationResource
   }
 
   @POST
-  public Session register(User user) throws Exception
+  public Session register(User user)
   {
     if (null == user)
     {
@@ -42,28 +42,35 @@ public class RegistrationResource
     {
       throw new WebApplicationException(Response.Status.NOT_ACCEPTABLE);
     }
-    
-    user.setRole(User.ROLE_USER);
-    
-    final String salt = Authenticator.getSalt();
-    final String password = Authenticator.getSecurePassword(user.getPassword(),salt);
-    
-    user.setSalt(salt);
-    user.setPassword(password);
 
-    userDAO.insert(user.getUsername(), user.getPassword(), user.getEmail(), user.getSalt(), user.getRole(), new Date(),
-                   new Date());
+    try
+    {
+      final String salt = Authenticator.getSalt();
+      final String password = Authenticator.getSecurePassword(user.getPassword(), salt);
 
-    final User u = userDAO.findUserByUsernameAndPassword(user.getUsername(), user.getPassword());
-    
-    Session session = new Session(u.getUserid());
-    sessionDAO.insert(session.getUserid(), session.getToken(), new java.util.Date());
+      user.setSalt(salt);
+      user.setPassword(password);
 
-    return session;
+      user.setRole(User.ROLE_USER);
+      userDAO.insert(user.getUsername(), user.getPassword(), user.getEmail(), user.getSalt(), user.getRole(),
+                     new Date(),
+                     new Date());
+
+      final User u = userDAO.findUserByUsernameAndPassword(user.getUsername(), user.getPassword());
+
+      Session session = new Session(u.getUserid());
+      sessionDAO.insert(session.getUserid(), session.getToken(), new java.util.Date());
+
+      return session;
+    }
+    catch (Exception ex)
+    {
+      throw new WebApplicationException(ex, Response.Status.INTERNAL_SERVER_ERROR);
+    }
   }
 
   @DELETE
-  public void unregister(@Auth User user) throws Exception
+  public void unregister(@Auth User user)
   {
     if (!sessionDAO.findSession(user.getUserid(), user.getToken()).isEmpty())
     {

@@ -1,8 +1,8 @@
 define(function (require) {
   var http = require('plugins/http'),
       ko = require('knockout');
- 
-  var url = 'http://api.flickr.com/services/feeds/photos_public.gne';
+
+    var url = 'https://api.flickr.com/services/feeds/photos_public.gne';
  
   var qs = { 
     tags: 'timofei', 

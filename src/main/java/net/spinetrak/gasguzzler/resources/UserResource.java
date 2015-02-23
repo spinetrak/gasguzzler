@@ -84,15 +84,23 @@ public class UserResource
 
   @PUT
   @Path("/{userid}")
-  public User update(@PathParam("userid") String userid, @Auth User current, User modified) throws Exception
+  public User update(@PathParam("userid") String userid, @Auth User current, User modified)
   {
-    final String salt = Authenticator.getSalt();
-    final String password = Authenticator.getSecurePassword(modified.getPassword(), salt);
+    try
+    {
+      final String salt = Authenticator.getSalt();
+      final String password = Authenticator.getSecurePassword(modified.getPassword(), salt);
 
-    modified.setSalt(salt);
-    modified.setPassword(password);
-    _userDAO.update(modified.getUsername(), modified.getPassword(), modified.getEmail(), modified.getSalt(), new Date(),
-                    modified.getUserid());
-    return modified;
+      modified.setSalt(salt);
+      modified.setPassword(password);
+      _userDAO.update(modified.getUsername(), modified.getPassword(), modified.getEmail(), modified.getSalt(),
+                      new Date(),
+                      modified.getUserid());
+      return modified;
+    }
+    catch (Exception ex)
+    {
+      throw new WebApplicationException(ex, Response.Status.INTERNAL_SERVER_ERROR);
+    }
   }
 }

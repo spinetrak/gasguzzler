@@ -13,6 +13,7 @@ define(function (require) {
         r_password: ko.observable(),
         r_email: ko.observable(),
 
+
         doLogin: function () {
 
             var username = this.l_username();
@@ -38,7 +39,7 @@ define(function (require) {
                     
                     shell.reconfigure();
 
-                    shell.router.navigate('profile');
+                    shell.router.navigate('');
                 },
                 function (error) {
                     app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"});
@@ -70,7 +71,7 @@ define(function (require) {
 
                     shell.reconfigure();
 
-                    shell.router.navigate('profile');
+                    shell.router.navigate('');
                 },
                 function (error) {
                     app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"});

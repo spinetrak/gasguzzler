@@ -29,7 +29,7 @@ public class SessionResource
   }
 
   @POST
-  public Session login(User user_) throws Exception
+  public Session login(User user_)
   {
     String salt = userDAO.getSalt(user_.getUsername());
     if(salt == null)
@@ -53,7 +53,7 @@ public class SessionResource
   }
 
   @DELETE
-  public void logout(@Auth User user) throws Exception
+  public void logout(@Auth User user)
   {
     if(!sessionDAO.findSession(user.getUserid(),user.getToken()).isEmpty())
     {
