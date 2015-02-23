@@ -7,6 +7,7 @@ import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
 
+import java.util.Date;
 import java.util.List;
 
 public interface UserDAO
@@ -46,19 +47,24 @@ public interface UserDAO
     @Bind("username") String username
   );
 
-  @SqlUpdate("insert into st_user (username, password, email, role, salt) values (:username, :password, :email, :role, :salt)")
+  @SqlUpdate("insert into st_user (username, password, email, role, salt, created, updated) values (:username, :password, :email, :role, :salt, :created, :updated)")
   void insert(
     @Bind("username") String username
     , @Bind("password") String password
     , @Bind("email") String email,
+    @Bind("salt") String salt,
     @Bind("role") String role,
-    @Bind("salt") String salt
+    @Bind("created") Date created,
+    @Bind("updated") Date updated
   );
 
-  @SqlUpdate("update st_user set username = :username, email = :email where userid = :userid")
+  @SqlUpdate("update st_user set username = :username, password = :password, email = :email, salt = :salt, updated = :updated where userid = :userid")
   void update(
-    @Bind("username") String username
-    , @Bind("email") String email,
+    @Bind("username") String username,
+    @Bind("password") String password,
+    @Bind("email") String email,
+    @Bind("salt") String salt,
+    @Bind("updated") Date updated,
     @Bind("userid") int userid
   );
 }

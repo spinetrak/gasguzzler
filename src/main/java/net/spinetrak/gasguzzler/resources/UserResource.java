@@ -3,11 +3,13 @@ package net.spinetrak.gasguzzler.resources;
 import io.dropwizard.auth.Auth;
 import net.spinetrak.gasguzzler.core.User;
 import net.spinetrak.gasguzzler.dao.UserDAO;
+import net.spinetrak.gasguzzler.security.Authenticator;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -82,9 +84,15 @@ public class UserResource
 
   @PUT
   @Path("/{userid}")
-  public User update(@PathParam("userid") String userid, @Auth User current, User modified)
+  public User update(@PathParam("userid") String userid, @Auth User current, User modified) throws Exception
   {
-    _userDAO.update(modified.getUsername(), modified.getEmail(), modified.getUserid());
+    final String salt = Authenticator.getSalt();
+    final String password = Authenticator.getSecurePassword(modified.getPassword(), salt);
+
+    modified.setSalt(salt);
+    modified.setPassword(password);
+    _userDAO.update(modified.getUsername(), modified.getPassword(), modified.getEmail(), modified.getSalt(), new Date(),
+                    modified.getUserid());
     return modified;
   }
 }

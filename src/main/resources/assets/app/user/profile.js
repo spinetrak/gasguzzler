@@ -39,7 +39,8 @@ define(function (require) {
 
             var username = this.username;
             var email = this.email;
-            var password = CryptoJS.SHA256(username + "|" + this.password).toString();
+            var password = this.password();
+            password = CryptoJS.SHA256(username + "|" + password).toString();
 
             var userid = sessionStorage.getItem("userid");
             var token = sessionStorage.getItem("token");

@@ -12,6 +12,7 @@ import net.spinetrak.gasguzzler.security.Authenticator;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Date;
 
 @Path("/registration")
 @JsonAutoDetect
@@ -49,8 +50,9 @@ public class RegistrationResource
     
     user.setSalt(salt);
     user.setPassword(password);
-    
-    userDAO.insert(user.getUsername(), user.getPassword(), user.getEmail(), user.getRole(), user.getSalt());
+
+    userDAO.insert(user.getUsername(), user.getPassword(), user.getEmail(), user.getSalt(), user.getRole(), new Date(),
+                   new Date());
 
     final User u = userDAO.findUserByUsernameAndPassword(user.getUsername(), user.getPassword());
     
