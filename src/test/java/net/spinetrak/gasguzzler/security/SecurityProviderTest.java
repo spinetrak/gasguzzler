@@ -25,35 +25,12 @@ import static org.junit.Assert.fail;
  * <p/>
  * This is where you test your provider acts as expected when injected and used by the auth attributes in a resource
  */
-public class SecurityProviderTests extends JerseyTest
+public class SecurityProviderTest extends JerseyTest
 {
 
   static
   {
     LoggingFactory.bootstrap();
-  }
-
-  @Path("/test/")
-  @Produces(MediaType.TEXT_PLAIN)
-  public static class ExampleResource
-  {
-    @GET
-    public String show(@Auth User principal)
-    {
-      return principal.getUsername();
-    }
-  }
-
-  @Override
-  protected AppDescriptor configure()
-  {
-    final DropwizardResourceConfig config = DropwizardResourceConfig.forTesting(new MetricRegistry());
-    final Authenticator authenticator = new Authenticator();
-
-    config.getSingletons().add(new SecurityProvider<>(authenticator));
-    config.getSingletons().add(new ExampleResource());
-
-    return new LowLevelAppDescriptor.Builder(config).build();
   }
 
   @Test
@@ -73,15 +50,6 @@ public class SecurityProviderTests extends JerseyTest
   }
 
   @Test
-  public void transformsCredentialsToPrincipals() throws Exception
-  {
-    assertEquals(client().resource("/test")
-                   .header(SecurityProvider.TOKEN, "validTokenReturnedAsUsername")
-                   .get(String.class),
-                 "validTokenReturnedAsUsername");
-  }
-
-  @Test
   public void respondsToNonBasicCredentialsWith401() throws Exception
   {
     try
@@ -95,6 +63,48 @@ public class SecurityProviderTests extends JerseyTest
     catch (UniformInterfaceException ex)
     {
       assertEquals(ex.getResponse().getStatus(), 401);
+    }
+  }
+
+  @Test
+  public void transformsCredentialsToPrincipals() throws Exception
+  {
+    try
+    {
+      assertEquals(client().resource("/test")
+                     .header(SecurityProvider.TOKEN, "validTokenReturnedAsUsername")
+                     .get(String.class),
+                   "validTokenReturnedAsUsername");
+
+
+      fail("Expected exception");
+  }
+    catch (UniformInterfaceException ex)
+    {
+      assertEquals(ex.getResponse().getStatus(), 401);
+    }
+  }
+
+  @Override
+  protected AppDescriptor configure()
+  {
+    final DropwizardResourceConfig config = DropwizardResourceConfig.forTesting(new MetricRegistry());
+    final Authenticator authenticator = new Authenticator();
+
+    config.getSingletons().add(new SecurityProvider<>(authenticator));
+    config.getSingletons().add(new ExampleResource());
+
+    return new LowLevelAppDescriptor.Builder(config).build();
+  }
+
+  @Path("/test/")
+  @Produces(MediaType.TEXT_PLAIN)
+  public static class ExampleResource
+  {
+    @GET
+    public String show(@Auth User principal)
+    {
+      return principal.getUsername();
     }
   }
 

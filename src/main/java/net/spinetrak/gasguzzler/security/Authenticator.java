@@ -36,7 +36,7 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<Credentia
     //Get a random salt
     sr.nextBytes(salt);
     //return salt
-    return salt.toString();
+    return new String(salt);
 
   }
 
@@ -71,7 +71,8 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<Credentia
   @Override
   public Optional<User> authenticate(Credentials credentials) throws AuthenticationException
   {
-    if (null == sessionDAO.findSession(credentials.getUserid(), credentials.getToken()))
+    if ((null == credentials) || (null == sessionDAO) || (null == sessionDAO.findSession(credentials.getUserid(),
+                                                                                         credentials.getToken())))
     {
       throw new AuthenticationException("Invalid credentials");
     }

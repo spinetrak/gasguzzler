@@ -1,6 +1,9 @@
 {
+  "salt": null,
+  "token": null,
+  "userid": 0,
   "username": "myName",
   "password": "myPassword",
-  "displayName": "myDisplayName",
-  "displayRole": "myDisplayRole"
+  "email": "my@mail.de",
+  "role": "myDisplayRole"
 }

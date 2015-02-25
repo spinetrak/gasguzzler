@@ -22,6 +22,7 @@ public class Trak extends Application<TrakConfiguration>
 {
   public Trak()
   {
+
   }
 
   public static void main(String[] args) throws Exception
