@@ -142,6 +142,7 @@ define(function (require) {
 
             return http.remove(url, '', userModel).then(
                 function (response) {
+                    //
                     app.showMessage("See you next time, " + that.username() + "!", "You are logged out!", ["Ok"], true, {"class": "notice success"});
                     that.setLoggedIn(false);
                     that.showRegisterForm(false);
