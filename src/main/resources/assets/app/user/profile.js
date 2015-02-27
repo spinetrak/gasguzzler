@@ -15,7 +15,8 @@ define(function (require) {
         username: ko.observable(),
         email: ko.observable(),
         password: ko.observable(),
-
+        logoutScreen: ko.observable('user/logout'),
+        
         urlRoot: location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : ''),
 
 
@@ -27,8 +28,8 @@ define(function (require) {
 
             if (!(userModel.userid && userModel.token)) {
                 this.setLoggedIn(false);
-                app.showMessage("You don't appear to be already logged in.", "Not logged in", ["Ok"], true, {"class": "notice error"});
-                router.navigate('user');
+                document.location.href = "/#user";
+                window.location.reload(true);
             }
 
             var url = this.urlRoot + '/api/user/' + userModel.userid;
@@ -36,9 +37,9 @@ define(function (require) {
             var that = this;
 
             return http.get(url, '', userModel).then(function (response) {
-                    that.userid = (response.userid);
-                    that.username = (response.username);
-                    that.email = (response.email);
+                    that.userid(response.userid);
+                    that.username(response.username);
+                    that.email(response.email);
                     that.setLoggedIn(true);
                 },
                 function (error) {
@@ -66,9 +67,9 @@ define(function (require) {
             var userModel = {
                 "userid": sessionStorage.getItem("userid"),
                 "token": sessionStorage.getItem("token"),
-                "username": this.username,
-                "email": this.email,
-                "password": CryptoJS.SHA256(this.username + "|" + this.password()).toString()
+                "username": this.username(),
+                "email": this.email(),
+                "password": CryptoJS.SHA256(this.username() + "|" + this.password()).toString()
             };
 
             var url = this.urlRoot + '/api/user/' + userModel.userid;

@@ -12,23 +12,21 @@ define(function (require) {
 
 
     return {
-
-        userid: sessionStorage.getItem("userid"),
-        token: sessionStorage.getItem("token"),
         loginScreen: ko.observable(),
         registerScreen: ko.observable(),
         profileScreen: ko.observable(),
         
         activate: function () {
-            if (this.userid && this.token) {
-                this.profileScreen = 'user/profile';
-                this.loginScreen = '';
-                this.registerScreen = '';
+
+            if (sessionStorage.getItem("userid") && sessionStorage.getItem("token")) {
+                this.profileScreen('user/profile');
+                this.loginScreen('');
+                this.registerScreen('');
             }
             else {
-                this.loginScreen = 'user/login';
-                this.registerScreen = 'user/register';
-                this.profileScreen = '';
+                this.loginScreen('user/login');
+                this.registerScreen('user/register');
+                this.profileScreen('');
             }
         }
     };

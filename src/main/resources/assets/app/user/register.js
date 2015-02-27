@@ -25,8 +25,8 @@ define(function (require) {
 
             if (userModel.userid && userModel.token) {
                 this.setLoggedIn(false);
-                app.showMessage("You appear to be already registered and logged in.", "Already registered", ["Ok"], true, {"class": "notice error"});
-                router.navigate('user/profile');
+                document.location.href = "/#user";
+                window.location.reload(true);
             }
         },
 
@@ -47,22 +47,24 @@ define(function (require) {
         doRegister: function () {
 
             var userModel = {
-                "username": this.username,
-                "password": CryptoJS.SHA256(this.username + "|" + this.password).toString(),
-                "email": this.email
+                "username": this.username(),
+                "password": CryptoJS.SHA256(this.username() + "|" + this.password()).toString(),
+                "email": this.email()
             };
             var url = this.urlRoot + '/api/registration';
 
             var that = this;
             return http.post(url, userModel).then(
                 function (response) {
-                    app.showMessage("Welcome, " + that.username() + " (" + that.email() + ")!", "Welcome!", ["Ok"], true, {"class": "notice success"});
                     that.setLoggedIn(true, response);
-                    router.navigate('user/profile');
+                    document.location.href = "/#user";
+                    window.location.reload(true);
                 },
                 function (error) {
-                    app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"});
+                    console.log(error);
                     that.setLoggedIn(false);
+                    document.location.href = "/#user";
+                    window.location.reload(true);
                 });
         }
     };

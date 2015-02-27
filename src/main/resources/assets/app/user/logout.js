@@ -7,8 +7,7 @@ define(function (require) {
         app = require('durandal/app'),
         router = require('plugins/router'),
         system = require('durandal/system'),
-        shell = require('services/shell'),
-        ko = require('knockout');
+        shell = require('services/shell');
 
     return {
         urlRoot: location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : ''),
@@ -22,8 +21,8 @@ define(function (require) {
 
             if (!(userModel.userid && userModel.token)) {
                 this.setLoggedIn(false);
-                app.showMessage("You don't appear to be already logged in.", "Not logged in", ["Ok"], true, {"class": "notice error"});
-                router.navigate('user/user');
+                document.location.href = "/#user";
+                window.location.reload(true);
             }
         },
 
@@ -53,15 +52,12 @@ define(function (require) {
 
             return http.remove(url, '', userModel).then(
                 function (response) {
-                    //
-                    app.showMessage("See you next time!", "You are logged out!", ["Ok"], true, {"class": "notice success"});
                     that.setLoggedIn(false);
-                    router.navigate('user/user');
+                    document.location.href = "/user";
+                    window.location.reload(true);
                 },
                 function (error) {
-                    app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"});
-                    that.setLoggedIn(false);
-                    router.navigate('user/user');
+                    app.showDialog(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"});
                 });
         },
 
@@ -77,15 +73,15 @@ define(function (require) {
             var that = this;
             return http.remove(url, '', userModel).then(
                 function (response) {
-
-                    app.showMessage("Your account has been deleted!", "Bye bye!", ["Ok"], true, {"class": "notice success"});
                     that.setLoggedIn(false);
-                    router.navigate('user/user');
+                    document.location.href = "/#user";
+                    window.location.reload(true);
                 },
                 function (error) {
-                    app.showMessage(error.statusText, error.statusText, ["Ok"], true, {"class": "notice error"});
+                    console.log(error);
                     that.setLoggedIn(false);
-                    router.navigate('user/user');
+                    document.location.href = "/#user";
+                    window.location.reload(true);
                 });
         }
     };

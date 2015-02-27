@@ -14,9 +14,6 @@ define(function (require) {
     return {
         username: ko.observable(),
         password: ko.observable(),
-
-        registerScreen: ko.observable(),
-
         urlRoot: location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : ''),
 
 
@@ -27,13 +24,9 @@ define(function (require) {
             };
 
             if (userModel.userid && userModel.token) {
-                this.setLoggedIn(false);
-                app.showMessage("You appear to be already registered and logged in.", "Already registered", ["Ok"], true, {"class": "notice error"});
-                router.navigate('user/profile');
+                document.location.href = "/#user";
+                window.location.reload(true);
             }
-
-            this.registerScreen = 'user/register';
-
         },
 
         setLoggedIn: function (loggedIn, response) {
@@ -51,8 +44,8 @@ define(function (require) {
 
         doLogin: function () {
             var userModel = {
-                "username": this.username,
-                "password": CryptoJS.SHA256(this.username + "|" + this.password()).toString()
+                "username": this.username(),
+                "password": CryptoJS.SHA256(this.username() + "|" + this.password()).toString()
             };
 
             var url = this.urlRoot + '/api/session';
@@ -61,8 +54,9 @@ define(function (require) {
 
             return http.post(url, userModel).then(
                 function (response) {
-                    app.showMessage("Welcome back, " + that.username() + "!", "Welcome!", ["Ok"], true, {"class": "notice success"});
                     that.setLoggedIn(true, response);
+                    document.location.href = "/#user";
+                    window.location.reload(true);
                 },
                 function (error) {
                     app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"});
