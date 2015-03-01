@@ -20,22 +20,9 @@ define(function (require) {
             };
 
             if (!(userModel.userid && userModel.token)) {
-                this.setLoggedIn(false);
+                app.trigger("loggedin", false);
                 document.location.href = "/#user";
                 window.location.reload(true);
-            }
-        },
-
-        setLoggedIn: function (loggedIn, response) {
-            if (loggedIn) {
-                if (response) {
-                    sessionStorage.setItem("token", response.token);
-                    sessionStorage.setItem("userid", response.userid);
-                }
-            }
-            else {
-                sessionStorage.removeItem("token");
-                sessionStorage.removeItem("userid");
             }
         },
 
@@ -48,11 +35,9 @@ define(function (require) {
 
             var url = this.urlRoot + '/api/session';
 
-            var that = this;
-
             return http.remove(url, '', userModel).then(
                 function (response) {
-                    that.setLoggedIn(false);
+                    app.trigger("loggedin", false);
                     document.location.href = "/user";
                     window.location.reload(true);
                 },
@@ -70,16 +55,15 @@ define(function (require) {
 
             var url = this.urlRoot + '/api/registration';
 
-            var that = this;
             return http.remove(url, '', userModel).then(
                 function (response) {
-                    that.setLoggedIn(false);
+                    app.trigger("loggedin", false);
                     document.location.href = "/#user";
                     window.location.reload(true);
                 },
                 function (error) {
                     console.log(error);
-                    that.setLoggedIn(false);
+                    app.trigger("loggedin", false);
                     document.location.href = "/#user";
                     window.location.reload(true);
                 });

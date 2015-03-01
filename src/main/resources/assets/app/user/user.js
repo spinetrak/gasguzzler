@@ -11,6 +11,19 @@ define(function (require) {
         ko = require('knockout');
 
 
+    var loginStatusSubscription = app.on('loggedin').then(function (loggedin, response) {
+        if (loggedin) {
+            if (response) {
+                sessionStorage.setItem("token", response.token);
+                sessionStorage.setItem("userid", response.userid);
+            }
+        }
+        else {
+            sessionStorage.removeItem("token");
+            sessionStorage.removeItem("userid");
+        }
+    });
+        
     return {
         loginScreen: ko.observable(),
         registerScreen: ko.observable(),

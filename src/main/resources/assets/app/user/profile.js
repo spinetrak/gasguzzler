@@ -27,7 +27,7 @@ define(function (require) {
             };
 
             if (!(userModel.userid && userModel.token)) {
-                this.setLoggedIn(false);
+                app.trigger("loggedin", false);
                 document.location.href = "/#user";
                 window.location.reload(true);
             }
@@ -40,25 +40,11 @@ define(function (require) {
                     that.userid(response.userid);
                     that.username(response.username);
                     that.email(response.email);
-                    that.setLoggedIn(true);
                 },
                 function (error) {
                     app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"});
-                    that.setLoggedIn(false);
+                    app.trigger("loggedin", false);
                 });
-        },
-
-        setLoggedIn: function (loggedIn, response) {
-            if (loggedIn) {
-                if (response) {
-                    sessionStorage.setItem("token", response.token);
-                    sessionStorage.setItem("userid", response.userid);
-                }
-            }
-            else {
-                sessionStorage.removeItem("token");
-                sessionStorage.removeItem("userid");
-            }
         },
 
 
@@ -78,7 +64,6 @@ define(function (require) {
             return http.put(url, userModel, userModel).then(
                 function (response) {
                     app.showMessage("Profile updated for " + that.username() + " (" + that.email() + ")!", "Profile updated!", ["Ok"], true, {"class": "notice success"});
-                    that.setLoggedIn(true);
                 },
                 function (error) {
                     app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"});

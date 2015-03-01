@@ -29,19 +29,6 @@ define(function (require) {
             }
         },
 
-        setLoggedIn: function (loggedIn, response) {
-            if (loggedIn) {
-                if (response) {
-                    sessionStorage.setItem("token", response.token);
-                    sessionStorage.setItem("userid", response.userid);
-                }
-            }
-            else {
-                sessionStorage.removeItem("token");
-                sessionStorage.removeItem("userid");
-            }
-        },
-
         doLogin: function () {
             var userModel = {
                 "username": this.username(),
@@ -50,17 +37,15 @@ define(function (require) {
 
             var url = this.urlRoot + '/api/session';
 
-            var that = this;
-
             return http.post(url, userModel).then(
                 function (response) {
-                    that.setLoggedIn(true, response);
+                    app.trigger("loggedin", true, response);
                     document.location.href = "/#user";
                     window.location.reload(true);
                 },
                 function (error) {
                     app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"});
-                    that.setLoggedIn(false);
+                    app.trigger("loggedin", false);
                 });
         }
     };
