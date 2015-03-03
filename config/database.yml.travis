@@ -1,0 +1,5 @@
+database:
+  driverClass: org.postgresql.Driver
+  user: gasguzzler
+  password: gasguzzler
+  url: jdbc:postgresql://localhost/gasguzzlerdb
