@@ -15,7 +15,7 @@ define(function (require) {
         username: ko.observable(),
         email: ko.observable(),
         password: ko.observable(),
-        logoutScreen: ko.observable('user/delete'),
+        logoutScreen: ko.observable('user/logout'),
         
         urlRoot: location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : ''),
 

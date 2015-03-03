@@ -36,8 +36,8 @@ define(function (require) {
                 this.registerScreen('');
             }
             else {
-                this.loginScreen('user/create');
-                this.registerScreen('user/create');
+                this.loginScreen('user/login');
+                this.registerScreen('user/register');
                 this.profileScreen('');
             }
         }
