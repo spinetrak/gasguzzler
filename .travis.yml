@@ -8,6 +8,8 @@ language: java
 
 script: mvn test
 
+services: postgresql
+
 addons:
   coverity_scan:
     project:
@@ -18,5 +20,9 @@ addons:
     build_command:   "mvn -DskipTests=true compile"
     branch_pattern: coverity_scan
 
+before_script:
+  - psql -c 'create database gasguzzlerdb;' -U gasguzzler
+  - psql -f ./setup_postgres.sql
+  
 after_success:
   - mvn clean cobertura:cobertura coveralls:report
