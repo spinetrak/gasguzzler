@@ -5,145 +5,142 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import io.dropwizard.testing.junit.ResourceTestRule;
 import net.spinetrak.gasguzzler.core.User;
 import net.spinetrak.gasguzzler.core.UserTest;
+import net.spinetrak.gasguzzler.dao.SessionDAO;
+import net.spinetrak.gasguzzler.dao.UserDAO;
 import net.spinetrak.gasguzzler.security.Authenticator;
 import net.spinetrak.gasguzzler.security.SecurityProvider;
-import org.junit.ClassRule;
+import net.spinetrak.gasguzzler.security.Session;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
 import java.util.List;
 
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.*;
 
 public class UserResourceTest
 {
-
-  @ClassRule
-  public static final ResourceTestRule resources = ResourceTestRule.builder()
-    .addResource(new UserResource())
-    .addProvider(new SecurityProvider<>(new Authenticator()))
+  private final Session session = new Session(0, "token");
+  private final User user = UserTest.getUser();
+  private SessionDAO _sessionDAO = mock(SessionDAO.class);
+  private UserDAO _userDAO = mock(UserDAO.class);
+  @Rule
+  public ResourceTestRule resources = ResourceTestRule.builder()
+    .addResource(new UserResource(
+      _userDAO,
+      _sessionDAO))
+    .addProvider(new SecurityProvider<>(new Authenticator(_sessionDAO)))
     .build();
 
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
-
-  @Test()
-  public void delete() throws Exception
+  @Test
+  public void create()
   {
-    resources.client().resource("/user/test1").delete();
+    when(_sessionDAO.findSession(0, "token")).thenReturn(session);
+    when(_userDAO.findUsersByUsernameOrEmail(anyString(), anyString())).thenReturn(new ArrayList<User>());
+    when(_userDAO.findUserByUsernameAndPassword(anyString(), anyString())).thenReturn(user);
+
+    //TODO
+    assertThat(resources.client().resource("/user")
+                 .type(MediaType.APPLICATION_JSON)
+                 .post(Session.class, UserTest.getUser())).isNotEqualTo(session);
   }
 
   @Test
-  public void get() throws Exception
+  public void delete()
   {
-    try
-    {
-      resources.client().resource("/user/test1").header(SecurityProvider.TOKEN, "token").header(
-        SecurityProvider.USERID, "1").get(User.class);
+    when(_sessionDAO.findSession(0, "token")).thenReturn(session);
 
+    resources.client().resource("/user/0").header(SecurityProvider.TOKEN, "token").header(
+      SecurityProvider.USERID, "0").type(MediaType.APPLICATION_JSON_TYPE).delete(user);
 
-      fail("Should have thrown 401");
-    }
-    catch (UniformInterfaceException ex)
-    {
-      assertEquals(ex.getResponse().getStatus(), 401);
-    }
+    verify(_sessionDAO, times(2)).findSession(0, "token");
   }
 
   @Test
-  public void getAll() throws Exception
+  public void get()
+  {
+    when(_userDAO.findUser(0)).thenReturn(user);
+    when(_sessionDAO.findSession(0, "token")).thenReturn(session);
+
+    assertThat(resources.client().resource("/user/0").header(SecurityProvider.TOKEN, "token").header(
+      SecurityProvider.USERID, "0").type(MediaType.APPLICATION_JSON_TYPE).get(User.class)).isEqualTo(user);
+  }
+
+  @Test
+  public void getAll()
+  {
+    when(_sessionDAO.findSession(0, "Admintoken")).thenReturn(session);
+
+    resources.client().resource("/user")
+      .header(SecurityProvider.TOKEN, "Admintoken").header(SecurityProvider.USERID, "0").type(
+      MediaType.APPLICATION_JSON_TYPE)
+      .get(new GenericType<List<User>>()
+      {
+      });
+  }
+
+  @Test
+  public void getAllThrows401WhenNotAdminRole()
   {
     try
     {
+      when(_sessionDAO.findSession(0, "token")).thenReturn(session);
+
       resources.client().resource("/user")
-        .header(SecurityProvider.TOKEN, "token").header(SecurityProvider.USERID, "1")
+        .header(SecurityProvider.TOKEN, "token").header(SecurityProvider.USERID, "0").type(
+        MediaType.APPLICATION_JSON_TYPE)
         .get(new GenericType<List<User>>()
         {
         });
-
-      fail("Should have thrown 401");
     }
-    catch (UniformInterfaceException ex)
+    catch (UniformInterfaceException ex_)
     {
-      assertEquals(ex.getResponse().getStatus(), 401);
+      assertEquals("Client response status: 401", ex_.getMessage());
     }
   }
 
-  @Test
-  public void getAllThrows401WhenNotAuthenticatedToken() throws Exception
+  @Before
+  public void setup()
   {
-    try
-    {
-      resources.client().resource("/user").header(SecurityProvider.TOKEN, "token").header(SecurityProvider.USERID, "1")
-        .get(new GenericType<List<User>>()
-        {
-        });
-
-      fail("Should have thrown 401");
-    }
-    catch (UniformInterfaceException ex)
-    {
-      assertEquals(ex.getResponse().getStatus(), 401);
-    }
+    user.setUserid(1);
+    user.setRole(User.ROLE_ADMIN);
   }
 
   @Test
-  public void getAllThrows401WhenPrincipalNotDisplayRoleAdmin() throws Exception
+  public void update()
   {
-    try
-    {
-      resources.client().resource("/user")
-        .header(SecurityProvider.TOKEN, "token").header(SecurityProvider.USERID, "1")
-        .get(new GenericType<List<User>>()
-        {
-        });
+    when(_sessionDAO.findSession(0, "token")).thenReturn(session);
 
-      fail("Should have thrown 401");
-    }
-    catch (UniformInterfaceException ex)
-    {
-      assertEquals(ex.getResponse().getStatus(), 401);
-    }
+    assertThat(resources.client().resource("/user/0").header(SecurityProvider.TOKEN, "token").header(
+      SecurityProvider.USERID, "0")
+                 .type(MediaType.APPLICATION_JSON)
+                 .put(User.class, UserTest.getUser())).isEqualTo(UserTest.getUser());
   }
 
   @Test
-  public void update() throws Exception
+  public void updateInvalidUser()
   {
-    User user = UserTest.getUser();
-
     try
     {
-      resources.client().resource("/user/test1").header(SecurityProvider.TOKEN, "token").header(
+      when(_sessionDAO.findSession(1, "token")).thenReturn(session);
+
+      User user = UserTest.getUser();
+
+      User updatedUser = resources.client().resource("/user/1").header(SecurityProvider.TOKEN, "token").header(
         SecurityProvider.USERID, "1")
         .type(MediaType.APPLICATION_JSON)
         .put(User.class, user);
 
-      fail("Should have thrown 401");
+      fail("Updated user should be invalid " + updatedUser);
     }
-    catch (UniformInterfaceException ex)
+    catch (UniformInterfaceException ex_)
     {
-      assertEquals(ex.getResponse().getStatus(), 401);
-    }
-  }
-
-  @Test
-  public void update_invalid_user() throws Exception
-  {
-    expectedException.expect(UniformInterfaceException.class);
-
-    User user = UserTest.getUser().setUsername("");
-
-    User updatedUser = resources.client().resource("/user/test1").header(SecurityProvider.TOKEN, "token").header(
-      SecurityProvider.USERID, "1")
-      .type(MediaType.APPLICATION_JSON)
-      .put(User.class, user);
-
-    if (updatedUser != null)
-    {
-      fail("Expected Exception");
+      assertEquals("Client response status: 401", ex_.getMessage());
     }
   }
 }

@@ -22,6 +22,11 @@ public interface UserDAO
   @Mapper(UserMapper.class)
   List<User> findAll();
 
+  @SqlQuery("select salt from st_user where username = :username")
+  String findSalt(
+    @Bind("username") String username
+  );
+
   @SqlQuery("select * from st_user where userid = :userid limit 1")
   @Mapper(UserMapper.class)
   User findUser(
@@ -40,11 +45,6 @@ public interface UserDAO
   List<User> findUsersByUsernameOrEmail(
     @Bind("username") String username
     , @Bind("email") String email
-  );
-
-  @SqlQuery("select salt from st_user where username = :username")
-  String getSalt(
-    @Bind("username") String username
   );
 
   @SqlUpdate("insert into st_user (username, password, email, role, salt, created, updated) values (:username, :password, :email, :role, :salt, :created, :updated)")

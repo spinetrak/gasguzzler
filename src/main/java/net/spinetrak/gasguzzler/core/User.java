@@ -32,82 +32,7 @@ public class User
   @NotEmpty
   @JsonProperty
   private String role;
-
-  public String getToken()
-  {
-    return token;
-  }
-
-  public void setToken(final String token_)
-  {
-    token = token_;
-  }
-
   private String token;
-
-  public int getUserid()
-  {
-    return userid;
-  }
-
-  public void setUserid(final int userid_)
-  {
-    userid = userid_;
-  }
-
-  public String getSalt()
-  {
-    return salt;
-  }
-
-  public void setSalt(final String salt_)
-  {
-    salt = salt_;
-  }
-  
-  public String getUsername()
-  {
-    return username;
-  }
-
-  public User setUsername(String username)
-  {
-    this.username = username;
-    return this;
-  }
-
-  public String getPassword()
-  {
-    return password;
-  }
-
-  public User setPassword(String password)
-  {
-    this.password = password;
-    return this;
-  }
-
-  public String getEmail()
-  {
-    return email;
-  }
-
-  public User setEmail(String email)
-  {
-    this.email = email;
-    return this;
-  }
-
-  public String getRole()
-  {
-    return role;
-  }
-
-  public User setRole(String displayRole)
-  {
-    this.role = displayRole;
-    return this;
-  }
 
   @Override
   public boolean equals(Object o)
@@ -123,11 +48,11 @@ public class User
 
     User that = (User) o;
 
-    if (!getUsername().equals(that.getUsername()))
+    if (getUserid() != that.getUserid())
     {
       return false;
     }
-    if (!getPassword().equals(that.getPassword()))
+    if (!getUsername().equals(that.getUsername()))
     {
       return false;
     }
@@ -141,5 +66,79 @@ public class User
     }
 
     return true;
+  }
+
+  public String getEmail()
+  {
+    return email;
+  }
+
+  public User setEmail(String email)
+  {
+    this.email = email;
+    return this;
+  }
+
+  public String getPassword()
+  {
+    return password;
+  }
+
+  public User setPassword(String password)
+  {
+    this.password = password;
+    return this;
+  }
+
+  public String getRole()
+  {
+    return role;
+  }
+
+  public User setRole(String displayRole)
+  {
+    this.role = displayRole;
+    return this;
+  }
+
+  public String getSalt()
+  {
+    return salt;
+  }
+
+  public void setSalt(final String salt_)
+  {
+    salt = salt_;
+  }
+
+  public String getToken()
+  {
+    return token;
+  }
+
+  public void setToken(final String token_)
+  {
+    token = token_;
+  }
+
+  public int getUserid()
+  {
+    return userid;
+  }
+
+  public void setUserid(final int userid_)
+  {
+    userid = userid_;
+  }
+
+  public String getUsername()
+  {
+    return username;
+  }
+
+  public User setUsername(String username)
+  {
+    this.username = username;
+    return this;
   }
 }

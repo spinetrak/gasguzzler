@@ -1,52 +1,101 @@
 package net.spinetrak.gasguzzler.resources;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import io.dropwizard.auth.Auth;
 import net.spinetrak.gasguzzler.core.User;
+import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
 import net.spinetrak.gasguzzler.security.Authenticator;
+import net.spinetrak.gasguzzler.security.Session;
 
-import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 @Path("/user")
+@JsonAutoDetect
+@Produces(MediaType.APPLICATION_JSON)
 @Consumes({MediaType.APPLICATION_JSON})
-@Produces({MediaType.APPLICATION_JSON})
 public class UserResource
 {
-  private UserDAO _userDAO;
+  private UserDAO userDAO;
+  private SessionDAO sessionDAO;
 
-  protected UserResource()
-  {
-  }
-
-  public UserResource(UserDAO userDAO_)
+  public UserResource(UserDAO userDAO_, SessionDAO sessionDAO_)
   {
     super();
-    _userDAO = userDAO_;
+    userDAO = userDAO_;
+    sessionDAO = sessionDAO_;
   }
 
   @POST
-  public User add(@Valid User user)
+  public Session create(User user)
   {
-    return user;
+    if (null == user)
+    {
+      throw new WebApplicationException(Response.Status.BAD_REQUEST);
+    }
+
+    if (!userDAO.findUsersByUsernameOrEmail(user.getUsername(), user.getEmail()).isEmpty())
+    {
+      throw new WebApplicationException(Response.Status.NOT_ACCEPTABLE);
+    }
+
+    try
+    {
+      final String salt = Authenticator.getSalt();
+      final String password = Authenticator.getSecurePassword(user.getPassword(), salt);
+
+      user.setSalt(salt);
+      user.setPassword(password);
+
+      user.setRole(User.ROLE_USER);
+      userDAO.insert(user.getUsername(), user.getPassword(), user.getEmail(), user.getSalt(), user.getRole(),
+                     new Date(),
+                     new Date());
+
+      final User u = userDAO.findUserByUsernameAndPassword(user.getUsername(), user.getPassword());
+
+      Session session = new Session(u.getUserid());
+      sessionDAO.insert(session.getUserid(), session.getToken(), new java.util.Date());
+
+      return session;
+    }
+    catch (WebApplicationException ex)
+    {
+      throw ex;
+    }
+    catch (Exception ex)
+    {
+      throw new WebApplicationException(ex, Response.Status.INTERNAL_SERVER_ERROR);
+    }
   }
 
   @DELETE
   @Path("/{userid}")
-  public void delete(@PathParam("userid") String userid)
+  public void delete(@PathParam("userid") int userid, @Auth User user)
   {
+    if ((userid != user.getUserid()) && !user.getRole().equals(User.ROLE_ADMIN))
+    {
+      throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+    }
+    if (null != sessionDAO.findSession(user.getUserid(), user.getToken()))
+    {
+      sessionDAO.delete(user.getUserid());
+    }
+    if (null != userDAO.findUser(user.getUserid()))
+    {
+      userDAO.delete(user.getUserid());
+    }
   }
 
   @GET
   @Path("/{userid}")
   public User get(@Auth User user, @PathParam("userid") int userid)
   {
-    final User u = _userDAO.findUser(userid);
+    final User u = userDAO.findUser(userid);
     if (u.getUserid() != userid)
     {
       u.setEmail("private");
@@ -54,10 +103,6 @@ public class UserResource
     return u;
   }
 
-  /*
-  * Using the Auth attribute will use the injected provider to authenticate all requests to this path
-  * You can also use the principal to apply authorisation in code dynamically
-   */
   @GET
   public List<User> getAll(@Auth User principal)
   {
@@ -67,36 +112,34 @@ public class UserResource
       throw new WebApplicationException(Response.Status.UNAUTHORIZED);
     }
 
-    List<User> users = new LinkedList<>();
-    users.add(
-      new User()
-        .setUsername("user1")
-        .setRole("Admin")
-    );
-    users.add(
-      new User()
-        .setUsername("user2")
-        .setRole("DBA")
-    );
-
-    return users;
+    return userDAO.findAll();
   }
 
   @PUT
   @Path("/{userid}")
-  public User update(@PathParam("userid") String userid, @Auth User current, User modified)
+  public User update(@PathParam("userid") int userid, @Auth User current, User modified)
   {
     try
     {
+      if ((userid != modified.getUserid() || userid != current.getUserid()) && (null != current.getRole() && !current.getRole().equals(
+        User.ROLE_ADMIN)))
+      {
+        throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+      }
+      
       final String salt = Authenticator.getSalt();
       final String password = Authenticator.getSecurePassword(modified.getPassword(), salt);
 
       modified.setSalt(salt);
       modified.setPassword(password);
-      _userDAO.update(modified.getUsername(), modified.getPassword(), modified.getEmail(), modified.getSalt(),
+      userDAO.update(modified.getUsername(), modified.getPassword(), modified.getEmail(), modified.getSalt(),
                       new Date(),
                       modified.getUserid());
       return modified;
+    }
+    catch (WebApplicationException ex)
+    {
+      throw ex;
     }
     catch (Exception ex)
     {

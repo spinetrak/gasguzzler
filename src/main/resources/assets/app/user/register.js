@@ -38,7 +38,7 @@ define(function (require) {
                 "password": CryptoJS.SHA256(this.username() + "|" + this.password()).toString(),
                 "email": this.email()
             };
-            var url = this.urlRoot + '/api/registration';
+            var url = this.urlRoot + '/api/user';
 
             return http.post(url, userModel).then(
                 function (response) {

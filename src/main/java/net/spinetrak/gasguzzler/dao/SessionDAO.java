@@ -1,8 +1,11 @@
 package net.spinetrak.gasguzzler.dao;
 
+import net.spinetrak.gasguzzler.core.SessionMapper;
+import net.spinetrak.gasguzzler.security.Session;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
+import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
 
 public interface SessionDAO
 {
@@ -16,8 +19,9 @@ public interface SessionDAO
     @Bind("userid") int userid
   );
 
-  @SqlQuery("select token from st_session where userid = :userid and token = :token limit 1")
-  String findSession(
+  @SqlQuery("select userid, token from st_session where userid = :userid and token = :token limit 1")
+  @Mapper(SessionMapper.class)
+  Session findSession(
     @Bind("userid") int userid, @Bind("token") String token
   );
 

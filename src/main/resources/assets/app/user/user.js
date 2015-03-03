@@ -30,15 +30,14 @@ define(function (require) {
         profileScreen: ko.observable(),
         
         activate: function () {
-
             if (sessionStorage.getItem("userid") && sessionStorage.getItem("token")) {
                 this.profileScreen('user/profile');
                 this.loginScreen('');
                 this.registerScreen('');
             }
             else {
-                this.loginScreen('user/login');
-                this.registerScreen('user/register');
+                this.loginScreen('user/create');
+                this.registerScreen('user/create');
                 this.profileScreen('');
             }
         }

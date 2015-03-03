@@ -29,20 +29,32 @@ public class SecurityProvider<T> implements InjectableProvider<Auth, Parameter>
   public final static String TOKEN = "token";
   public final static String USERID = "userid";
 
-  private final Authenticator<Credentials, T> authenticator;
+  private final Authenticator<Session, T> authenticator;
 
-  public SecurityProvider(Authenticator<Credentials, T> authenticator)
+  public SecurityProvider(Authenticator<Session, T> authenticator)
   {
     this.authenticator = authenticator;
+  }
+
+  @Override
+  public Injectable getInjectable(ComponentContext ic, Auth auth, Parameter parameter)
+  {
+    return new SecurityInjectable<>(authenticator, auth.required());
+  }
+
+  @Override
+  public ComponentScope getScope()
+  {
+    return ComponentScope.PerRequest;
   }
 
   private static class SecurityInjectable<T> extends AbstractHttpContextInjectable<T>
   {
 
-    private final Authenticator<Credentials, T> authenticator;
+    private final Authenticator<Session, T> authenticator;
     private final boolean required;
 
-    private SecurityInjectable(Authenticator<Credentials, T> authenticator, boolean required)
+    private SecurityInjectable(Authenticator<Session, T> authenticator, boolean required)
     {
       this.authenticator = authenticator;
       this.required = required;
@@ -58,7 +70,7 @@ public class SecurityProvider<T> implements InjectableProvider<Auth, Parameter>
       {
         if (token != null && userid != null)
         {
-          final Optional<T> result = authenticator.authenticate(new Credentials(Integer.parseInt(userid),token));
+          final Optional<T> result = authenticator.authenticate(new Session(Integer.parseInt(userid), token));
           if (result.isPresent())
           {
             return result.get();
@@ -81,17 +93,5 @@ public class SecurityProvider<T> implements InjectableProvider<Auth, Parameter>
 
       return null;
     }
-  }
-
-  @Override
-  public ComponentScope getScope()
-  {
-    return ComponentScope.PerRequest;
-  }
-
-  @Override
-  public Injectable getInjectable(ComponentContext ic, Auth auth, Parameter parameter)
-  {
-    return new SecurityInjectable<T>(authenticator, auth.required());
   }
 }

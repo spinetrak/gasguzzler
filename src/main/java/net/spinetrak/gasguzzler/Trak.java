@@ -8,8 +8,6 @@ import io.dropwizard.setup.Environment;
 import io.dropwizard.views.ViewBundle;
 import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
-import net.spinetrak.gasguzzler.resources.RegistrationResource;
-import net.spinetrak.gasguzzler.resources.SessionResource;
 import net.spinetrak.gasguzzler.resources.UserResource;
 import net.spinetrak.gasguzzler.security.Authenticator;
 import net.spinetrak.gasguzzler.security.SecurityProvider;
@@ -33,7 +31,7 @@ public class Trak extends Application<TrakConfiguration>
   @Override
   public String getName()
   {
-    return "spinetrak";
+    return "gasguzzler";
   }
 
   @Override
@@ -52,13 +50,11 @@ public class Trak extends Application<TrakConfiguration>
                   Environment environment) throws ClassNotFoundException
   {
     final DBIFactory factory = new DBIFactory();
-    final DBI jdbi = factory.build(environment, configuration.getDataSourceFactory(), "mysql");
+    final DBI jdbi = factory.build(environment, configuration.getDataSourceFactory(), "postgres");
     final UserDAO userDAO = jdbi.onDemand(UserDAO.class);
     final SessionDAO sessionDAO = jdbi.onDemand(SessionDAO.class);
     environment.jersey().setUrlPattern("/api/*");
-    environment.jersey().register(new UserResource(userDAO));
-    environment.jersey().register(new SessionResource(userDAO,sessionDAO));
-    environment.jersey().register(new RegistrationResource(userDAO,sessionDAO));
+    environment.jersey().register(new UserResource(userDAO, sessionDAO));
     environment.jersey().register(new SecurityProvider<>(new Authenticator(sessionDAO)));
   }
 }

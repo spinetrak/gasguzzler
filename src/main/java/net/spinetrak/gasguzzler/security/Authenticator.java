@@ -13,7 +13,7 @@ import java.security.SecureRandom;
  * This is an example authenticator that takes the credentials extracted from the request by the SecurityProvider
  * and authenticates the principle
  */
-public class Authenticator implements io.dropwizard.auth.Authenticator<Credentials, User>
+public class Authenticator implements io.dropwizard.auth.Authenticator<Session, User>
 {
 
   private SessionDAO sessionDAO;
@@ -37,51 +37,41 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<Credentia
     sr.nextBytes(salt);
     //return salt
     return new String(salt);
-
   }
 
-  public static String getSecurePassword(String passwordToHash, String salt)
+  public static String getSecurePassword(String passwordToHash, String salt) throws NoSuchAlgorithmException
   {
-    String generatedPassword = null;
-    try
+    // Create MessageDigest instance for MD5
+    MessageDigest md = MessageDigest.getInstance("SHA-256");
+    //Add password bytes to digest
+    md.update(salt.getBytes());
+    //Get the hash's bytes
+    byte[] bytes = md.digest(passwordToHash.getBytes());
+    //This bytes[] has bytes in decimal format;
+    //Convert it to hexadecimal format
+    StringBuilder sb = new StringBuilder();
+    for (final byte aByte : bytes)
     {
-      // Create MessageDigest instance for MD5
-      MessageDigest md = MessageDigest.getInstance("SHA-256");
-      //Add password bytes to digest
-      md.update(salt.getBytes());
-      //Get the hash's bytes
-      byte[] bytes = md.digest(passwordToHash.getBytes());
-      //This bytes[] has bytes in decimal format;
-      //Convert it to hexadecimal format
-      StringBuilder sb = new StringBuilder();
-      for (final byte aByte : bytes)
-      {
-        sb.append(Integer.toString((aByte & 0xff) + 0x100, 16).substring(1));
-      }
-      //Get complete hashed password in hex format
-      generatedPassword = sb.toString();
+      sb.append(Integer.toString((aByte & 0xff) + 0x100, 16).substring(1));
     }
-    catch (NoSuchAlgorithmException e)
-    {
-      e.printStackTrace();
-    }
-    return generatedPassword;
+    //Get complete hashed password in hex format
+    return sb.toString();
   }
 
   @Override
-  public Optional<User> authenticate(Credentials credentials) throws AuthenticationException
+  public Optional<User> authenticate(Session session_) throws AuthenticationException
   {
-    if ((null == credentials) || (null == sessionDAO) || (null == sessionDAO.findSession(credentials.getUserid(),
-                                                                                         credentials.getToken())))
+    if ((null == session_) || (null == sessionDAO) || (null == sessionDAO.findSession(session_.getUserid(),
+                                                                                      session_.getToken())))
     {
       throw new AuthenticationException("Invalid credentials");
     }
     else
     {
       final User user = new User();
-      user.setUserid(credentials.getUserid());
-      user.setToken(credentials.getToken());
-      user.setRole(credentials.getToken().contains("Admin") ? User.ROLE_ADMIN : User.ROLE_USER);
+      user.setUserid(session_.getUserid());
+      user.setToken(session_.getToken());
+      user.setRole(session_.getToken().contains("Admin") ? User.ROLE_ADMIN : User.ROLE_USER);
 
       return Optional.fromNullable(user);
     }

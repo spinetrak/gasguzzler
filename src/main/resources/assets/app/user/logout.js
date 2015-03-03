@@ -38,7 +38,7 @@ define(function (require) {
             return http.remove(url, '', userModel).then(
                 function (response) {
                     app.trigger("loggedin", false);
-                    document.location.href = "/user";
+                    document.location.href = "/#user";
                     window.location.reload(true);
                 },
                 function (error) {
@@ -53,7 +53,7 @@ define(function (require) {
                 "token": sessionStorage.getItem("token")
             };
 
-            var url = this.urlRoot + '/api/registration';
+            var url = this.urlRoot + '/api/user/' + userModel.userid;
 
             return http.remove(url, '', userModel).then(
                 function (response) {
