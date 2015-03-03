@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS st_user CASCADE;
+DROP TABLE IF EXISTS gasguzzlerdb.public.st_user CASCADE;
 CREATE TABLE st_user
 (
   userid   SERIAL PRIMARY KEY NOT NULL,
@@ -6,11 +6,13 @@ CREATE TABLE st_user
   password VARCHAR(100)       NOT NULL,
   email    VARCHAR(100)       NOT NULL,
   salt     VARCHAR(100)       NOT NULL,
-  role     VARCHAR(100)       NOT NULL
+  role    VARCHAR(100) NOT NULL,
+  created TIMESTAMP    NOT NULL,
+  updated TIMESTAMP    NOT NULL
 );
 
 
-DROP TABLE IF EXISTS st_session CASCADE;
+DROP TABLE IF EXISTS gasguzzlerdb.public.st_session CASCADE;
 CREATE TABLE st_session
 (
   token   VARCHAR(23) PRIMARY KEY NOT NULL,
