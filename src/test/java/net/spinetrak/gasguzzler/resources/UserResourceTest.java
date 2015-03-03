@@ -44,10 +44,11 @@ public class UserResourceTest
     when(_userDAO.findUsersByUsernameOrEmail(anyString(), anyString())).thenReturn(new ArrayList<User>());
     when(_userDAO.findUserByUsernameAndPassword(anyString(), anyString())).thenReturn(user);
 
-    //TODO
-    assertThat(resources.client().resource("/user")
-                 .type(MediaType.APPLICATION_JSON)
-                 .post(Session.class, UserTest.getUser())).isNotEqualTo(session);
+    final Session mysession = resources.client().resource("/user")
+      .type(MediaType.APPLICATION_JSON)
+      .post(Session.class, UserTest.getUser());
+    assertThat(mysession).isNotEqualTo(session);
+    assertThat(mysession.getUserid()).isEqualTo(session.getUserid());
   }
 
   @Test
@@ -107,7 +108,6 @@ public class UserResourceTest
   @Before
   public void setup()
   {
-    user.setUserid(1);
     user.setRole(User.ROLE_ADMIN);
   }
 
@@ -127,12 +127,12 @@ public class UserResourceTest
   {
     try
     {
-      when(_sessionDAO.findSession(1, "token")).thenReturn(session);
+      when(_sessionDAO.findSession(0, "token")).thenReturn(session);
 
       User user = UserTest.getUser();
 
       User updatedUser = resources.client().resource("/user/1").header(SecurityProvider.TOKEN, "token").header(
-        SecurityProvider.USERID, "1")
+        SecurityProvider.USERID, "0")
         .type(MediaType.APPLICATION_JSON)
         .put(User.class, user);
 
