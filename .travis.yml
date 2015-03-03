@@ -21,9 +21,9 @@ addons:
     branch_pattern: coverity_scan
 
 before_script:
-  - psql -c "CREATE DATABASE gasguzzlerdb;" -U postgres
   - psql -c "CREATE USER gasguzzler WITH PASSWORD 'gasguzzler';" -U postgres
-  - psql -f ./setup_postgres.sql
+  - psql -c "CREATE DATABASE gasguzzlerdb OWNER gasguzzler;" -U postgres
+  - psql -U postgres -d gasguzzlerdb -f ./setup_postgres.sql
   
 after_success:
   - mvn clean cobertura:cobertura coveralls:report
