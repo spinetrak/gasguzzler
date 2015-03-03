@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS gasguzzlerdb.public.st_user CASCADE;
-CREATE TABLE gasguzzlerdb.public.st_user
+DROP TABLE IF EXISTS st_user CASCADE;
+CREATE TABLE st_user
 (
   userid   SERIAL PRIMARY KEY NOT NULL,
   username VARCHAR(100)       NOT NULL,
@@ -10,8 +10,8 @@ CREATE TABLE gasguzzlerdb.public.st_user
 );
 
 
-DROP TABLE IF EXISTS gasguzzlerdb.public.st_session CASCADE;
-CREATE TABLE gasguzzlerdb.public.st_session
+DROP TABLE IF EXISTS st_session CASCADE;
+CREATE TABLE st_session
 (
   token   VARCHAR(23) PRIMARY KEY NOT NULL,
   userid  INT,
