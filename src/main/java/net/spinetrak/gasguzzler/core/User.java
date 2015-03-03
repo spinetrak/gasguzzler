@@ -60,10 +60,6 @@ public class User
     {
       return false;
     }
-    if (!getRole().equals(that.getRole()))
-    {
-      return false;
-    }
 
     return true;
   }

@@ -1,9 +1,12 @@
 package net.spinetrak.gasguzzler.dao;
 
+import io.dropwizard.testing.junit.DropwizardAppRule;
+import net.spinetrak.gasguzzler.Trak;
+import net.spinetrak.gasguzzler.TrakConfiguration;
 import net.spinetrak.gasguzzler.core.User;
-import org.junit.Before;
+import net.spinetrak.gasguzzler.core.UserTest;
+import org.junit.ClassRule;
 import org.junit.Test;
-import org.skife.jdbi.v2.DBI;
 
 import java.util.Date;
 import java.util.List;
@@ -16,18 +19,16 @@ import static org.junit.Assert.assertTrue;
  */
 public class UserDAOTest
 {
-  private UserDAO _userDAO;
-
+  @ClassRule
+  public static final DropwizardAppRule<TrakConfiguration> RULE =
+    new DropwizardAppRule<>(Trak.class, "config-test.yml");
+  private UserDAO _userDAO = (UserDAO) RULE.getConfiguration().getDAO("userDAO");
+  
   @Test
   public void createReadUpdateDelete()
   {
-    final User user = new User();
-    user.setUsername("username");
-    user.setPassword("pwd");
-    user.setToken("token");
-    user.setEmail("a@b.c");
+    final User user = UserTest.getUser();
     user.setSalt("salt");
-    user.setRole(User.ROLE_USER);
 
     _userDAO.insert(user.getUsername(), user.getPassword(), user.getEmail(), user.getSalt(), user.getRole(), new Date(),
                     new Date());
@@ -55,12 +56,5 @@ public class UserDAOTest
     {
       _userDAO.delete(x.getUserid());
     }
-  }
-
-  @Before
-  public void setup()
-  {
-    DBI dbi = new DBI("jdbc:postgresql://localhost/gasguzzlerdb", "gasguzzler", "gasguzzler");
-    _userDAO = dbi.onDemand(UserDAO.class);
   }
 }

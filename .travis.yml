@@ -21,8 +21,8 @@ addons:
     branch_pattern: coverity_scan
 
 before_script:
-  - psql -c "CREATE USER gasguzzler WITH PASSWORD 'gasguzzler';" -U postgres
-  - psql -c "CREATE DATABASE gasguzzlerdb OWNER gasguzzler;" -U postgres
+  - cp config/config-test.yml.travis config-test.yml
+  - psql -c "CREATE DATABASE gasguzzlerdb;" -U postgres
   - psql -U postgres -d gasguzzlerdb -f ./setup_postgres.sql
   
 after_success:

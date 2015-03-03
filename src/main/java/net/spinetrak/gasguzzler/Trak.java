@@ -49,10 +49,13 @@ public class Trak extends Application<TrakConfiguration>
   public void run(TrakConfiguration configuration,
                   Environment environment) throws ClassNotFoundException
   {
-    final DBIFactory factory = new DBIFactory();
-    final DBI jdbi = factory.build(environment, configuration.getDataSourceFactory(), "postgres");
+    final DBI jdbi = new DBIFactory().build(environment, configuration.getDataSourceFactory(), "postgres");
     final UserDAO userDAO = jdbi.onDemand(UserDAO.class);
     final SessionDAO sessionDAO = jdbi.onDemand(SessionDAO.class);
+
+    configuration.addDAO("userDAO", userDAO);
+    configuration.addDAO("sessionDAO", sessionDAO);
+    environment.jersey().register(sessionDAO);
     environment.jersey().setUrlPattern("/api/*");
     environment.jersey().register(new UserResource(userDAO, sessionDAO));
     environment.jersey().register(new SecurityProvider<>(new Authenticator(sessionDAO)));

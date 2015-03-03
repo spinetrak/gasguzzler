@@ -3,32 +3,35 @@ package net.spinetrak.gasguzzler.security;
 import com.google.common.base.Optional;
 import io.dropwizard.auth.AuthenticationException;
 import net.spinetrak.gasguzzler.core.User;
+import net.spinetrak.gasguzzler.core.UserTest;
 import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
-import org.junit.Before;
 import org.junit.Test;
-import org.skife.jdbi.v2.DBI;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class AuthenticatorTest
 {
-  private UserDAO _userDAO;
-  private SessionDAO _sessionDAO;
-  private User _user;
+  private SessionDAO _sessionDAO = mock(SessionDAO.class);
+  private UserDAO _userDAO = mock(UserDAO.class);
+  private User _user = UserTest.getUser();
 
   @Test
   public void authenticateReturnsUserForValidSession() throws AuthenticationException
   {
-    User user = null;
     try
     {
+      when(_userDAO.findUserByUsernameAndPassword(anyString(), anyString())).thenReturn(_user);
+
       _userDAO.insert(_user.getUsername(), _user.getPassword(), _user.getEmail(), _user.getSalt(), _user.getRole(),
                       new Date(), new Date());
-      user = _userDAO.findUserByUsernameAndPassword(_user.getUsername(), _user.getPassword());
+      final User user = _userDAO.findUserByUsernameAndPassword(_user.getUsername(), _user.getPassword());
 
       final Session session = new Session(user.getUserid());
       _sessionDAO.insert(session.getUserid(), session.getToken(), new Date());
@@ -46,14 +49,6 @@ public class AuthenticatorTest
     catch (AuthenticationException ex)
     {
       assertEquals(ex.getMessage(), "Invalid credentials");
-    }
-    finally
-    {
-      if (user != null)
-      {
-        _sessionDAO.delete(user.getUserid());
-        _userDAO.delete(user.getUserid());
-      }
     }
   }
 
@@ -101,20 +96,5 @@ public class AuthenticatorTest
     }
 
 
-  }
-
-  @Before
-  public void setup()
-  {
-    DBI dbi = new DBI("jdbc:postgresql://localhost/gasguzzlerdb", "gasguzzler", "gasguzzler");
-    _userDAO = dbi.onDemand(UserDAO.class);
-    _sessionDAO = dbi.onDemand(SessionDAO.class);
-    _user = new User();
-    _user.setUsername("username");
-    _user.setPassword("pwd");
-    _user.setToken("token");
-    _user.setEmail("a@b.c");
-    _user.setSalt("salt");
-    _user.setRole(User.ROLE_USER);
   }
 }
