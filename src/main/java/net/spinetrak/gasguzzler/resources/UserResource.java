@@ -45,18 +45,16 @@ public class UserResource
 
     try
     {
-      final String salt = Authenticator.getSalt();
-      final String password = Authenticator.getSecurePassword(user.getPassword(), salt);
+      final String password = Authenticator.getSecurePassword(user.getPassword());
 
-      user.setSalt(salt);
       user.setPassword(password);
 
       user.setRole(User.ROLE_USER);
-      userDAO.insert(user.getUsername(), user.getPassword(), user.getEmail(), user.getSalt(), user.getRole(),
+      userDAO.insert(user.getUsername(), user.getPassword(), user.getEmail(), user.getRole(),
                      new Date(),
                      new Date());
 
-      final User u = userDAO.findUserByUsernameAndPassword(user.getUsername(), user.getPassword());
+      final User u = userDAO.findByUsername(user.getUsername());
 
       Session session = new Session(u.getUserid());
       sessionDAO.insert(session.getUserid(), session.getToken(), new java.util.Date());
@@ -126,13 +124,10 @@ public class UserResource
       {
         throw new WebApplicationException(Response.Status.UNAUTHORIZED);
       }
-      
-      final String salt = Authenticator.getSalt();
-      final String password = Authenticator.getSecurePassword(modified.getPassword(), salt);
 
-      modified.setSalt(salt);
+      final String password = Authenticator.getSecurePassword(modified.getPassword());
       modified.setPassword(password);
-      userDAO.update(modified.getUsername(), modified.getPassword(), modified.getEmail(), modified.getSalt(),
+      userDAO.update(modified.getUsername(), modified.getPassword(), modified.getEmail(),
                       new Date(),
                       modified.getUserid());
       return modified;

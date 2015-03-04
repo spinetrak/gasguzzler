@@ -28,12 +28,11 @@ public class SessionDAOTest
   public void createReadDelete()
   {
     final User user = UserTest.getUser();
-    user.setSalt("salt");
 
     user.setRole(User.ROLE_USER);
-    _userDAO.insert(user.getUsername(), user.getPassword(), user.getEmail(), user.getSalt(), user.getRole(), new Date(),
+    _userDAO.insert(user.getUsername(), user.getPassword(), user.getEmail(), user.getRole(), new Date(),
                     new Date());
-    final User u = _userDAO.findUserByUsernameAndPassword(user.getUsername(), user.getPassword());
+    final User u = _userDAO.findByUsername(user.getUsername());
 
     final Session session = new Session(u.getUserid());
     _sessionDAO.insert(session.getUserid(), session.getToken(), new Date());

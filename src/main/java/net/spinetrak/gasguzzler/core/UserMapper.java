@@ -13,6 +13,7 @@ public class UserMapper implements ResultSetMapper<User> {
         User user = new User();
 
         user.setUsername(resultSet.getString("username"));
+      user.setPassword(resultSet.getString("password"));
         user.setUserid(resultSet.getInt("userid"));
         user.setEmail(resultSet.getString("email"));
         user.setRole(resultSet.getString("role"));

@@ -22,22 +22,16 @@ public interface UserDAO
   @Mapper(UserMapper.class)
   List<User> findAll();
 
-  @SqlQuery("select salt from st_user where username = :username")
-  String findSalt(
+  @SqlQuery("select * from st_user where username = :username")
+  @Mapper(UserMapper.class)
+  User findByUsername(
     @Bind("username") String username
   );
 
-  @SqlQuery("select * from st_user where userid = :userid limit 1")
+  @SqlQuery("select * from st_user where userid = :userid")
   @Mapper(UserMapper.class)
   User findUser(
     @Bind("userid") int userid
-  );
-
-  @SqlQuery("select * from st_user where username = :username and password = :password limit 1 ")
-  @Mapper(UserMapper.class)
-  User findUserByUsernameAndPassword(
-    @Bind("username") String username
-    , @Bind("password") String password
   );
 
   @SqlQuery("select * from st_user where username = :username or email = :email")
@@ -47,23 +41,21 @@ public interface UserDAO
     , @Bind("email") String email
   );
 
-  @SqlUpdate("insert into st_user (username, password, email, role, salt, created, updated) values (:username, :password, :email, :role, :salt, :created, :updated)")
+  @SqlUpdate("insert into st_user (username, password, email, role, created, updated) values (:username, :password, :email, :role, :created, :updated)")
   void insert(
     @Bind("username") String username
     , @Bind("password") String password
     , @Bind("email") String email,
-    @Bind("salt") String salt,
     @Bind("role") String role,
     @Bind("created") Date created,
     @Bind("updated") Date updated
   );
 
-  @SqlUpdate("update st_user set username = :username, password = :password, email = :email, salt = :salt, updated = :updated where userid = :userid")
+  @SqlUpdate("update st_user set username = :username, password = :password, email = :email, updated = :updated where userid = :userid")
   void update(
     @Bind("username") String username,
     @Bind("password") String password,
     @Bind("email") String email,
-    @Bind("salt") String salt,
     @Bind("updated") Date updated,
     @Bind("userid") int userid
   );

@@ -42,7 +42,7 @@ public class UserResourceTest
   {
     when(_sessionDAO.findSession(0, "token")).thenReturn(session);
     when(_userDAO.findUsersByUsernameOrEmail(anyString(), anyString())).thenReturn(new ArrayList<User>());
-    when(_userDAO.findUserByUsernameAndPassword(anyString(), anyString())).thenReturn(user);
+    when(_userDAO.findByUsername(anyString())).thenReturn(user);
 
     final Session mysession = resources.client().resource("/user")
       .type(MediaType.APPLICATION_JSON)

@@ -15,9 +15,6 @@ public class User
   private int userid;
 
   @NotEmpty
-  private String salt;
-
-  @NotEmpty
   @JsonProperty
   private String username;
 
@@ -95,16 +92,6 @@ public class User
   {
     this.role = displayRole;
     return this;
-  }
-
-  public String getSalt()
-  {
-    return salt;
-  }
-
-  public void setSalt(final String salt_)
-  {
-    salt = salt_;
   }
 
   public String getToken()

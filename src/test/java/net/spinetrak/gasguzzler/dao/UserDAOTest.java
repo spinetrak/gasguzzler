@@ -28,12 +28,11 @@ public class UserDAOTest
   public void createReadUpdateDelete()
   {
     final User user = UserTest.getUser();
-    user.setSalt("salt");
 
-    _userDAO.insert(user.getUsername(), user.getPassword(), user.getEmail(), user.getSalt(), user.getRole(), new Date(),
+    _userDAO.insert(user.getUsername(), user.getPassword(), user.getEmail(), user.getRole(), new Date(),
                     new Date());
 
-    final User u = _userDAO.findUserByUsernameAndPassword(user.getUsername(), user.getPassword());
+    final User u = _userDAO.findByUsername(user.getUsername());
     user.setUserid(u.getUserid());
     assertEquals(user, u);
 
@@ -43,11 +42,8 @@ public class UserDAOTest
     final User u2 = _userDAO.findUser(user.getUserid());
     assertEquals(user, u2);
 
-    final String salt = _userDAO.findSalt(user.getUsername());
-    assertEquals(user.getSalt(), salt);
-
     user.setUsername("new_username");
-    _userDAO.update(user.getUsername(), user.getPassword(), user.getEmail(), user.getSalt(), new Date(),
+    _userDAO.update(user.getUsername(), user.getPassword(), user.getEmail(), new Date(),
                     user.getUserid());
     final User u3 = _userDAO.findUser(user.getUserid());
     assertEquals(user, u3);

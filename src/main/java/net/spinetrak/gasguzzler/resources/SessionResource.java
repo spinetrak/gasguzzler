@@ -12,6 +12,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 
 @Path("/session")
 @Produces(MediaType.APPLICATION_JSON)
@@ -32,20 +33,13 @@ public class SessionResource
   @POST
   public Session create(User user_)
   {
-    String salt = userDAO.findSalt(user_.getUsername());
-    if (salt == null)
-    {
-      throw new WebApplicationException(Response.Status.NOT_FOUND);
-    }
     try
     {
-      final String password = Authenticator.getSecurePassword(
-        user_.getPassword(), salt);
-      user_.setPassword(password);
-
-      User u = userDAO.findUserByUsernameAndPassword(user_.getUsername(),
-                                                     user_.getPassword());
-      if (null == u)
+      final User u = userDAO.findByUsername(user_.getUsername());
+      final String storedPassword = u.getPassword();
+      final String suppliedPassword = user_.getPassword();
+      if (null == storedPassword || null == suppliedPassword || !Authenticator.validatePassword(suppliedPassword,
+                                                                                                storedPassword))
       {
         throw new WebApplicationException(Response.Status.NOT_FOUND);
       }
@@ -57,6 +51,10 @@ public class SessionResource
       return session;
     }
     catch (NoSuchAlgorithmException ex)
+    {
+      throw new WebApplicationException(Response.Status.NOT_FOUND);
+    }
+    catch (InvalidKeySpecException ex)
     {
       throw new WebApplicationException(Response.Status.NOT_FOUND);
     }

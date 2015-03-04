@@ -34,14 +34,13 @@ public class SessionResourceTest
   @Test
   public void create()
   {
-    when(_userDAO.findSalt("myName")).thenReturn("salt");
+
     when(_sessionDAO.findSession(0, "token")).thenReturn(session);
-    when(_userDAO.findUserByUsernameAndPassword(anyString(), anyString())).thenReturn(user);
-
-
+    when(_userDAO.findByUsername(anyString())).thenReturn(UserTest.getUserWithHashedPassword());
+    
     final Session mysession = resources.client().resource("/session")
       .type(MediaType.APPLICATION_JSON)
-      .post(Session.class, UserTest.getUser());
+      .post(Session.class, user);
     assertThat(mysession).isNotEqualTo(session);
     assertThat(mysession.getUserid()).isEqualTo(session.getUserid());
   }
