@@ -24,3 +24,4 @@ database:
   user: gasguzzler
   password: gasguzzler
   url: jdbc:postgresql://localhost/gasguzzlerdb
+

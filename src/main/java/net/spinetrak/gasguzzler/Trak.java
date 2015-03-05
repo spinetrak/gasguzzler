@@ -2,6 +2,9 @@ package net.spinetrak.gasguzzler;
 
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
+import io.dropwizard.db.DataSourceFactory;
+import io.dropwizard.flyway.FlywayBundle;
+import io.dropwizard.flyway.FlywayFactory;
 import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -12,6 +15,7 @@ import net.spinetrak.gasguzzler.resources.SessionResource;
 import net.spinetrak.gasguzzler.resources.UserResource;
 import net.spinetrak.gasguzzler.security.Authenticator;
 import net.spinetrak.gasguzzler.security.SecurityProvider;
+import org.flywaydb.core.Flyway;
 import org.skife.jdbi.v2.DBI;
 
 /**
@@ -44,12 +48,31 @@ public class Trak extends Application<TrakConfiguration>
     bootstrap.addBundle(new AssetsBundle("/assets/css", "/css", null, "css"));
     bootstrap.addBundle(new AssetsBundle("/assets/images", "/images", null, "images"));
     bootstrap.addBundle(new AssetsBundle("/assets/js", "/js", null, "js"));
+
+    bootstrap.addBundle(new FlywayBundle<TrakConfiguration>()
+    {
+      @Override
+      public DataSourceFactory getDataSourceFactory(TrakConfiguration configuration)
+      {
+        return configuration.getDataSourceFactory();
+      }
+
+      @Override
+      public FlywayFactory getFlywayFactory(TrakConfiguration configuration)
+      {
+        return configuration.getFlywayFactory();
+      }
+    });
   }
 
   @Override
   public void run(TrakConfiguration configuration,
                   Environment environment) throws ClassNotFoundException
   {
+    final Flyway flyway = configuration.getFlywayFactory().build(
+      configuration.getDataSourceFactory().build(environment.metrics(), "flyway"));
+    flyway.migrate();
+
     final DBI jdbi = new DBIFactory().build(environment, configuration.getDataSourceFactory(), "postgres");
     final UserDAO userDAO = jdbi.onDemand(UserDAO.class);
     final SessionDAO sessionDAO = jdbi.onDemand(SessionDAO.class);

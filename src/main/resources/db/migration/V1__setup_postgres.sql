@@ -1,4 +1,3 @@
-DROP TABLE IF EXISTS gasguzzlerdb.public.st_user CASCADE;
 CREATE TABLE st_user
 (
   userid   SERIAL PRIMARY KEY NOT NULL,
@@ -12,7 +11,6 @@ CREATE TABLE st_user
 CREATE UNIQUE INDEX st_user_username_key ON st_user (username);
 CREATE UNIQUE INDEX st_user_email_key ON st_user (email);
 
-DROP TABLE IF EXISTS gasguzzlerdb.public.st_session CASCADE;
 CREATE TABLE st_session
 (
   token   VARCHAR(23) PRIMARY KEY NOT NULL,

@@ -3,6 +3,7 @@ package net.spinetrak.gasguzzler;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
+import io.dropwizard.flyway.FlywayFactory;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -19,6 +20,11 @@ public class TrakConfiguration extends Configuration
   @JsonProperty
   private DataSourceFactory database = new DataSourceFactory();
 
+  @Valid
+  @NotNull
+  @JsonProperty
+  private FlywayFactory flyway = new FlywayFactory();
+
   private Map<String, Object> _daos = new HashMap<>();
 
   public Object getDAO(final String key_)
@@ -29,6 +35,11 @@ public class TrakConfiguration extends Configuration
   public DataSourceFactory getDataSourceFactory()
   {
     return database;
+  }
+
+  public FlywayFactory getFlywayFactory()
+  {
+    return flyway;
   }
 
   protected void addDAO(final String key_, final Object dao_)
