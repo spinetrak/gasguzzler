@@ -29,9 +29,16 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.test.framework.AppDescriptor;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.LowLevelAppDescriptor;
+import io.dropwizard.auth.Auth;
 import io.dropwizard.jersey.DropwizardResourceConfig;
 import io.dropwizard.logging.LoggingFactory;
+import net.spinetrak.gasguzzler.core.User;
 import org.junit.Test;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -103,8 +110,20 @@ public class SecurityProviderTest extends JerseyTest
     final Authenticator authenticator = new Authenticator();
 
     config.getSingletons().add(new SecurityProvider<>(authenticator));
+    config.getSingletons().add(new UserResource());
 
     return new LowLevelAppDescriptor.Builder(config).build();
+  }
+
+  @Path("/test/")
+  @Produces(MediaType.TEXT_PLAIN)
+  public static class UserResource
+  {
+    @GET
+    public String get(@Auth final User principal_)
+    {
+      return principal_.getUsername();
+    }
   }
 
 }
