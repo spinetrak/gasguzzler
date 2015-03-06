@@ -9,7 +9,7 @@ public class User
   public static final String ROLE_ADMIN = "admin";
   public static final String ROLE_USER = "user";
 
-  
+
   @NotEmpty
   @JsonProperty
   private int userid;
@@ -66,15 +66,35 @@ public class User
     return email;
   }
 
+  public String getPassword()
+  {
+    return password;
+  }
+
+  public String getRole()
+  {
+    return role;
+  }
+
+  public String getToken()
+  {
+    return token;
+  }
+
+  public int getUserid()
+  {
+    return userid;
+  }
+
+  public String getUsername()
+  {
+    return username;
+  }
+
   public User setEmail(String email)
   {
     this.email = email;
     return this;
-  }
-
-  public String getPassword()
-  {
-    return password;
   }
 
   public User setPassword(String password)
@@ -83,20 +103,10 @@ public class User
     return this;
   }
 
-  public String getRole()
-  {
-    return role;
-  }
-
   public User setRole(String displayRole)
   {
     this.role = displayRole;
     return this;
-  }
-
-  public String getToken()
-  {
-    return token;
   }
 
   public void setToken(final String token_)
@@ -104,19 +114,9 @@ public class User
     token = token_;
   }
 
-  public int getUserid()
-  {
-    return userid;
-  }
-
   public void setUserid(final int userid_)
   {
     userid = userid_;
-  }
-
-  public String getUsername()
-  {
-    return username;
   }
 
   public User setUsername(String username)

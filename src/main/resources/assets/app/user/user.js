@@ -43,12 +43,12 @@ define(function (require) {
             sessionStorage.removeItem("userid");
         }
     });
-        
+
     return {
         loginScreen: ko.observable(),
         registerScreen: ko.observable(),
         profileScreen: ko.observable(),
-        
+
         activate: function () {
             if (sessionStorage.getItem("userid") && sessionStorage.getItem("token")) {
                 this.profileScreen('user/profile');

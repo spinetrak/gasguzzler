@@ -63,14 +63,14 @@ public class Session
     return token;
   }
 
-  public void setToken(final String token_)
-  {
-    token = token_;
-  }
-
   public int getUserid()
   {
     return userid;
+  }
+
+  public void setToken(final String token_)
+  {
+    token = token_;
   }
 
   public void setUserid(final int userid_)

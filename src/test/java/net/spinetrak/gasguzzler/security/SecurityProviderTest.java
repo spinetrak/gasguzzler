@@ -96,7 +96,7 @@ public class SecurityProviderTest extends JerseyTest
 
 
       fail("Expected exception");
-  }
+    }
     catch (UniformInterfaceException ex)
     {
       assertEquals(ex.getResponse().getStatus(), 401);

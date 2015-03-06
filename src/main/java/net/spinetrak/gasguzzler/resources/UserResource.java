@@ -128,8 +128,8 @@ public class UserResource
       final String password = Authenticator.getSecurePassword(modified.getPassword());
       modified.setPassword(password);
       userDAO.update(modified.getUsername(), modified.getPassword(), modified.getEmail(),
-                      new Date(),
-                      modified.getUserid());
+                     new Date(),
+                     modified.getUserid());
       return modified;
     }
     catch (WebApplicationException ex)

@@ -52,7 +52,7 @@ public class TrakConfiguration extends Configuration
   {
     return _daos.get(key_);
   }
-  
+
   public DataSourceFactory getDataSourceFactory()
   {
     return database;

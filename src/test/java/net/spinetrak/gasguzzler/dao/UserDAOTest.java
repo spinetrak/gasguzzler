@@ -44,7 +44,7 @@ public class UserDAOTest
   public static final DropwizardAppRule<TrakConfiguration> RULE =
     new DropwizardAppRule<>(Trak.class, "config-test.yml");
   private UserDAO _userDAO = (UserDAO) RULE.getConfiguration().getDAO("userDAO");
-  
+
   @Test
   public void createReadUpdateDelete()
   {

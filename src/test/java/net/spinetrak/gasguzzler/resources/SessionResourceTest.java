@@ -61,7 +61,7 @@ public class SessionResourceTest
 
     when(_sessionDAO.findSession(0, "token")).thenReturn(session);
     when(_userDAO.findByUsername(anyString())).thenReturn(UserTest.getUserWithHashedPassword());
-    
+
     final Session mysession = resources.client().resource("/session")
       .type(MediaType.APPLICATION_JSON)
       .post(Session.class, user);
