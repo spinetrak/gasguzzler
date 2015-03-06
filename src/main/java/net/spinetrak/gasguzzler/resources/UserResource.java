@@ -31,32 +31,32 @@ public class UserResource
   }
 
   @POST
-  public Session create(User user)
+  public Session create(final User user_)
   {
-    if (null == user)
+    if (null == user_)
     {
       throw new WebApplicationException(Response.Status.BAD_REQUEST);
     }
 
-    if (!userDAO.findUsersByUsernameOrEmail(user.getUsername(), user.getEmail()).isEmpty())
+    if (!userDAO.findUsersByUsernameOrEmail(user_.getUsername(), user_.getEmail()).isEmpty())
     {
       throw new WebApplicationException(Response.Status.NOT_ACCEPTABLE);
     }
 
     try
     {
-      final String password = Authenticator.getSecurePassword(user.getPassword());
+      final String password = Authenticator.getSecurePassword(user_.getPassword());
 
-      user.setPassword(password);
+      user_.setPassword(password);
 
-      user.setRole(User.ROLE_USER);
-      userDAO.insert(user.getUsername(), user.getPassword(), user.getEmail(), user.getRole(),
+      user_.setRole(User.ROLE_USER);
+      userDAO.insert(user_.getUsername(), user_.getPassword(), user_.getEmail(), user_.getRole(),
                      new Date(),
                      new Date());
 
-      final User u = userDAO.findByUsername(user.getUsername());
+      final User u = userDAO.findByUsername(user_.getUsername());
 
-      Session session = new Session(u.getUserid());
+      final Session session = new Session(u.getUserid());
       sessionDAO.insert(session.getUserid(), session.getToken(), new java.util.Date());
 
       return session;
@@ -73,28 +73,28 @@ public class UserResource
 
   @DELETE
   @Path("/{userid}")
-  public void delete(@PathParam("userid") int userid, @Auth User user)
+  public void delete(@PathParam("userid") final int userid_, @Auth final User user_)
   {
-    if ((userid != user.getUserid()) && !user.getRole().equals(User.ROLE_ADMIN))
+    if ((userid_ != user_.getUserid()) && !user_.getRole().equals(User.ROLE_ADMIN))
     {
       throw new WebApplicationException(Response.Status.UNAUTHORIZED);
     }
-    if (null != sessionDAO.findSession(user.getUserid(), user.getToken()))
+    if (null != sessionDAO.findSession(user_.getUserid(), user_.getToken()))
     {
-      sessionDAO.delete(user.getUserid());
+      sessionDAO.delete(user_.getUserid());
     }
-    if (null != userDAO.findUser(user.getUserid()))
+    if (null != userDAO.findUser(user_.getUserid()))
     {
-      userDAO.delete(user.getUserid());
+      userDAO.delete(user_.getUserid());
     }
   }
 
   @GET
   @Path("/{userid}")
-  public User get(@Auth User user, @PathParam("userid") int userid)
+  public User get(@Auth final User user_, @PathParam("userid") final int userid_)
   {
-    final User u = userDAO.findUser(userid);
-    if (u.getUserid() != userid)
+    final User u = userDAO.findUser(userid_);
+    if (user_.getUserid() != userid_)
     {
       u.setEmail("private");
     }
@@ -102,10 +102,10 @@ public class UserResource
   }
 
   @GET
-  public List<User> getAll(@Auth User principal)
+  public List<User> getAll(@Auth final User principal_)
   {
 
-    if (!principal.getRole().equals(User.ROLE_ADMIN))
+    if (!principal_.getRole().equals(User.ROLE_ADMIN))
     {
       throw new WebApplicationException(Response.Status.UNAUTHORIZED);
     }
@@ -115,22 +115,22 @@ public class UserResource
 
   @PUT
   @Path("/{userid}")
-  public User update(@PathParam("userid") int userid, @Auth User current, User modified)
+  public User update(@PathParam("userid") final int userid_, @Auth final User current_, final User modified_)
   {
     try
     {
-      if ((userid != modified.getUserid() || userid != current.getUserid()) && (null != current.getRole() && !current.getRole().equals(
+      if ((userid_ != modified_.getUserid() || userid_ != current_.getUserid()) && (null != current_.getRole() && !current_.getRole().equals(
         User.ROLE_ADMIN)))
       {
         throw new WebApplicationException(Response.Status.UNAUTHORIZED);
       }
 
-      final String password = Authenticator.getSecurePassword(modified.getPassword());
-      modified.setPassword(password);
-      userDAO.update(modified.getUsername(), modified.getPassword(), modified.getEmail(),
+      final String password = Authenticator.getSecurePassword(modified_.getPassword());
+      modified_.setPassword(password);
+      userDAO.update(modified_.getUsername(), modified_.getPassword(), modified_.getEmail(),
                      new Date(),
-                     modified.getUserid());
-      return modified;
+                     modified_.getUserid());
+      return modified_;
     }
     catch (WebApplicationException ex)
     {

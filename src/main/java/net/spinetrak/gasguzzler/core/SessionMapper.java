@@ -11,11 +11,12 @@ public class SessionMapper implements ResultSetMapper<Session>
 {
 
   @Override
-  public Session map(int i, ResultSet resultSet, StatementContext statementContext) throws SQLException
+  public Session map(final int i_, final ResultSet resultSet_, final StatementContext statementContext_) throws
+                                                                                                         SQLException
   {
     Session session = new Session();
-    session.setUserid(resultSet.getInt("userid"));
-    session.setToken(resultSet.getString("token"));
+    session.setUserid(resultSet_.getInt("userid"));
+    session.setToken(resultSet_.getString("token"));
 
     return session;
   }

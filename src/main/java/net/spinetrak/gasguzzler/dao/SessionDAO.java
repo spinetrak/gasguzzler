@@ -10,25 +10,15 @@ import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
 public interface SessionDAO
 {
   @SqlUpdate("delete from st_session where userid = :userid and token = :token")
-  void delete(
-    @Bind("userid") int userid, @Bind("token") String token
-  );
+  void delete(@Bind("userid") int userid, @Bind("token") String token);
 
   @SqlUpdate("delete from st_session where userid = :userid")
-  void delete(
-    @Bind("userid") int userid
-  );
+  void delete(@Bind("userid") int userid);
 
   @SqlQuery("select userid, token from st_session where userid = :userid and token = :token limit 1")
   @Mapper(SessionMapper.class)
-  Session findSession(
-    @Bind("userid") int userid, @Bind("token") String token
-  );
+  Session findSession(@Bind("userid") int userid, @Bind("token") String token);
 
   @SqlUpdate("insert into st_session (userid, token, created) values (:userid, :token, :created)")
-  void insert(
-    @Bind("userid") int userid,
-    @Bind("token") String token
-    , @Bind("created") java.util.Date created
-  );
+  void insert(@Bind("userid") int userid, @Bind("token") String token, @Bind("created") java.util.Date created);
 }

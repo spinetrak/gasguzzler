@@ -49,10 +49,11 @@ import static org.mockito.Mockito.*;
 
 public class UserResourceTest
 {
-  private final Session session = new Session(0, "token");
+  private final Session _session = new Session(0, "token");
   private final User user = UserTest.getUser();
   private SessionDAO _sessionDAO = mock(SessionDAO.class);
   private UserDAO _userDAO = mock(UserDAO.class);
+
   @Rule
   public ResourceTestRule resources = ResourceTestRule.builder()
     .addResource(new UserResource(
@@ -64,21 +65,21 @@ public class UserResourceTest
   @Test
   public void create()
   {
-    when(_sessionDAO.findSession(0, "token")).thenReturn(session);
+    when(_sessionDAO.findSession(0, "token")).thenReturn(_session);
     when(_userDAO.findUsersByUsernameOrEmail(anyString(), anyString())).thenReturn(new ArrayList<User>());
     when(_userDAO.findByUsername(anyString())).thenReturn(user);
 
     final Session mysession = resources.client().resource("/user")
       .type(MediaType.APPLICATION_JSON)
       .post(Session.class, UserTest.getUser());
-    assertThat(mysession).isNotEqualTo(session);
-    assertThat(mysession.getUserid()).isEqualTo(session.getUserid());
+    assertThat(mysession).isNotEqualTo(_session);
+    assertThat(mysession.getUserid()).isEqualTo(_session.getUserid());
   }
 
   @Test
   public void delete()
   {
-    when(_sessionDAO.findSession(0, "token")).thenReturn(session);
+    when(_sessionDAO.findSession(0, "token")).thenReturn(_session);
 
     resources.client().resource("/user/0").header(SecurityProvider.TOKEN, "token").header(
       SecurityProvider.USERID, "0").type(MediaType.APPLICATION_JSON_TYPE).delete(user);
@@ -90,7 +91,7 @@ public class UserResourceTest
   public void get()
   {
     when(_userDAO.findUser(0)).thenReturn(user);
-    when(_sessionDAO.findSession(0, "token")).thenReturn(session);
+    when(_sessionDAO.findSession(0, "token")).thenReturn(_session);
 
     assertThat(resources.client().resource("/user/0").header(SecurityProvider.TOKEN, "token").header(
       SecurityProvider.USERID, "0").type(MediaType.APPLICATION_JSON_TYPE).get(User.class)).isEqualTo(user);
@@ -99,7 +100,7 @@ public class UserResourceTest
   @Test
   public void getAll()
   {
-    when(_sessionDAO.findSession(0, "Admintoken")).thenReturn(session);
+    when(_sessionDAO.findSession(0, "Admintoken")).thenReturn(_session);
 
     resources.client().resource("/user")
       .header(SecurityProvider.TOKEN, "Admintoken").header(SecurityProvider.USERID, "0").type(
@@ -114,7 +115,7 @@ public class UserResourceTest
   {
     try
     {
-      when(_sessionDAO.findSession(0, "token")).thenReturn(session);
+      when(_sessionDAO.findSession(0, "token")).thenReturn(_session);
 
       resources.client().resource("/user")
         .header(SecurityProvider.TOKEN, "token").header(SecurityProvider.USERID, "0").type(
@@ -138,7 +139,7 @@ public class UserResourceTest
   @Test
   public void update()
   {
-    when(_sessionDAO.findSession(0, "token")).thenReturn(session);
+    when(_sessionDAO.findSession(0, "token")).thenReturn(_session);
 
     assertThat(resources.client().resource("/user/0").header(SecurityProvider.TOKEN, "token").header(
       SecurityProvider.USERID, "0")
@@ -151,11 +152,11 @@ public class UserResourceTest
   {
     try
     {
-      when(_sessionDAO.findSession(0, "token")).thenReturn(session);
+      when(_sessionDAO.findSession(0, "token")).thenReturn(_session);
 
-      User user = UserTest.getUser();
+      final User user = UserTest.getUser();
 
-      User updatedUser = resources.client().resource("/user/1").header(SecurityProvider.TOKEN, "token").header(
+      final User updatedUser = resources.client().resource("/user/1").header(SecurityProvider.TOKEN, "token").header(
         SecurityProvider.USERID, "0")
         .type(MediaType.APPLICATION_JSON)
         .put(User.class, user);

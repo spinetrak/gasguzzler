@@ -32,33 +32,32 @@ public class User
   private String token;
 
   @Override
-  public boolean equals(Object o)
+  public boolean equals(final Object object_)
   {
-    if (this == o)
+    if (this == object_)
     {
       return true;
     }
-    if (!(o instanceof User))
+    if (!(object_ instanceof User))
     {
       return false;
     }
 
-    User that = (User) o;
+    User that = (User) object_;
 
     if (getUserid() != that.getUserid())
     {
       return false;
     }
-    if (!getUsername().equals(that.getUsername()))
+    if (getUsername().equals(that.getUsername()))
     {
-      return false;
+      if (getEmail().equals(that.getEmail()))
+      {
+        return true;
+      }
     }
-    if (!getEmail().equals(that.getEmail()))
-    {
-      return false;
-    }
+    return false;
 
-    return true;
   }
 
   public String getEmail()
@@ -91,21 +90,21 @@ public class User
     return username;
   }
 
-  public User setEmail(String email)
+  public User setEmail(final String email_)
   {
-    this.email = email;
+    email = email_;
     return this;
   }
 
-  public User setPassword(String password)
+  public User setPassword(final String password_)
   {
-    this.password = password;
+    password = password_;
     return this;
   }
 
-  public User setRole(String displayRole)
+  public User setRole(final String role_)
   {
-    this.role = displayRole;
+    role = role_;
     return this;
   }
 
@@ -119,9 +118,9 @@ public class User
     userid = userid_;
   }
 
-  public User setUsername(String username)
+  public User setUsername(final String username_)
   {
-    this.username = username;
+    username = username_;
     return this;
   }
 }

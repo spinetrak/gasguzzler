@@ -23,15 +23,15 @@ public class SessionResource
   private UserDAO userDAO;
   private SessionDAO sessionDAO;
 
-  public SessionResource(UserDAO userDAO, SessionDAO sessionDAO)
+  public SessionResource(final UserDAO userDAO_, final SessionDAO sessionDAO_)
   {
     super();
-    this.userDAO = userDAO;
-    this.sessionDAO = sessionDAO;
+    userDAO = userDAO_;
+    sessionDAO = sessionDAO_;
   }
 
   @POST
-  public Session create(User user_)
+  public Session create(final User user_)
   {
     try
     {
@@ -44,28 +44,24 @@ public class SessionResource
         throw new WebApplicationException(Response.Status.NOT_FOUND);
       }
 
-      Session session = new Session(u.getUserid());
+      final Session session = new Session(u.getUserid());
       sessionDAO.insert(session.getUserid(), session.getToken(),
                         new java.util.Date());
 
       return session;
     }
-    catch (NoSuchAlgorithmException ex)
-    {
-      throw new WebApplicationException(Response.Status.NOT_FOUND);
-    }
-    catch (InvalidKeySpecException ex)
+    catch (NoSuchAlgorithmException | InvalidKeySpecException ex_)
     {
       throw new WebApplicationException(Response.Status.NOT_FOUND);
     }
   }
 
   @DELETE
-  public void delete(@Auth User user)
+  public void delete(@Auth final User user_)
   {
-    if (null != sessionDAO.findSession(user.getUserid(), user.getToken()))
+    if (null != sessionDAO.findSession(user_.getUserid(), user_.getToken()))
     {
-      sessionDAO.delete(user.getUserid(), user.getToken());
+      sessionDAO.delete(user_.getUserid(), user_.getToken());
     }
   }
 }

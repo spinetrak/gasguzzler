@@ -62,25 +62,25 @@ public class AuthenticatorTest
       _sessionDAO.insert(session.getUserid(), session.getToken(), new Date());
 
 
-      Authenticator authenticator = new Authenticator(_sessionDAO);
+      final Authenticator authenticator = new Authenticator(_sessionDAO);
 
       final Optional<User> result = authenticator.authenticate(session);
       assertTrue(result.isPresent());
 
-      Authenticator authenticator1 = new Authenticator();
+      final Authenticator authenticator1 = new Authenticator();
       authenticator1.authenticate(session);
       fail("Expected exception");
     }
-    catch (AuthenticationException ex)
+    catch (final AuthenticationException ex_)
     {
-      assertEquals(ex.getMessage(), "Invalid credentials");
+      assertEquals(ex_.getMessage(), "Invalid credentials");
     }
   }
 
   @Test(expected = AuthenticationException.class)
   public void authenticateThrowsAuthenticationExceptionForInvalidCredentials() throws AuthenticationException
   {
-    Authenticator authenticator = new Authenticator();
+    final Authenticator authenticator = new Authenticator();
 
     authenticator.authenticate(new Session(1234, "failToken"));
   }
@@ -101,14 +101,9 @@ public class AuthenticatorTest
       assertTrue(Authenticator.validatePassword("password", password2));
 
     }
-    catch (NoSuchAlgorithmException e)
+    catch (final NoSuchAlgorithmException | InvalidKeySpecException e)
     {
       fail(e.getMessage());
     }
-    catch (InvalidKeySpecException e)
-    {
-      fail(e.getMessage());
-    }
-
   }
 }

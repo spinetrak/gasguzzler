@@ -54,7 +54,7 @@ public class SessionTest
   @Test
   public void getTokenAndUserid()
   {
-    Session session = new Session(1234, "1234");
+    final Session session = new Session(1234, "1234");
     assertEquals("1234", session.getToken());
     assertEquals(1234, session.getUserid());
   }

@@ -29,16 +29,9 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.test.framework.AppDescriptor;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.LowLevelAppDescriptor;
-import io.dropwizard.auth.Auth;
 import io.dropwizard.jersey.DropwizardResourceConfig;
 import io.dropwizard.logging.LoggingFactory;
-import net.spinetrak.gasguzzler.core.User;
 import org.junit.Test;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -61,9 +54,9 @@ public class SecurityProviderTest extends JerseyTest
 
       fail("Should have thrown 401");
     }
-    catch (UniformInterfaceException ex)
+    catch (final UniformInterfaceException ex_)
     {
-      assertEquals(ex.getResponse().getStatus(), 401);
+      assertEquals(ex_.getResponse().getStatus(), 401);
     }
   }
 
@@ -78,9 +71,9 @@ public class SecurityProviderTest extends JerseyTest
 
       fail("Should have thrown 401");
     }
-    catch (UniformInterfaceException ex)
+    catch (final UniformInterfaceException ex_)
     {
-      assertEquals(ex.getResponse().getStatus(), 401);
+      assertEquals(ex_.getResponse().getStatus(), 401);
     }
   }
 
@@ -97,9 +90,9 @@ public class SecurityProviderTest extends JerseyTest
 
       fail("Expected exception");
     }
-    catch (UniformInterfaceException ex)
+    catch (final UniformInterfaceException ex_)
     {
-      assertEquals(ex.getResponse().getStatus(), 401);
+      assertEquals(ex_.getResponse().getStatus(), 401);
     }
   }
 
@@ -110,20 +103,8 @@ public class SecurityProviderTest extends JerseyTest
     final Authenticator authenticator = new Authenticator();
 
     config.getSingletons().add(new SecurityProvider<>(authenticator));
-    config.getSingletons().add(new ExampleResource());
 
     return new LowLevelAppDescriptor.Builder(config).build();
-  }
-
-  @Path("/test/")
-  @Produces(MediaType.TEXT_PLAIN)
-  public static class ExampleResource
-  {
-    @GET
-    public String show(@Auth User principal)
-    {
-      return principal.getUsername();
-    }
   }
 
 }

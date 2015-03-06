@@ -46,11 +46,11 @@ public class TrakConfiguration extends Configuration
   @JsonProperty
   private FlywayFactory flyway = new FlywayFactory();
 
-  private Map<String, Object> _daos = new HashMap<>();
+  private Map<String, Object> daos = new HashMap<>();
 
   public Object getDAO(final String key_)
   {
-    return _daos.get(key_);
+    return daos.get(key_);
   }
 
   public DataSourceFactory getDataSourceFactory()
@@ -65,6 +65,6 @@ public class TrakConfiguration extends Configuration
 
   protected void addDAO(final String key_, final Object dao_)
   {
-    _daos.put(key_, dao_);
+    daos.put(key_, dao_);
   }
 }

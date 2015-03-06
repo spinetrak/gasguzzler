@@ -44,14 +44,9 @@ import org.skife.jdbi.v2.DBI;
 
 public class Trak extends Application<TrakConfiguration>
 {
-  public Trak()
+  public static void main(final String[] args_) throws Exception
   {
-
-  }
-
-  public static void main(String[] args) throws Exception
-  {
-    new Trak().run(args);
+    new Trak().run(args_);
   }
 
   @Override
@@ -61,49 +56,50 @@ public class Trak extends Application<TrakConfiguration>
   }
 
   @Override
-  public void initialize(Bootstrap<TrakConfiguration> bootstrap)
+  public void initialize(final Bootstrap<TrakConfiguration> bootstrap_)
   {
-    bootstrap.addBundle(new ViewBundle());
-    bootstrap.addBundle(new AssetsBundle("/assets", "/", "index.html", "static"));
-    bootstrap.addBundle(new AssetsBundle("/assets/app", "/app", null, "app"));
-    bootstrap.addBundle(new AssetsBundle("/assets/css", "/css", null, "css"));
-    bootstrap.addBundle(new AssetsBundle("/assets/images", "/images", null, "images"));
-    bootstrap.addBundle(new AssetsBundle("/assets/js", "/js", null, "js"));
+    bootstrap_.addBundle(new ViewBundle());
+    bootstrap_.addBundle(new AssetsBundle("/assets", "/", "index.html", "static"));
+    bootstrap_.addBundle(new AssetsBundle("/assets/app", "/app", null, "app"));
+    bootstrap_.addBundle(new AssetsBundle("/assets/css", "/css", null, "css"));
+    bootstrap_.addBundle(new AssetsBundle("/assets/images", "/images", null, "images"));
+    bootstrap_.addBundle(new AssetsBundle("/assets/js", "/js", null, "js"));
 
-    bootstrap.addBundle(new FlywayBundle<TrakConfiguration>()
+    bootstrap_.addBundle(new FlywayBundle<TrakConfiguration>()
     {
       @Override
-      public DataSourceFactory getDataSourceFactory(TrakConfiguration configuration)
+      public DataSourceFactory getDataSourceFactory(final TrakConfiguration configuration_)
       {
-        return configuration.getDataSourceFactory();
+        return configuration_.getDataSourceFactory();
       }
 
       @Override
-      public FlywayFactory getFlywayFactory(TrakConfiguration configuration)
+      public FlywayFactory getFlywayFactory(final TrakConfiguration configuration_)
       {
-        return configuration.getFlywayFactory();
+        return configuration_.getFlywayFactory();
       }
     });
   }
 
   @Override
-  public void run(TrakConfiguration configuration,
-                  Environment environment) throws ClassNotFoundException
+  public void run(final TrakConfiguration configuration_,
+                  final Environment environment_) throws ClassNotFoundException
   {
-    final Flyway flyway = configuration.getFlywayFactory().build(
-      configuration.getDataSourceFactory().build(environment.metrics(), "flyway"));
+    final Flyway flyway = configuration_.getFlywayFactory().build(
+      configuration_.getDataSourceFactory().build(environment_.metrics(), "flyway"));
     flyway.migrate();
 
-    final DBI jdbi = new DBIFactory().build(environment, configuration.getDataSourceFactory(), "postgres");
+    final DBI jdbi = new DBIFactory().build(environment_, configuration_.getDataSourceFactory(), "postgres");
     final UserDAO userDAO = jdbi.onDemand(UserDAO.class);
     final SessionDAO sessionDAO = jdbi.onDemand(SessionDAO.class);
 
-    configuration.addDAO("userDAO", userDAO);
-    configuration.addDAO("sessionDAO", sessionDAO);
-    environment.jersey().register(sessionDAO);
-    environment.jersey().setUrlPattern("/api/*");
-    environment.jersey().register(new UserResource(userDAO, sessionDAO));
-    environment.jersey().register(new SessionResource(userDAO, sessionDAO));
-    environment.jersey().register(new SecurityProvider<>(new Authenticator(sessionDAO)));
+    configuration_.addDAO("userDAO", userDAO);
+    configuration_.addDAO("sessionDAO", sessionDAO);
+
+    environment_.jersey().setUrlPattern("/api/*");
+
+    environment_.jersey().register(new UserResource(userDAO, sessionDAO));
+    environment_.jersey().register(new SessionResource(userDAO, sessionDAO));
+    environment_.jersey().register(new SecurityProvider<>(new Authenticator(sessionDAO)));
   }
 }

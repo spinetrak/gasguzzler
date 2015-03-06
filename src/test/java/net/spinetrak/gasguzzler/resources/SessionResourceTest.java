@@ -43,7 +43,7 @@ import static org.mockito.Mockito.*;
 public class SessionResourceTest
 {
   private final Session session = new Session(0, "token");
-  private final User user = UserTest.getUser();
+  private final User _user = UserTest.getUser();
   private SessionDAO _sessionDAO = mock(SessionDAO.class);
   private UserDAO _userDAO = mock(UserDAO.class);
 
@@ -64,7 +64,7 @@ public class SessionResourceTest
 
     final Session mysession = resources.client().resource("/session")
       .type(MediaType.APPLICATION_JSON)
-      .post(Session.class, user);
+      .post(Session.class, _user);
     assertThat(mysession).isNotEqualTo(session);
     assertThat(mysession.getUserid()).isEqualTo(session.getUserid());
   }
@@ -75,7 +75,7 @@ public class SessionResourceTest
     when(_sessionDAO.findSession(0, "token")).thenReturn(session);
 
     resources.client().resource("/session").header(SecurityProvider.TOKEN, "token").header(
-      SecurityProvider.USERID, "0").type(MediaType.APPLICATION_JSON_TYPE).delete(user);
+      SecurityProvider.USERID, "0").type(MediaType.APPLICATION_JSON_TYPE).delete(_user);
 
     verify(_sessionDAO, times(2)).findSession(0, "token");
   }

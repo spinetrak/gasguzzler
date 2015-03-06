@@ -10,15 +10,16 @@ public class UserMapper implements ResultSetMapper<User>
 {
 
   @Override
-  public User map(int i, ResultSet resultSet, StatementContext statementContext) throws SQLException
+  public User map(final int i_, final ResultSet resultSet_, final StatementContext statementContext_) throws
+                                                                                                      SQLException
   {
     User user = new User();
 
-    user.setUsername(resultSet.getString("username"));
-    user.setPassword(resultSet.getString("password"));
-    user.setUserid(resultSet.getInt("userid"));
-    user.setEmail(resultSet.getString("email"));
-    user.setRole(resultSet.getString("role"));
+    user.setUsername(resultSet_.getString("username"));
+    user.setPassword(resultSet_.getString("password"));
+    user.setUserid(resultSet_.getInt("userid"));
+    user.setEmail(resultSet_.getString("email"));
+    user.setRole(resultSet_.getString("role"));
 
     return user;
   }
