@@ -21,6 +21,7 @@ addons:
     branch_pattern: coverity_scan
 
 before_script:
+  - cp config/config-travis.yml config-test.yml
   - psql -c "CREATE DATABASE gasguzzlerdb;" -U postgres
   
 after_success:
