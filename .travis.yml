@@ -5,6 +5,9 @@ env:
    - secure: "z7SxlBk1jD1y+7USJLtAxBrpAzz1/noZf2JwadAte83/Q8ru0ajpJlQjNcEsBDyAPs0s6VVHpvATP5/Uix1t8SMDAIQj2bzq+/P6t58vN+oD1V9SQOhIuh+iPHvzMWIyK01SCytOnNX1ggqS/CQyFr7eaFxdobZvt1/TiYBWfLQ="
 
 language: java
+jdk:
+  - oraclejdk8
+  - oraclejdk7
 
 script: mvn test
 
