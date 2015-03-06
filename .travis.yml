@@ -23,6 +23,7 @@ addons:
 before_script:
   - cp config/config-travis.yml config-test.yml
   - psql -c "CREATE DATABASE gasguzzlerdb;" -U postgres
+  - export DROPWIZARD_PASSPHRASE="i am going to see some sunshine"
   
 after_success:
   - mvn clean cobertura:cobertura coveralls:report

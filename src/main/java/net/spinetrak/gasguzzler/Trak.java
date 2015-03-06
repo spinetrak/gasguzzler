@@ -24,6 +24,7 @@
 
 package net.spinetrak.gasguzzler;
 
+import com.meltmedia.dropwizard.crypto.CryptoBundle;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.db.DataSourceFactory;
@@ -32,7 +33,6 @@ import io.dropwizard.flyway.FlywayFactory;
 import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import io.dropwizard.views.ViewBundle;
 import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
 import net.spinetrak.gasguzzler.resources.SessionResource;
@@ -58,13 +58,14 @@ public class Trak extends Application<TrakConfiguration>
   @Override
   public void initialize(final Bootstrap<TrakConfiguration> bootstrap_)
   {
-    bootstrap_.addBundle(new ViewBundle());
     bootstrap_.addBundle(new AssetsBundle("/assets", "/", "index.html", "static"));
     bootstrap_.addBundle(new AssetsBundle("/assets/app", "/app", null, "app"));
     bootstrap_.addBundle(new AssetsBundle("/assets/css", "/css", null, "css"));
     bootstrap_.addBundle(new AssetsBundle("/assets/images", "/images", null, "images"));
     bootstrap_.addBundle(new AssetsBundle("/assets/js", "/js", null, "js"));
 
+    bootstrap_.addBundle(CryptoBundle.builder().build());
+    
     bootstrap_.addBundle(new FlywayBundle<TrakConfiguration>()
     {
       @Override

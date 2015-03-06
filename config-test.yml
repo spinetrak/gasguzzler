@@ -20,6 +20,15 @@ server:
 
 database:
   driverClass: org.postgresql.Driver
-  user: gasguzzler
-  password: gasguzzler
   url: jdbc:postgresql://localhost/gasguzzlerdb
+  user: gasguzzler
+  password:
+      salt: "ok9gOg=="
+      iv: "6QHQA8bvZQaq5V1MH1j9zA=="
+      value: "zZMONrPHxMIXQy6FbQ1TGw=="
+      cipher: "aes-256-cbc"
+      keyDerivation: "pbkdf2"
+      keyLength: 256
+      iterations: 2000
+      encrypted: true
+
