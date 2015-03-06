@@ -93,7 +93,7 @@ public class AuthenticatorTest
     {
       final String password = Authenticator.getSecurePassword("password");
       assertNotEquals(password, "password");
-      assertTrue("Got unexpected length of " + password.length(), 200 >= password.length());
+      assertTrue("Got unexpected length of " + password.length(), 220 >= password.length());
       final String password2 = Authenticator.getSecurePassword("password");
       assertNotEquals(password, password2);
 
