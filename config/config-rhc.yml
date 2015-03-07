@@ -1,0 +1,17 @@
+server:
+  adminMinThreads: 1
+  adminMaxThreads: 64
+  applicationConnectors:
+   - type: http
+     bindHost: @OPENSHIFT_DIY_IP@
+     port: @OPENSHIFT_DIY_PORT@
+  adminConnectors:
+   - type: http
+     bindHost: @OPENSHIFT_DIY_IP@
+     port: @SOME_OTHER_PORT@
+
+database:
+  driverClass: org.postgresql.Driver
+  user: adminbfsllnl
+  url: postgresql://$OPENSHIFT_POSTGRESQL_DB_HOST:$OPENSHIFT_POSTGRESQL_DB_PORT
+  password: Qe4uqiHV4iAh
