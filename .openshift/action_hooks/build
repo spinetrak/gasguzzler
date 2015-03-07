@@ -7,6 +7,9 @@ if [ ! -d "$OPENSHIFT_DATA_DIR/jdk1.8.0_05" ]; then
     tar -zxf jdk-8u5-linux-x64.tar.gz
 fi
 
+
+cd $OPENSHIFT_REPO_DIR
+
 export PATH=$OPENSHIFT_DATA_DIR/jdk1.8.0_05/bin:$PATH
 export JAVA_HOME="$OPENSHIFT_DATA_DIR/jdk1.8.0_05"
 
