@@ -9,27 +9,9 @@ fi
 
 export PATH=$OPENSHIFT_DATA_DIR/jdk1.8.0_05/bin:$PATH
 export JAVA_HOME="$OPENSHIFT_DATA_DIR/jdk1.8.0_05"
-    
-echo "PATH: $PATH"
-echo "JAVA_HOME: $JAVA_HOME"
-
-echo "java -version:"
-java -version
-
-cd $OPENSHIFT_REPO_DIR
-
-cp config/config-rhc.yml config-test.yml
-sed -i 's/@OPENSHIFT_DIY_IP@/'"$OPENSHIFT_DIY_IP"'/g' config-test.yml
-sed -i 's/@OPENSHIFT_DIY_PORT@/'"$OPENSHIFT_DIY_PORT"'/g' config-test.yml
-sed -i 's/@SOME_OTHER_PORT@/'"$OPENSHIFT_DIY_PORT"'/g' config-test.yml
-sed -i 's/@OPENSHIFT_POSTGRESQL_DB_HOST@/'"$OPENSHIFT_POSTGRESQL_DB_HOST"'/g' config-test.yml
-sed -i 's/@OPENSHIFT_POSTGRESQL_DB_PORT@/'"$OPENSHIFT_POSTGRESQL_DB_PORT"'/g' config-test.yml
-
-echo "mymvn -version"
-$OPENSHIFT_REPO_DIR/mymvn -version
 
 export DROPWIZARD_PASSPHRASE='i am going to see some sunshine'
-$OPENSHIFT_REPO_DIR/mymvn -s $OPENSHIFT_REPO_DIR/.openshift/settings.xml -q package
+$OPENSHIFT_REPO_DIR/mymvn -s $OPENSHIFT_REPO_DIR/.openshift/settings.xml -q -DskipTests=true install
 
 
 
