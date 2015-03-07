@@ -17,7 +17,9 @@ echo "java -version:"
 java -version
 
 cd $OPENSHIFT_REPO_DIR
-echo "$OPENSHIFT_REPO_DIR/mymvn -version"
+echo "mymvn -version"
 $OPENSHIFT_REPO_DIR/mymvn -version
+
+export DROPWIZARD_PASSPHRASE='i am going to see some sunshine'
 $OPENSHIFT_REPO_DIR/mymvn -s $OPENSHIFT_REPO_DIR/.openshift/settings.xml -q package
 
