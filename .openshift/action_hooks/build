@@ -17,7 +17,7 @@ echo "java -version:"
 java -version
 
 cd $OPENSHIFT_REPO_DIR
-echo "mymvn -version"
-mymvn -version
-mymvn -s $OPENSHIFT_REPO_DIR/.openshift/settings.xml -q package
+echo "$OPENSHIFT_REPO_DIR/mymvn -version"
+$OPENSHIFT_REPO_DIR/mymvn -version
+$OPENSHIFT_REPO_DIR/mymvn -s $OPENSHIFT_REPO_DIR/.openshift/settings.xml -q package
 
