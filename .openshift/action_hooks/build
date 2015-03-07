@@ -10,8 +10,8 @@ fi
 export PATH=$OPENSHIFT_DATA_DIR/jdk1.8.0_05/bin:$PATH
 export JAVA_HOME="$OPENSHIFT_DATA_DIR/jdk1.8.0_05"
     
-echo $PATH
-echo $JAVA_HOME
+echo "PATH: $PATH"
+echo "JAVA_HOME: $JAVA_HOME"
 
 java -version
 
