@@ -1,4 +1,3 @@
----
 server:
   adminMinThreads: 1
   adminMaxThreads: 64
@@ -21,7 +20,15 @@ server:
 database:
   driverClass: "org.postgresql.Driver"
   url: "jdbc:postgresql://localhost/gasguzzlerdb"
-  user: "gasguzzler"
+  user:
+    salt: "Ge5eEw=="
+    iv: "z+rL2qjNEHQ9vd3dfruHqQ=="
+    value: "kR6n76iS0Jn0JA4pU7qFwg=="
+    cipher: "aes-256-cbc"
+    keyDerivation: "pbkdf2"
+    keyLength: 256
+    iterations: 2000
+    encrypted: true
   password:
     salt: "ok9gOg=="
     iv: "6QHQA8bvZQaq5V1MH1j9zA=="
@@ -31,4 +38,3 @@ database:
     keyLength: 256
     iterations: 2000
     encrypted: true
-
