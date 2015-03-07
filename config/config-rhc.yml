@@ -5,10 +5,6 @@ server:
    - type: http
      bindHost: @OPENSHIFT_DIY_IP@
      port: @OPENSHIFT_DIY_PORT@
-  adminConnectors:
-   - type: http
-     bindHost: @OPENSHIFT_DIY_IP@
-     port: 4@OPENSHIFT_DIY_PORT@
      
 database:
   driverClass: "org.postgresql.Driver"

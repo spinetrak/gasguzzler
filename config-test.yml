@@ -9,14 +9,6 @@ server:
       keyStorePath: server.jks
       keyStorePassword: spinetrak
       validateCerts: false
-  adminConnectors:
-    - type: http
-      port: 9081
-    - type: https
-      port: 9444
-      keyStorePath: server.jks
-      keyStorePassword: spinetrak
-      validateCerts: false
 
 database:
   driverClass: org.postgresql.Driver
