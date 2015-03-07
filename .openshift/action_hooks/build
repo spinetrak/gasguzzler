@@ -13,8 +13,12 @@ export JAVA_HOME="$OPENSHIFT_DATA_DIR/jdk1.8.0_05"
 echo "PATH: $PATH"
 echo "JAVA_HOME: $JAVA_HOME"
 
+echo "java -version:"
 java -version
 
+echo "mymvn -version"
+mymvn -version
+
 cd $OPENSHIFT_REPO_DIR
-mvn -s $OPENSHIFT_REPO_DIR/.openshift/settings.xml -q package
+mymvn -s $OPENSHIFT_REPO_DIR/.openshift/settings.xml -q package
 
