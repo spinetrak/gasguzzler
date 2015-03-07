@@ -13,7 +13,7 @@ server:
 database:
   driverClass: "org.postgresql.Driver"
   user: "adminbfsllnl"
-  url: "jdbc:@OPENSHIFT_POSTGRESQL_DB_URL@"
+  url: "jdbc:postgresql://@OPENSHIFT_POSTGRESQL_DB_HOST@:@OPENSHIFT_POSTGRESQL_DB_PORT@/database"
   password:
     salt: "yD4GWg=="
     iv: "Zl+NX3PM7iOPl2ImOSSg3A=="
