@@ -3,8 +3,8 @@ server:
   adminMaxThreads: 64
   applicationConnectors:
   - type: "http"
-      bindHost: @OPENSHIFT_DIY_IP@
-      port: @OPENSHIFT_DIY_PORT@
+    bindHost: @OPENSHIFT_DIY_IP@
+    port: @OPENSHIFT_DIY_PORT@
 database:
   driverClass: "org.postgresql.Driver"
   url: "jdbc:postgresql://@OPENSHIFT_POSTGRESQL_DB_HOST@:@OPENSHIFT_POSTGRESQL_DB_PORT@/gasguzzler"
