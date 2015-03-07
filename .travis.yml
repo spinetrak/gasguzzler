@@ -29,3 +29,11 @@ before_script:
   
 after_success:
   - mvn clean cobertura:cobertura coveralls:report
+  
+deploy:
+  provider: openshift
+  user: renzop@gmail.com
+  password:
+    secure: "iiI/24EgahDr65xDQ/7X4Lb9nGAJKKqLIS0sDCNr8vhAiBTruIhcJxuyRJwJKHtZdMtkcsHDji4NkksQARHo6fkMk4sU5oUbB9cMQQCU6GzK73nk87glFzwkGB+pONpCEqO5X3Af9FsPNcw/fk0A2vd5etncIVnvHsyVzavn4ks="
+  domain: spinetrak
+  app: gasguzzler
