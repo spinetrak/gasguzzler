@@ -35,4 +35,11 @@ public class EncryptedDataSourceFactory extends DataSourceFactory
   {
     return super.getPassword();
   }
+
+  @Override
+  @Encrypted
+  public String getUser()
+  {
+    return super.getUser();
+  }
 }
