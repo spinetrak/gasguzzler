@@ -12,3 +12,4 @@ export JAVA_HOME="$OPENSHIFT_DATA_DIR/jdk1.8.0_05"
     
 cd $OPENSHIFT_REPO_DIR
 mvn -s $OPENSHIFT_REPO_DIR/.openshift/settings.xml package
+
