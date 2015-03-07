@@ -36,6 +36,10 @@ public class SessionResource
     try
     {
       final User u = userDAO.findByUsername(user_.getUsername());
+      if (null == u)
+      {
+        throw new WebApplicationException(Response.Status.NOT_FOUND);
+      }
       final String storedPassword = u.getPassword();
       final String suppliedPassword = user_.getPassword();
       if (null == storedPassword || null == suppliedPassword || !Authenticator.validatePassword(suppliedPassword,
