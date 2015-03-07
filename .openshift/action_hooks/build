@@ -8,7 +8,7 @@ if [ ! -d "$OPENSHIFT_DATA_DIR/jdk1.8.0_05" ]; then
 fi
 
 export PATH=$OPENSHIFT_DATA_DIR/jdk1.8.0_05/bin:$PATH
-export JAVA_HOME="$OPENSHIFT_DATA_DIR/jdk/jdk1.8.0_05"
+export JAVA_HOME="$OPENSHIFT_DATA_DIR/jdk1.8.0_05"
     
 cd $OPENSHIFT_REPO_DIR
-mvn -s $OPENSHIFT_REPO_DIR/.openshift/settings.xml -q package
+mvn -s $OPENSHIFT_REPO_DIR/.openshift/settings.xml package

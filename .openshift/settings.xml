@@ -23,5 +23,5 @@
   -->
 
 <settings>
-    <localRepository>$OPENSHIFT_DATA_DIR</localRepository>
+    <localRepository>dependencies</localRepository>
 </settings>
