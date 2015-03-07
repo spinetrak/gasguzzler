@@ -9,9 +9,17 @@ server:
    - type: http
      bindHost: @OPENSHIFT_DIY_IP@
      port: @SOME_OTHER_PORT@
-
+     
 database:
-  driverClass: org.postgresql.Driver
-  user: adminbfsllnl
-  url: jdbc:postgresql://$OPENSHIFT_POSTGRESQL_DB_HOST:$OPENSHIFT_POSTGRESQL_DB_PORT
-  password: Qe4uqiHV4iAh
+  driverClass: "org.postgresql.Driver"
+  user: "adminbfsllnl"
+  url: "jdbc:postgresql://$OPENSHIFT_POSTGRESQL_DB_HOST:$OPENSHIFT_POSTGRESQL_DB_PORT"
+  password:
+    salt: "yD4GWg=="
+    iv: "Zl+NX3PM7iOPl2ImOSSg3A=="
+    value: "qnILaV1Wh2MPyEzY5nJUeQ=="
+    cipher: "aes-256-cbc"
+    keyDerivation: "pbkdf2"
+    keyLength: 256
+    iterations: 2000
+    encrypted: true
