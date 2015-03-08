@@ -88,6 +88,7 @@ public class Trak extends Application<TrakConfiguration>
   {
     final Flyway flyway = configuration_.getFlywayFactory().build(
       configuration_.getDataSourceFactory().build(environment_.metrics(), "flyway"));
+    flyway.repair();
     flyway.migrate();
 
     final DBI jdbi = new DBIFactory().build(environment_, configuration_.getDataSourceFactory(), "postgres");
