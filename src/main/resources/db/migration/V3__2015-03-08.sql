@@ -1,0 +1,1 @@
+DROP INDEX IF EXISTS st_session_userid_key
