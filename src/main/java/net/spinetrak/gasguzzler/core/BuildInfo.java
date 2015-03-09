@@ -33,6 +33,7 @@ public class BuildInfo
   final private static String BUILD_BRANCH = "Gasguzzler-Build-Branch";
   final private static String BUILD_DATE = "Gasguzzler-Build-Date";
   final private static String BUILD_NUMBER = "Gasguzzler-Build-Number";
+  final private static String BUILD_URL = "Gasguzzler-Build-URL";
   final private static String BUILD_VERSION = "Gasguzzler-Build-Version";
   private static BuildInfo _buildInfo;
   @NotEmpty
@@ -46,6 +47,9 @@ public class BuildInfo
   final private String buildNumber;
   @NotEmpty
   @JsonProperty
+  final private String buildURL;
+  @NotEmpty
+  @JsonProperty
   final private String buildVersion;
 
   private BuildInfo()
@@ -54,6 +58,7 @@ public class BuildInfo
     buildDate = Manifests.exists(BUILD_DATE) ? Manifests.read(BUILD_DATE) : "n/a";
     buildNumber = Manifests.exists(BUILD_NUMBER) ? Manifests.read(BUILD_NUMBER) : "n/a";
     buildBranch = Manifests.exists(BUILD_BRANCH) ? Manifests.read(BUILD_BRANCH) : "n/a";
+    buildURL = Manifests.exists(BUILD_URL) ? Manifests.read(BUILD_URL) : "n/a";
   }
 
   public static BuildInfo getInstance()

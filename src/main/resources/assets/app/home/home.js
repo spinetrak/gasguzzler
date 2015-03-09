@@ -34,7 +34,7 @@ define(function (require) {
         buildVersion: ko.observable(),
         buildDate: ko.observable(),
         buildNumber: ko.observable(),
-        buildNumberUrl: ko.observable(),
+        buildURL: ko.observable(),
         buildBranch: ko.observable(),
 
         urlRoot: location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : ''),
@@ -49,14 +49,14 @@ define(function (require) {
                     that.buildVersion(response.buildVersion);
                     that.buildDate(response.buildDate);
                     that.buildNumber(response.buildNumber);
-                    that.buildNumberUrl("https://github.com/spinetrak/gasguzzler/commit/" + response.buildNumber);
+                    that.buildURL(response.buildURL);
                     that.buildBranch(response.buildBranch);
                 },
                 function (error) {
                     that.buildVersion("n/a");
                     that.buildDate("n/a");
                     that.buildNumber("n/a");
-                    that.buildNumberUrl("#");
+                    that.buildURL("#");
                     that.buildBranch("n/a");
                 });
         }

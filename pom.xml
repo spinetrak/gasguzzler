@@ -28,20 +28,20 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>net.spinetrak</groupId>
-    <artifactId>gasguzzler</artifactId>
-    <version>${project.version}</version>
-
-    <scm>
-        <connection>scm:git:git://github.com/spinetrak/gasguzzler.git</connection>
-    </scm>
-
     <properties>
         <project.version>0.0.2</project.version>
         <dropwizard.version>0.7.1</dropwizard.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss z</maven.build.timestamp.format>
     </properties>
+
+    <groupId>net.spinetrak</groupId>
+    <artifactId>gasguzzler</artifactId>
+    <version>0.0.2</version>
+
+    <scm>
+        <connection>scm:git:git://github.com/spinetrak/gasguzzler.git</connection>
+    </scm>
 
     <repositories>
         <repository>
@@ -140,15 +140,41 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>buildnumber-maven-plugin</artifactId>
-                <version>1.3</version>
+                <groupId>ru.concerteza.buildnumber</groupId>
+                <artifactId>maven-jgit-buildnumber-plugin</artifactId>
+                <version>1.2.7</version>
                 <executions>
                     <execution>
-                        <phase>validate</phase>
+                        <id>jgit-buildnumber</id>
                         <goals>
-                            <goal>create</goal>
+                            <goal>extract-buildnumber</goal>
                         </goals>
+                        <phase>validate</phase>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <version>2.1.9</version>
+                <executions>
+                    <execution>
+                        <id>git-commit-id</id>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                        <phase>validate</phase>
+                        <configuration>
+                            <!-- Only changing prefix since properties conflicts with jgit above -->
+                            <prefix>git-commit-id</prefix>
+                            <!-- We're using a pom in this example-->
+                            <skipPoms>false</skipPoms>
+                            <gitDescribe>
+                                <!-- Faster to get just branch if skip = true -->
+                                <skip>false</skip>
+                            </gitDescribe>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -184,9 +210,12 @@
                                     <manifestEntries>
                                         <Main-Class>net.spinetrak.gasguzzler.Trak</Main-Class>
                                         <Gasguzzler-Build-Version>${project.version}</Gasguzzler-Build-Version>
-                                        <Gasguzzler-Build-Number>${buildNumber}</Gasguzzler-Build-Number>
-                                        <Gasguzzler-Build-Branch>${scmBranch}</Gasguzzler-Build-Branch>
-                                        <Gasguzzler-Build-Date>${maven.build.timestamp}</Gasguzzler-Build-Date>
+                                        <Gasguzzler-Build-Number>${git.buildnumber}</Gasguzzler-Build-Number>
+                                        <Gasguzzler-Build-URL>
+                                            https://github.com/spinetrak/gasguzzler/commit/${git-commit-id.commit.id}
+                                        </Gasguzzler-Build-URL>
+                                        <Gasguzzler-Build-Branch>${git-commit-id.branch}</Gasguzzler-Build-Branch>
+                                        <Gasguzzler-Build-Date>${git-commit-id.commit.time}</Gasguzzler-Build-Date>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>
