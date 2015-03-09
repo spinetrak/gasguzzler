@@ -1,0 +1,40 @@
+server:
+  adminMinThreads: 1
+  adminMaxThreads: 64
+  applicationConnectors:
+  - type: "http"
+    port: 8080
+  - type: "https"
+    port: 8443
+    keyStorePath: "server.jks"
+    keyStorePassword: "spinetrak"
+    validateCerts: false
+  adminConnectors:
+  - type: "http"
+    port: 8081
+  - type: "https"
+    port: 8444
+    keyStorePath: "server.jks"
+    keyStorePassword: "spinetrak"
+    validateCerts: false
+database:
+  driverClass: "org.postgresql.Driver"
+  url: "jdbc:postgresql://localhost/gasguzzlerdb"
+  user:
+    salt: "Ge5eEw=="
+    iv: "z+rL2qjNEHQ9vd3dfruHqQ=="
+    value: "kR6n76iS0Jn0JA4pU7qFwg=="
+    cipher: "aes-256-cbc"
+    keyDerivation: "pbkdf2"
+    keyLength: 256
+    iterations: 2000
+    encrypted: true
+  password:
+    salt: "ok9gOg=="
+    iv: "6QHQA8bvZQaq5V1MH1j9zA=="
+    value: "zZMONrPHxMIXQy6FbQ1TGw=="
+    cipher: "aes-256-cbc"
+    keyDerivation: "pbkdf2"
+    keyLength: 256
+    iterations: 2000
+    encrypted: true

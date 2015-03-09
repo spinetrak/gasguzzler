@@ -1,0 +1,24 @@
+<section>
+    <form id="loginForm" class="vertical">
+        <fieldset>
+            <legend>Login</legend>
+
+            <label for="username">Username</label>
+            <input id="username" name="username" type="text" pattern="[\w]{3,}" required
+                   data-bind="value: username"/>
+
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" pattern=".{6,}" required
+                   data-bind="value: password"/>
+
+            <div class="right">
+                <button type="submit" class="small green fa fa-car"
+                        data-bind="click: doLogin">
+                    Login
+                </button>
+            </div>
+        </fieldset>
+    </form>
+
+</section>
+

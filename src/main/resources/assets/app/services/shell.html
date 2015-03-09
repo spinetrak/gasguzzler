@@ -1,0 +1,11 @@
+<div>
+    <ul class="menu" data-bind="foreach: router.navigationModel">
+        <li data-bind="css: { current: isActive }">
+            <a data-bind="attr: { href: hash }, html: title"></a>
+        </li>
+    </ul>
+    <div class="loader pull-right" data-bind="css: { active: router.isNavigating }">
+        <i class="icon-spinner icon-2x icon-spin"></i>
+    </div>
+    <div class="container-fluid page-host" data-bind="router: { transition:'entrance' }"></div>
+</div>

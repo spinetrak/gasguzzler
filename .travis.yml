@@ -1,0 +1,39 @@
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "z7SxlBk1jD1y+7USJLtAxBrpAzz1/noZf2JwadAte83/Q8ru0ajpJlQjNcEsBDyAPs0s6VVHpvATP5/Uix1t8SMDAIQj2bzq+/P6t58vN+oD1V9SQOhIuh+iPHvzMWIyK01SCytOnNX1ggqS/CQyFr7eaFxdobZvt1/TiYBWfLQ="
+
+language: java
+jdk:
+  - oraclejdk8
+
+script: mvn test
+
+services: postgresql
+
+addons:
+  coverity_scan:
+    project:
+      name: "spinetrak/gasguzzler"
+      description: "Build submitted via Travis CI"
+    notification_email: spinetrak@spinetrak.net
+    build_command_prepend: "mvn clean"
+    build_command:   "mvn -DskipTests=true compile"
+    branch_pattern: coverity_scan
+
+before_script:
+  - cp config/config-travis.yml config-test.yml
+  - psql -c "CREATE DATABASE gasguzzlerdb;" -U postgres
+  - export DROPWIZARD_PASSPHRASE="i am going to see some sunshine"
+  
+after_success:
+  - mvn clean cobertura:cobertura coveralls:report
+  
+deploy:
+  provider: openshift
+  user: renzop@gmail.com
+  password:
+    secure: "iiI/24EgahDr65xDQ/7X4Lb9nGAJKKqLIS0sDCNr8vhAiBTruIhcJxuyRJwJKHtZdMtkcsHDji4NkksQARHo6fkMk4sU5oUbB9cMQQCU6GzK73nk87glFzwkGB+pONpCEqO5X3Af9FsPNcw/fk0A2vd5etncIVnvHsyVzavn4ks="
+  domain: spinetrak
+  app: gasguzzler

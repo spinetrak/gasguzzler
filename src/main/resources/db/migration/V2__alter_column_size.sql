@@ -1,0 +1,1 @@
+ALTER TABLE st_user ALTER COLUMN password TYPE VARCHAR(220);
