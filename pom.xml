@@ -210,7 +210,7 @@
                                         <Gasguzzler-Build-Version>${project.version}</Gasguzzler-Build-Version>
                                         <Gasguzzler-Build-Number>${buildNumber}</Gasguzzler-Build-Number>
                                         <Gasguzzler-Build-URL>
-                                            https://github.com/spinetrak/gasguzzler/commit/${git-commit-id.commit.id}
+                                            https://github.com/spinetrak/gasguzzler/commit/${buildNumber}
                                         </Gasguzzler-Build-URL>
                                         <Gasguzzler-Build-Branch>${git-commit-id.branch}</Gasguzzler-Build-Branch>
                                         <Gasguzzler-Build-Date>${git-commit-id.commit.time}</Gasguzzler-Build-Date>
