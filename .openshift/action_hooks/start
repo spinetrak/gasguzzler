@@ -5,6 +5,7 @@ export PATH=$OPENSHIFT_DATA_DIR/jdk1.8.0_05/bin:$PATH
 export JAVA_HOME="$OPENSHIFT_DATA_DIR/jdk1.8.0_05"
 export DROPWIZARD_PASSPHRASE='i am going to see some sunshine'
 
-nohup java -jar target/gasguzzler-0.0.1-SNAPSHOT.jar server config.yml > ${OPENSHIFT_DIY_LOG_DIR}/gasguzzler.log 2>&1 &
+mv target/gasguzzler-*.jar target/gasguzzler.jar
+nohup java -jar target/gasguzzler.jar server config.yml > ${OPENSHIFT_DIY_LOG_DIR}/gasguzzler.log 2>&1 &
 
 
