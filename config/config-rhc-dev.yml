@@ -1,0 +1,32 @@
+server:
+  adminMinThreads: 1
+  adminMaxThreads: 64
+  applicationConnectors:
+  - type: "http"
+    bindHost: @OPENSHIFT_DIY_IP@
+    port: @OPENSHIFT_DIY_PORT@
+  adminConnectors:
+  - type: "http"
+    bindHost: @OPENSHIFT_DIY_IP@
+    port: 4@OPENSHIFT_DIY_PORT@
+database:
+  driverClass: "org.postgresql.Driver"
+  url: "jdbc:postgresql://@OPENSHIFT_POSTGRESQL_DB_HOST@:@OPENSHIFT_POSTGRESQL_DB_PORT@/gasguzzlerdev"
+  user:
+    salt: "jjn9zA=="
+    iv: "QCU267m/vgUwWQuaZ3fgYg=="
+    value: "bRaeYNCwN5E5TPCRaNNxSg=="
+    cipher: "aes-256-cbc"
+    keyDerivation: "pbkdf2"
+    keyLength: 256
+    iterations: 2000
+    encrypted: true
+  password:
+    salt: "2ueivw=="
+    iv: "qEUj187Tsff+u71cZsq/dA=="
+    value: "21NCUzj/xcJpc36ydTyUWw=="
+    cipher: "aes-256-cbc"
+    keyDerivation: "pbkdf2"
+    keyLength: 256
+    iterations: 2000
+    encrypted: true
