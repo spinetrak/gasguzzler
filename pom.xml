@@ -212,8 +212,8 @@
                                         <Gasguzzler-Build-URL>
                                             https://github.com/spinetrak/gasguzzler/commit/${buildNumber}
                                         </Gasguzzler-Build-URL>
-                                        <Gasguzzler-Build-Branch>${git-commit-id.branch}</Gasguzzler-Build-Branch>
-                                        <Gasguzzler-Build-Date>${git-commit-id.commit.time}</Gasguzzler-Build-Date>
+                                        <Gasguzzler-Build-Branch>dev</Gasguzzler-Build-Branch>
+                                        <Gasguzzler-Build-Date>${timestamp}</Gasguzzler-Build-Date>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>
