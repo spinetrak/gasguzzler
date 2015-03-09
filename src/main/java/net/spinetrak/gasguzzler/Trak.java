@@ -35,6 +35,7 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
+import net.spinetrak.gasguzzler.resources.BuildInfoResource;
 import net.spinetrak.gasguzzler.resources.SessionResource;
 import net.spinetrak.gasguzzler.resources.UserResource;
 import net.spinetrak.gasguzzler.security.Authenticator;
@@ -86,6 +87,7 @@ public class Trak extends Application<TrakConfiguration>
   public void run(final TrakConfiguration configuration_,
                   final Environment environment_) throws ClassNotFoundException
   {
+
     final Flyway flyway = configuration_.getFlywayFactory().build(
       configuration_.getDataSourceFactory().build(environment_.metrics(), "flyway"));
     flyway.repair();
@@ -102,6 +104,7 @@ public class Trak extends Application<TrakConfiguration>
 
     environment_.jersey().register(new UserResource(userDAO, sessionDAO));
     environment_.jersey().register(new SessionResource(userDAO, sessionDAO));
+    environment_.jersey().register(new BuildInfoResource());
     environment_.jersey().register(new SecurityProvider<>(new Authenticator(sessionDAO)));
   }
 }

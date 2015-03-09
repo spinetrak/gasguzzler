@@ -12,6 +12,7 @@ cd $OPENSHIFT_REPO_DIR
 
 export PATH=$OPENSHIFT_DATA_DIR/jdk1.8.0_05/bin:$PATH
 export JAVA_HOME="$OPENSHIFT_DATA_DIR/jdk1.8.0_05"
+export DROPWIZARD_PASSPHRASE='i am going to see some sunshine'
 
 $OPENSHIFT_REPO_DIR/mymvn -s $OPENSHIFT_REPO_DIR/.openshift/settings.xml -q -DskipTests=true package
 
