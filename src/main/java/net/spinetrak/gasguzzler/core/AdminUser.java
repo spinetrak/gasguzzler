@@ -25,15 +25,18 @@
 package net.spinetrak.gasguzzler.core;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.meltmedia.jackson.crypto.Encrypted;
 import org.hibernate.validator.constraints.NotEmpty;
 
 public class AdminUser
 {
   @NotEmpty
   @JsonProperty
+  @Encrypted
   private String password;
   @NotEmpty
   @JsonProperty
+  @Encrypted
   private String username;
 
   public String getPassword()
