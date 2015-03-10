@@ -30,6 +30,8 @@
 
     <properties>
         <project.version>0.0.2</project.version>
+        <build.number>12345</build.number>
+        <build.branch>dev</build.branch>
         <dropwizard.version>0.7.1</dropwizard.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss z</maven.build.timestamp.format>
@@ -37,7 +39,7 @@
 
     <groupId>net.spinetrak</groupId>
     <artifactId>gasguzzler</artifactId>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
 
     <scm>
         <connection>scm:git:git://github.com/spinetrak/gasguzzler.git</connection>
@@ -189,11 +191,11 @@
                                     <manifestEntries>
                                         <Main-Class>net.spinetrak.gasguzzler.Trak</Main-Class>
                                         <Gasguzzler-Build-Version>${project.version}</Gasguzzler-Build-Version>
-                                        <Gasguzzler-Build-Number>${buildNumber}</Gasguzzler-Build-Number>
+                                        <Gasguzzler-Build-Number>${build.number}</Gasguzzler-Build-Number>
                                         <Gasguzzler-Build-URL>
-                                            https://github.com/spinetrak/gasguzzler/commit/${buildNumber}
+                                            https://github.com/spinetrak/gasguzzler/commit/${build.number}
                                         </Gasguzzler-Build-URL>
-                                        <Gasguzzler-Build-Branch>dev</Gasguzzler-Build-Branch>
+                                        <Gasguzzler-Build-Branch>${build.branch}</Gasguzzler-Build-Branch>
                                         <Gasguzzler-Build-Date>${timestamp}</Gasguzzler-Build-Date>
                                     </manifestEntries>
                                 </transformer>
