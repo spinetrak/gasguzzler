@@ -23,7 +23,7 @@ fi
 
 git ls-remote https://github.com/spinetrak/gasguzzler.git -h $MYBRANCH
 
-export MYBUILD=`git ls-remote https://github.com/spinetrak/gasguzzler.git -h master | awk '{ print $1 }
+export MYBUILD=`git ls-remote https://github.com/spinetrak/gasguzzler.git -h master | awk '{ print $1 }'
 
 $OPENSHIFT_REPO_DIR/mymvn -s $OPENSHIFT_REPO_DIR/.openshift/settings.xml -q -DskipTests=true -Dbuild.branch=$MYBRANCH -Dbuild.number=$MYBUILD package
 
