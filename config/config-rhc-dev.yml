@@ -3,6 +3,7 @@ server:
   applicationContextPath: /
   adminContextPath: /admin
   connector:
+    type: http
     bindHost: @OPENSHIFT_DIY_IP@
     port: @OPENSHIFT_DIY_PORT@
 isHttps: true
