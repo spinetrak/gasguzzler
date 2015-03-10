@@ -33,6 +33,8 @@ import io.dropwizard.flyway.FlywayFactory;
 import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import net.spinetrak.gasguzzler.admin.SessionHealthCheck;
+import net.spinetrak.gasguzzler.admin.UserHealthCheck;
 import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
 import net.spinetrak.gasguzzler.resources.BuildInfoResource;
@@ -115,5 +117,7 @@ public class Trak extends Application<TrakConfiguration>
       environment_.servlets().addFilter("HttpRedirectFilter", new HttpRedirectFilter())
         .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
     }
+    environment_.healthChecks().register("users", new UserHealthCheck(userDAO));
+    environment_.healthChecks().register("sessions", new SessionHealthCheck(sessionDAO));
   }
 }
