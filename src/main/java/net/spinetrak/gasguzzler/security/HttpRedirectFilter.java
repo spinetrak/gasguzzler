@@ -22,57 +22,42 @@
  * SOFTWARE.
  */
 
-package net.spinetrak.gasguzzler;
+package net.spinetrak.gasguzzler.security;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.dropwizard.Configuration;
-import io.dropwizard.db.DataSourceFactory;
-import io.dropwizard.flyway.FlywayFactory;
-import net.spinetrak.gasguzzler.security.EncryptedDataSourceFactory;
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import java.util.HashMap;
-import java.util.Map;
-
-public class TrakConfiguration extends Configuration
+public class HttpRedirectFilter implements Filter
 {
-  private Map<String, Object> daos = new HashMap<>();
-  @Valid
-  @NotNull
-  @JsonProperty
-  private EncryptedDataSourceFactory database = new EncryptedDataSourceFactory();
-  @Valid
-  @NotNull
-  @JsonProperty
-  private FlywayFactory flyway = new FlywayFactory();
-  @Valid
-  @NotNull
-  @JsonProperty
-  private Boolean isHttps = false;
-
-  public Object getDAO(final String key_)
+  @Override
+  public void destroy()
   {
-    return daos.get(key_);
   }
 
-  public DataSourceFactory getDataSourceFactory()
+  @Override
+  public void doFilter(final ServletRequest request_, final ServletResponse response_, final FilterChain chain_) throws
+                                                                                                                 IOException,
+                                                                                                                 ServletException
   {
-    return database;
+    if (request_ instanceof HttpServletRequest)
+    {
+      final StringBuffer uri = ((HttpServletRequest) request_).getRequestURL();
+      if (uri.toString().startsWith("http://"))
+      {
+        final String location = "https://" + uri.substring("http://".length());
+        ((HttpServletResponse) response_).sendRedirect(location);
+      }
+      else
+      {
+        chain_.doFilter(request_, response_);
+      }
+    }
   }
 
-  public FlywayFactory getFlywayFactory()
+  @Override
+  public void init(final FilterConfig filterConfig) throws ServletException
   {
-    return flyway;
-  }
-
-  public Boolean isHttps()
-  {
-    return isHttps;
-  }
-
-  protected void addDAO(final String key_, final Object dao_)
-  {
-    daos.put(key_, dao_);
   }
 }

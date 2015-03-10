@@ -23,5 +23,42 @@
  */
 
 define(function (require) {
-    return {};
+    var http = require('plugins/http'),
+        app = require('durandal/app'),
+        system = require('durandal/system'),
+        router = require('plugins/router'),
+        shell = require('services/shell'),
+        ko = require('knockout');
+
+    return {
+        buildVersion: ko.observable(),
+        buildDate: ko.observable(),
+        buildNumber: ko.observable(),
+        buildURL: ko.observable(),
+        buildBranch: ko.observable(),
+
+        urlRoot: location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : ''),
+
+
+        activate: function () {
+            var url = this.urlRoot + '/api/buildinfo';
+
+            var that = this;
+
+            return http.get(url).then(function (response) {
+                    that.buildVersion(response.buildVersion);
+                    that.buildDate(response.buildDate);
+                    that.buildNumber(response.buildNumber);
+                    that.buildURL(response.buildURL);
+                    that.buildBranch(response.buildBranch);
+                },
+                function (error) {
+                    that.buildVersion("n/a");
+                    that.buildDate("n/a");
+                    that.buildNumber("n/a");
+                    that.buildURL("#");
+                    that.buildBranch("n/a");
+                });
+        }
+    };
 });

@@ -53,5 +53,21 @@
                 <li><a href="https://www.pivotaltracker.com/n/projects/1294098">Pivotal Tracker</a></li>
             </ul>
         </li>
+        <li><h6>Build Info</h6>
+            <ul>
+                <li>Branch:
+                    <div id="branch" data-bind="text: buildBranch"></div>
+                </li>
+                <li>Version:
+                    <div id="build" data-bind="text: buildVersion"></div>
+                </li>
+                <li>Number: <a data-bind="attr: { href: buildURL }">
+                    <div id="version" data-bind="text: buildNumber"></div>
+                </a></li>
+                <li>Date:
+                    <div id="date" data-bind="text: buildDate"></div>
+                </li>
+            </ul>
+        </li>
     </ol>
 </section>

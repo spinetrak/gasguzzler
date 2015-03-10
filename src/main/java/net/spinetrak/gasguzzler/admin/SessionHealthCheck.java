@@ -22,57 +22,27 @@
  * SOFTWARE.
  */
 
-package net.spinetrak.gasguzzler;
+package net.spinetrak.gasguzzler.admin;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.dropwizard.Configuration;
-import io.dropwizard.db.DataSourceFactory;
-import io.dropwizard.flyway.FlywayFactory;
-import net.spinetrak.gasguzzler.security.EncryptedDataSourceFactory;
+import com.codahale.metrics.health.HealthCheck;
+import net.spinetrak.gasguzzler.dao.SessionDAO;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import java.util.HashMap;
-import java.util.Map;
-
-public class TrakConfiguration extends Configuration
+public class SessionHealthCheck extends HealthCheck
 {
-  private Map<String, Object> daos = new HashMap<>();
-  @Valid
-  @NotNull
-  @JsonProperty
-  private EncryptedDataSourceFactory database = new EncryptedDataSourceFactory();
-  @Valid
-  @NotNull
-  @JsonProperty
-  private FlywayFactory flyway = new FlywayFactory();
-  @Valid
-  @NotNull
-  @JsonProperty
-  private Boolean isHttps = false;
+  final private SessionDAO _sessionDAO;
 
-  public Object getDAO(final String key_)
+  public SessionHealthCheck(final SessionDAO sessionDAO_)
   {
-    return daos.get(key_);
+    _sessionDAO = sessionDAO_;
   }
 
-  public DataSourceFactory getDataSourceFactory()
+  @Override
+  protected Result check() throws Exception
   {
-    return database;
-  }
-
-  public FlywayFactory getFlywayFactory()
-  {
-    return flyway;
-  }
-
-  public Boolean isHttps()
-  {
-    return isHttps;
-  }
-
-  protected void addDAO(final String key_, final Object dao_)
-  {
-    daos.put(key_, dao_);
+    if (_sessionDAO.findAll().isEmpty())
+    {
+      return Result.unhealthy("No sessions in the sessions DB.");
+    }
+    return Result.healthy();
   }
 }

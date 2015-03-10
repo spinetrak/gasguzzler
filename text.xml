@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ The MIT License (MIT)
+  ~
+  ~ Copyright (c) 2014-2015 spinetrak
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in all
+  ~ copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  ~ SOFTWARE.
+  -->
+
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>my.test</groupId>
+    <artifactId>git-branch-info</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <scm>
+        <connection>scm:git:ssh://path_not_used_in_buildnumber_example/but_scm_type_is</connection>
+    </scm>
+
+    <build>
+        <plugins>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>1.2</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>ru.concerteza.buildnumber</groupId>
+                <artifactId>maven-jgit-buildnumber-plugin</artifactId>
+                <version>1.2.7</version>
+                <executions>
+                    <execution>
+                        <id>jgit-buildnumber</id>
+                        <goals>
+                            <goal>extract-buildnumber</goal>
+                        </goals>
+                        <phase>validate</phase>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <version>2.1.9</version>
+                <executions>
+                    <execution>
+                        <id>git-commit-id</id>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                        <phase>validate</phase>
+                        <configuration>
+                            <!-- Only changing prefix since properties conflicts with jgit above -->
+                            <prefix>git-commit-id</prefix>
+                            <!-- We're using a pom in this example-->
+                            <skipPoms>false</skipPoms>
+                            <gitDescribe>
+                                <!-- Faster to get just branch if skip = true -->
+                                <skip>false</skip>
+                            </gitDescribe>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <id>echo-properties</id>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <phase>validate</phase>
+                        <configuration>
+                            <target>
+                                <echo message="buildnumber-maven-plugin properties:"/>
+                                <echo message="  $${scmBranch}:                  ${scmBranch}"/>
+                                <echo message="  $${buildNumber}:                ${buildNumber}"/>
+                                <echo message="  $${timestamp}:                  ${timestamp}"/>
+
+                                <echo message="maven-jgit-buildnumber-plugin properties:"/>
+                                <echo message="  $${git.revision}:               ${git.revision}"/>
+                                <echo message="  $${git.branch}:                 ${git.branch}"/>
+                                <echo message="  $${git.tag}:                    ${git.tag}"/>
+                                <echo message="  $${git.commitsCount}:           ${git.commitsCount}"/>
+                                <echo message="  $${git.buildnumber}:            ${git.buildnumber}"/>
+
+
+                                <echo message="git-commit-id-plugin properties (aliased with git-commit-id):"/>
+                                <echo message="  $${git.branch}:                 ${git-commit-id.branch}"/>
+
+                                <echo message="  $${git.commit.id.describe}:     ${git-commit-id.commit.id.describe}"/>
+
+                                <echo message="  $${git.build.user.name}:        ${git-commit-id.build.user.name}"/>
+                                <echo message="  $${git.build.user.email}:       ${git-commit-id.build.user.email}"/>
+                                <echo message="  $${git.build.time}:             ${git-commit-id.build.time}"/>
+
+                                <echo message="  $${git.commit.id}:              ${git-commit-id.commit.id}"/>
+                                <echo message="  $${git.commit.id.abbrev}:       ${git-commit-id.commit.id.abbrev}"/>
+                                <echo message="  $${git.commit.user.name}:       ${git-commit-id.commit.user.name}"/>
+                                <echo message="  $${git.commit.user.email}:      ${git-commit-id.commit.user.email}"/>
+                                <echo message="  $${git.commit.message.full}:    ${git-commit-id.commit.message.full}"/>
+                                <echo message="  $${git.commit.message.short}:   ${git-commit-id.commit.message.short}"/>
+                                <echo message="  $${git.commit.time}:            ${git-commit-id.commit.time}"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
+</project>
