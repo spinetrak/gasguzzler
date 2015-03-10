@@ -39,9 +39,13 @@ import net.spinetrak.gasguzzler.resources.BuildInfoResource;
 import net.spinetrak.gasguzzler.resources.SessionResource;
 import net.spinetrak.gasguzzler.resources.UserResource;
 import net.spinetrak.gasguzzler.security.Authenticator;
+import net.spinetrak.gasguzzler.security.HttpRedirectFilter;
 import net.spinetrak.gasguzzler.security.SecurityProvider;
 import org.flywaydb.core.Flyway;
 import org.skife.jdbi.v2.DBI;
+
+import javax.servlet.DispatcherType;
+import java.util.EnumSet;
 
 public class Trak extends Application<TrakConfiguration>
 {
@@ -66,7 +70,7 @@ public class Trak extends Application<TrakConfiguration>
     bootstrap_.addBundle(new AssetsBundle("/assets/js", "/js", null, "js"));
 
     bootstrap_.addBundle(CryptoBundle.builder().build());
-    
+
     bootstrap_.addBundle(new FlywayBundle<TrakConfiguration>()
     {
       @Override
@@ -101,10 +105,15 @@ public class Trak extends Application<TrakConfiguration>
     configuration_.addDAO("sessionDAO", sessionDAO);
 
     environment_.jersey().setUrlPattern("/api/*");
-
     environment_.jersey().register(new UserResource(userDAO, sessionDAO));
     environment_.jersey().register(new SessionResource(userDAO, sessionDAO));
     environment_.jersey().register(new BuildInfoResource());
     environment_.jersey().register(new SecurityProvider<>(new Authenticator(sessionDAO)));
+
+    if (configuration_.isHttps())
+    {
+      environment_.servlets().addFilter("HttpRedirectFilter", new HttpRedirectFilter())
+        .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+    }
   }
 }

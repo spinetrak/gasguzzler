@@ -9,6 +9,7 @@ server:
     keyStorePath: "server.jks"
     keyStorePassword: "spinetrak"
     validateCerts: false
+isHttps: false
 database:
   driverClass: "org.postgresql.Driver"
   url: "jdbc:postgresql://localhost/gasguzzlerdb"

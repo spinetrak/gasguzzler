@@ -9,6 +9,7 @@ server:
   - type: "http"
     bindHost: @OPENSHIFT_DIY_IP@
     port: 4@OPENSHIFT_DIY_PORT@
+isHttps: true
 database:
   driverClass: "org.postgresql.Driver"
   url: "jdbc:postgresql://@OPENSHIFT_POSTGRESQL_DB_HOST@:@OPENSHIFT_POSTGRESQL_DB_PORT@/gasguzzlerdev"
