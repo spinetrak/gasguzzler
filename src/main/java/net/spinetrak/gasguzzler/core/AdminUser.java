@@ -22,69 +22,30 @@
  * SOFTWARE.
  */
 
-package net.spinetrak.gasguzzler;
+package net.spinetrak.gasguzzler.core;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.dropwizard.Configuration;
-import io.dropwizard.db.DataSourceFactory;
-import io.dropwizard.flyway.FlywayFactory;
-import net.spinetrak.gasguzzler.core.AdminUser;
-import net.spinetrak.gasguzzler.security.EncryptedDataSourceFactory;
+import com.meltmedia.jackson.crypto.Encrypted;
+import org.hibernate.validator.constraints.NotEmpty;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import java.util.HashMap;
-import java.util.Map;
-
-public class TrakConfiguration extends Configuration
+public class AdminUser
 {
-  @Valid
-  @NotNull
+  @NotEmpty
   @JsonProperty
-  private AdminUser admin;
-  private Map<String, Object> daos = new HashMap<>();
-  @Valid
-  @NotNull
+  @Encrypted
+  private String password;
+  @NotEmpty
   @JsonProperty
-  private EncryptedDataSourceFactory database = new EncryptedDataSourceFactory();
-  @Valid
-  @NotNull
-  @JsonProperty
-  private FlywayFactory flyway = new FlywayFactory();
-  @Valid
-  @NotNull
-  @JsonProperty
-  private Boolean isHttps = false;
+  @Encrypted
+  private String username;
 
-  public AdminUser
-  getAdmin()
+  public String getPassword()
   {
-    return admin;
+    return password;
   }
 
-  public Object getDAO(final String key_)
+  public String getUsername()
   {
-    return daos.get(key_);
+    return username;
   }
-
-  public DataSourceFactory getDataSourceFactory()
-  {
-    return database;
-  }
-
-  public FlywayFactory getFlywayFactory()
-  {
-    return flyway;
-  }
-
-  public Boolean isHttps()
-  {
-    return isHttps;
-  }
-
-  protected void addDAO(final String key_, final Object dao_)
-  {
-    daos.put(key_, dao_);
-  }
-
 }

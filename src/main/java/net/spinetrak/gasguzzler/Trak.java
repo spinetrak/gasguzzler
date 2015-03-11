@@ -40,6 +40,7 @@ import net.spinetrak.gasguzzler.dao.UserDAO;
 import net.spinetrak.gasguzzler.resources.BuildInfoResource;
 import net.spinetrak.gasguzzler.resources.SessionResource;
 import net.spinetrak.gasguzzler.resources.UserResource;
+import net.spinetrak.gasguzzler.security.AdminSecurityHandler;
 import net.spinetrak.gasguzzler.security.Authenticator;
 import net.spinetrak.gasguzzler.security.HttpRedirectFilter;
 import net.spinetrak.gasguzzler.security.SecurityProvider;
@@ -119,5 +120,8 @@ public class Trak extends Application<TrakConfiguration>
     }
     environment_.healthChecks().register("users", new UserHealthCheck(userDAO));
     environment_.healthChecks().register("sessions", new SessionHealthCheck(sessionDAO));
+
+    environment_.admin().setSecurityHandler(
+      new AdminSecurityHandler(configuration_.getAdmin().getUsername(), configuration_.getAdmin().getPassword()));
   }
 }

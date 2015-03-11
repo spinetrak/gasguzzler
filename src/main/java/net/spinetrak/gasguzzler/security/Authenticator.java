@@ -1,9 +1,36 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2014-2015 spinetrak
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package net.spinetrak.gasguzzler.security;
+
 
 import com.google.common.base.Optional;
 import io.dropwizard.auth.AuthenticationException;
 import net.spinetrak.gasguzzler.core.User;
 import net.spinetrak.gasguzzler.dao.SessionDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -18,7 +45,8 @@ import java.security.spec.InvalidKeySpecException;
  */
 public class Authenticator implements io.dropwizard.auth.Authenticator<Session, User>
 {
-
+  private final static Logger LOGGER = LoggerFactory.getLogger(Authenticator.class.getName());
+  
   private SessionDAO sessionDAO;
 
   public Authenticator(SessionDAO sessionDAO_)
@@ -98,8 +126,9 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<Session, 
   }
 
   @Override
-  public Optional<User> authenticate(Session session_) throws AuthenticationException
+  public Optional<User> authenticate(final Session session_) throws AuthenticationException
   {
+    LOGGER.info("Authenticating {}", session_);
     if ((null == session_) || (null == sessionDAO) || (null == sessionDAO.findSession(session_.getUserid(),
                                                                                       session_.getToken())))
     {
