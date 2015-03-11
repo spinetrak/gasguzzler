@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<!--
+  ~ The MIT License (MIT)
+  ~
+  ~ Copyright (c) 2014-2015 spinetrak
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in all
+  ~ copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  ~ SOFTWARE.
+  -->
+
+<html lang="en">
+<head>
+    <title>Metrics-Watcher Examples</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../css/style.css" media="all"/>
+    <link rel="stylesheet" href="../css/kickstart.css" media="all"/>
+    <link rel="stylesheet" href="../lib/durandal/css/durandal.css"/>
+    <link rel="stylesheet" href="../lib/font-awesome/css/font-awesome.css"/>
+    <script src="../lib/jquery/jquery-1.9.1.min.js"></script>
+
+    <!-- must include bootstrap -->
+    <link rel="stylesheet" type="text/css" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+
+    <!--  And include the metrics-watcher library -->
+    <script src="metrics/metrics-watcher.js"></script>
+    <!-- And include the metrics stylesheet -->
+    <link href="metrics/metrics-watcher-style.css" rel="stylesheet">
+
+    <script>
+        function addGraphs() {
+            metricsWatcher.addMeter("infoLog", "ch.qos.logback.core.Appender",
+                    "info", 100, "Info Log");
+            metricsWatcher.addMeter("warnLog", "ch.qos.logback.core.Appender",
+                    "warn", 100, "Warning Log");
+            metricsWatcher.addMeter("errorLog", "ch.qos.logback.core.Appender",
+                    "error", 100, "Error Log");
+
+            metricsWatcher.addMeter("2xxResponses", "io.dropwizard.jetty.MutableServletContextHandler",
+                    "2xx-responses", 100, "2xx");
+            metricsWatcher.addMeter("3xxResponses", "io.dropwizard.jetty.MutableServletContextHandler",
+                    "3xx-responses", 100, "3xx");
+            metricsWatcher.addMeter("4xxResponses", "io.dropwizard.jetty.MutableServletContextHandler",
+                    "4xx-responses", 100, "4xx");
+            metricsWatcher.addMeter("5xxResponses", "io.dropwizard.jetty.MutableServletContextHandler",
+                    "5xx-responses", 100, "5xx");
+
+            metricsWatcher.addCounter("activeRequests",
+                    "io.dropwizard.jetty.MutableServletContextHandler", "active-requests",
+                    10, "Active Requests");
+            metricsWatcher.addCounter("activeDispatches",
+                    "io.dropwizard.jetty.MutableServletContextHandler", "active-dispatches",
+                    10, "Active Dispatches");
+            metricsWatcher.addCounter("activeSuspended",
+                    "io.dropwizard.jetty.MutableServletContextHandler", "active-suspended",
+                    10, "Active Suspended");
+
+            metricsWatcher.addTimer("getRequests", "io.dropwizard.jetty.MutableServletContextHandler", "get-requests", 1, "GET", "getRequests", 1);
+            metricsWatcher.addTimer("postRequests", "io.dropwizard.jetty.MutableServletContextHandler", "post-requests", 1, "POST", "postRequests", 1);
+            metricsWatcher.addTimer("putRequests", "io.dropwizard.jetty.MutableServletContextHandler", "put-requests", 1, "PUT", "putRequests", 1);
+        }
+
+        $(document).ready(function () {
+            addGraphs();
+            metricsWatcher.initGraphs();
+            keepUpdatingGraphs();
+        });
+
+        function keepUpdatingGraphs() {
+            downloadMetricData();
+            setTimeout(keepUpdatingGraphs, 30000);
+        }
+
+        function downloadMetricData() {
+
+            url = "admin/metrics";
+            $.ajax({
+                contentType: "application/json",
+                url: url,
+                success: function (data) {
+                    metricsWatcher.updateGraphs(data);
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    metricsWatcher.initGraphs();
+                },
+                async: false
+            });
+        }
+    </script>
+</head>
+<body>
+
+
+<div class="grid">
+    <div class="col_12">
+        <div class="col_2">&nbsp;</div>
+        <div class="col_8">
+            <div class="container mainContent">
+                <div>
+                    <ul class="menu grid flex">
+                        <li>
+                            <a href="/#">Home</a>
+                        </li>
+                        <li>
+                            <a href="/#stats">Stats</a>
+                        </li>
+                        <li>
+                            <a href="/#user">You</a>
+                        </li>
+                        <li class="current">
+                            <a href="#">Metrics</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="grid flex">
+                    <div id="infoLog"></div>
+                    <div id="warnLog"></div>
+                    <div id="errorLog"></div>
+                    <div id="2xxResponses"></div>
+                    <div id="3xxResponses"></div>
+                    <div id="4xxResponses"></div>
+                    <div id="5xxResponses"></div>
+                    <div id="activeRequests"></div>
+                    <div id="activeDispatches"></div>
+                    <div id="activeSuspended"></div>
+                    <div id="getRequests"></div>
+                    <div id="postRequests"></div>
+                    <div id="putRequests"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col_2">&nbsp;</div>
+    </div>
+</div>
+
+</body>
+</html>
