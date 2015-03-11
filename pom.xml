@@ -39,7 +39,7 @@
 
     <groupId>net.spinetrak</groupId>
     <artifactId>gasguzzler</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.4</version>
 
     <scm>
         <connection>scm:git:git://github.com/spinetrak/gasguzzler.git</connection>
@@ -196,7 +196,7 @@
                                             https://github.com/spinetrak/gasguzzler/commit/${build.number}
                                         </Gasguzzler-Build-URL>
                                         <Gasguzzler-Build-Branch>${build.branch}</Gasguzzler-Build-Branch>
-                                        <Gasguzzler-Build-Date>${timestamp}</Gasguzzler-Build-Date>
+                                        <Gasguzzler-Build-Date>${maven.build.timestamp}</Gasguzzler-Build-Date>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>
