@@ -62,8 +62,7 @@ public class SessionTest
   @Test
   public void serializesToJson() throws Exception
   {
-    assertEquals(fixture("fixtures/session.json").replaceAll("\\s", "").substring(0, 20),
-                 MAPPER.writeValueAsString(getSession()).substring(
-                   0, 20));
+    assertEquals(fixture("fixtures/session.json").replaceAll("\\s", "").substring(33),
+                 MAPPER.writeValueAsString(getSession()).substring(33));
   }
 }
