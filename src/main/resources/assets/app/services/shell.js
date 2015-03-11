@@ -27,8 +27,9 @@ define(function (require) {
 
     var routeArr = [
         {route: '', title: 'Home', moduleId: 'home/home', nav: true},
-        {route: 'recentstats', title: 'Stats', moduleId: 'site/recentstats', nav: true},
-        {route: 'user', title: 'You', moduleId: 'user/user', nav: true}
+        {route: 'stats', title: 'Stats', moduleId: 'site/stats', nav: true},
+        {route: 'user', title: 'You', moduleId: 'user/user', nav: true},
+        {route: 'metrics', title: 'Metrics', moduleId: '', hash: '/metrics', nav: true}
     ];
 
     return {
