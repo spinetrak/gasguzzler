@@ -71,16 +71,18 @@ define(function (require) {
         doChangeProfile: function () {
 
             var mypassword = this.password();
+            var myemail = this.email();
+            var myusername = this.username();
 
             var userModel = {
                 "userid": sessionStorage.getItem("userid"),
                 "token": sessionStorage.getItem("token"),
-                "username": this.username(),
-                "email": this.email(),
-                "password": CryptoJS.SHA256(this.username() + "|" + this.password()).toString()
+                "username": myusername,
+                "email": myemail,
+                "password": CryptoJS.SHA256(myusername + "|" + mypassword).toString()
             };
 
-            if (userModel.username.length < 3 || !mypassword || mypassword.length < 6 || userModel.email.length < 5 || !this.doValidateEmail(userModel.email)) {
+            if (!myusername || myusername.length < 3 || !mypassword || mypassword.length < 6 || !myemail || myemail.length < 5 || !this.doValidateEmail(myemail)) {
                 app.showMessage("Please make sure that you have entered a valid username, email, and password", "Error!", ["Ok"], true, {"class": "notice error"});
                 return;
             }

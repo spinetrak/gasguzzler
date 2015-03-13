@@ -49,10 +49,19 @@ define(function (require) {
         },
 
         doLogin: function () {
+
+            var mypassword = this.password();
+            var myusername = this.username();
+            
             var userModel = {
-                "username": this.username(),
-                "password": CryptoJS.SHA256(this.username() + "|" + this.password()).toString()
+                "username": myusername,
+                "password": CryptoJS.SHA256(myusername + "|" + mypassword).toString()
             };
+
+            if (!myusername || myusername.length < 3 || !mypassword || mypassword.length < 6) {
+                app.showMessage("Please make sure that you have entered a valid username and password", "Error!", ["Ok"], true, {"class": "notice error"});
+                return;
+            }
 
             var url = this.urlRoot + '/api/session';
 

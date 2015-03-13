@@ -53,11 +53,21 @@ define(function (require) {
 
         doRegister: function () {
 
+            var mypassword = this.password();
+            var myemail = this.email();
+            var myusername = this.username();
+
             var userModel = {
-                "username": this.username(),
-                "password": CryptoJS.SHA256(this.username() + "|" + this.password()).toString(),
-                "email": this.email()
+                "username": myusername,
+                "password": CryptoJS.SHA256(myusername + "|" + mypassword).toString(),
+                "email": myemail
             };
+
+            if (!myusername || myusername.length < 3 || !mypassword || mypassword.length < 6 || !myemail || myemail.length < 5 || !this.doValidateEmail(myemail)) {
+                app.showMessage("Please make sure that you have entered a valid username, email, and password", "Error!", ["Ok"], true, {"class": "notice error"});
+                return;
+            }
+            
             var url = this.urlRoot + '/api/user';
 
             return http.post(url, userModel).then(
@@ -72,6 +82,11 @@ define(function (require) {
                     document.location.href = "/#user";
                     window.location.reload(true);
                 });
+        },
+
+        doValidateEmail: function (email) {
+            var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(email);
         }
     };
 });
