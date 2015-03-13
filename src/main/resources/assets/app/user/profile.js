@@ -70,13 +70,23 @@ define(function (require) {
 
         doChangeProfile: function () {
 
+            var mypassword = this.password();
+            var myemail = this.email();
+            var myusername = this.username();
+
             var userModel = {
                 "userid": sessionStorage.getItem("userid"),
                 "token": sessionStorage.getItem("token"),
-                "username": this.username(),
-                "email": this.email(),
-                "password": CryptoJS.SHA256(this.username() + "|" + this.password()).toString()
+                "username": myusername,
+                "email": myemail,
+                "password": CryptoJS.SHA256(myusername + "|" + mypassword).toString()
             };
+
+            if (!myusername || myusername.length < 3 || !mypassword || mypassword.length < 6 || !myemail || myemail.length < 5 || !this.doValidateEmail(myemail)) {
+                app.showMessage("Please make sure that you have entered a valid username, email, and password", "Error!", ["Ok"], true, {"class": "notice error"});
+                return;
+            }
+
 
             var url = this.urlRoot + '/api/user/' + userModel.userid;
 
@@ -88,6 +98,11 @@ define(function (require) {
                 function (error) {
                     app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"});
                 });
+        },
+
+        doValidateEmail: function (email) {
+            var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(email);
         }
     };
 });
