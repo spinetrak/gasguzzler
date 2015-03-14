@@ -42,6 +42,10 @@ public interface MetricsDAO
   @Mapper(MetricsMapper.class)
   List<DataPoint> get(@Bind("name") final String name);
 
+  @SqlQuery("select distinct name from st_metrics where m_count > 0")
+  @Mapper(MetricsMapper.class)
+  List<DataPoint> get();
+
   @SqlUpdate("insert into st_metrics (m_timestamp, m_name, m_count, m_rate) values (:dp.timestamp, :dp.name, :dp.count, :dp.rate)")
   void insert(@BindBean("dp") final DataPoint data);
 }
