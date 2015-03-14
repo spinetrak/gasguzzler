@@ -27,8 +27,6 @@ package net.spinetrak.gasguzzler.metrics;
 import com.codahale.metrics.*;
 import net.spinetrak.gasguzzler.core.DataPoint;
 import net.spinetrak.gasguzzler.dao.MetricsDAO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.SortedMap;
@@ -36,8 +34,6 @@ import java.util.concurrent.TimeUnit;
 
 public class DbReporter extends ScheduledReporter
 {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(DbReporter.class);
   private Clock _clock;
   private MetricsDAO _dao;
 
@@ -52,8 +48,6 @@ public class DbReporter extends ScheduledReporter
     super(registry_, "db-reporter", filter_, rateUnit_, durationUnit_);
     _dao = dao_;
     _clock = clock_;
-
-    LOGGER.info("DbReporter created: " + this);
   }
 
   public static Builder forRegistry(final MetricRegistry registry_)
@@ -66,8 +60,6 @@ public class DbReporter extends ScheduledReporter
                      final SortedMap<String, Histogram> histograms_, final SortedMap<String, Meter> meters_,
                      final SortedMap<String, Timer> timers_)
   {
-    LOGGER.info("start reporting metrics now");
-
     final long timestamp = TimeUnit.MILLISECONDS.toSeconds(_clock.getTime());
 
     for (Map.Entry<String, Counter> entry : counters_.entrySet())
@@ -88,7 +80,6 @@ public class DbReporter extends ScheduledReporter
 
   private void report(final DataPoint dataPoint_)
   {
-    LOGGER.info("start reporting dat point: " + dataPoint_);
     _dao.insert(dataPoint_);
   }
 

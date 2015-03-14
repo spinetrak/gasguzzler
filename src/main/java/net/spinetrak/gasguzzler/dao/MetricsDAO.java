@@ -24,7 +24,9 @@
 
 package net.spinetrak.gasguzzler.dao;
 
+import net.spinetrak.gasguzzler.core.CountDataPoint;
 import net.spinetrak.gasguzzler.core.DataPoint;
+import net.spinetrak.gasguzzler.core.RateDataPoint;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.BindBean;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
@@ -39,12 +41,20 @@ public interface MetricsDAO
   void delete(@Bind("name") final String name_);
 
   @SqlQuery("select * from st_metrics where m_name = :name")
-  @Mapper(MetricsMapper.class)
+  @Mapper(AllMetricsMapper.class)
   List<DataPoint> get(@Bind("name") final String name);
 
-  @SqlQuery("select distinct name from st_metrics where m_count > 0")
-  @Mapper(MetricsMapper.class)
+  @SqlQuery("select distinct m_name from st_metrics where m_count > 0")
+  @Mapper(AvailableMetricsMapper.class)
   List<DataPoint> get();
+
+  @SqlQuery("select m_timestamp, m_count from st_metrics where m_name = :name order by m_timestamp")
+  @Mapper(CountMetricsMapper.class)
+  List<CountDataPoint> getCount(@Bind("name") final String name);
+
+  @SqlQuery("select m_timestamp, m_rate from st_metrics where m_name = :name order by m_timestamp")
+  @Mapper(RateMetricsMapper.class)
+  List<RateDataPoint> getRate(@Bind("name") final String name);
 
   @SqlUpdate("insert into st_metrics (m_timestamp, m_name, m_count, m_rate) values (:dp.timestamp, :dp.name, :dp.count, :dp.rate)")
   void insert(@BindBean("dp") final DataPoint data);

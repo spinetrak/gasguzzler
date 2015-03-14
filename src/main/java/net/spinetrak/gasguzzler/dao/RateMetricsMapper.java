@@ -1,18 +1,18 @@
 /*
  * The MIT License (MIT)
- *  
+ *
  * Copyright (c) 2014-2015 spinetrak
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- *  
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,44 +24,24 @@
 
 package net.spinetrak.gasguzzler.dao;
 
-import io.dropwizard.testing.junit.DropwizardAppRule;
-import net.spinetrak.gasguzzler.Trak;
-import net.spinetrak.gasguzzler.TrakConfiguration;
-import net.spinetrak.gasguzzler.core.DataPoint;
-import net.spinetrak.gasguzzler.core.DataPointTest;
-import org.junit.ClassRule;
-import org.junit.Test;
+import net.spinetrak.gasguzzler.core.RateDataPoint;
+import org.skife.jdbi.v2.StatementContext;
+import org.skife.jdbi.v2.tweak.ResultSetMapper;
 
-import java.util.List;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-import static org.junit.Assert.assertTrue;
-
-public class MetricsDAOTest
+public class RateMetricsMapper implements ResultSetMapper<RateDataPoint>
 {
-  @ClassRule
-  public static final DropwizardAppRule<TrakConfiguration> RULE =
-    new DropwizardAppRule<>(Trak.class, "config-test.yml");
-  private MetricsDAO _metricsDAO = (MetricsDAO) RULE.getConfiguration().getDAO("metricsDAO");
 
-
-  @Test
-  public void createReadDelete()
+  @Override
+  public RateDataPoint map(final int i_, final ResultSet resultSet_, final StatementContext statementContext_) throws
+                                                                                                               SQLException
   {
-    final DataPoint dataPoint = DataPointTest.getDataPoint();
+    final RateDataPoint dataPoint = new RateDataPoint();
+    dataPoint.setY(resultSet_.getDouble("m_rate"));
+    dataPoint.setX(resultSet_.getLong("m_timestamp"));
 
-    _metricsDAO.insert(dataPoint);
-
-    final List<DataPoint> dataPoints1 = _metricsDAO.get("test");
-
-    assertTrue(!dataPoints1.isEmpty());
-
-    final List<DataPoint> dataPoints2 = _metricsDAO.get();
-    assertTrue(!dataPoints2.isEmpty());
-    
-    _metricsDAO.delete("test");
-
-    final List<DataPoint> dataPoints3 = _metricsDAO.get("test");
-    assertTrue(dataPoints3.isEmpty());
+    return dataPoint;
   }
-
 }

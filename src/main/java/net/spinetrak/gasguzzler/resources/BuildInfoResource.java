@@ -22,46 +22,26 @@
  * SOFTWARE.
  */
 
-package net.spinetrak.gasguzzler.dao;
+package net.spinetrak.gasguzzler.resources;
 
-import io.dropwizard.testing.junit.DropwizardAppRule;
-import net.spinetrak.gasguzzler.Trak;
-import net.spinetrak.gasguzzler.TrakConfiguration;
-import net.spinetrak.gasguzzler.core.DataPoint;
-import net.spinetrak.gasguzzler.core.DataPointTest;
-import org.junit.ClassRule;
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import net.spinetrak.gasguzzler.core.BuildInfo;
 
-import java.util.List;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
-import static org.junit.Assert.assertTrue;
-
-public class MetricsDAOTest
+@Path("/buildinfo")
+@JsonAutoDetect
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes({MediaType.APPLICATION_JSON})
+public class BuildInfoResource
 {
-  @ClassRule
-  public static final DropwizardAppRule<TrakConfiguration> RULE =
-    new DropwizardAppRule<>(Trak.class, "config-test.yml");
-  private MetricsDAO _metricsDAO = (MetricsDAO) RULE.getConfiguration().getDAO("metricsDAO");
-
-
-  @Test
-  public void createReadDelete()
+  @GET
+  public BuildInfo get()
   {
-    final DataPoint dataPoint = DataPointTest.getDataPoint();
-
-    _metricsDAO.insert(dataPoint);
-
-    final List<DataPoint> dataPoints1 = _metricsDAO.get("test");
-
-    assertTrue(!dataPoints1.isEmpty());
-
-    final List<DataPoint> dataPoints2 = _metricsDAO.get();
-    assertTrue(!dataPoints2.isEmpty());
-    
-    _metricsDAO.delete("test");
-
-    final List<DataPoint> dataPoints3 = _metricsDAO.get("test");
-    assertTrue(dataPoints3.isEmpty());
+    return BuildInfo.getInstance();
   }
-
 }

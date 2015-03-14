@@ -25,76 +25,22 @@
 package net.spinetrak.gasguzzler.core;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.hibernate.validator.constraints.NotEmpty;
 
-public class DataPoint
+public class CountDataPoint
 {
-  @NotEmpty
-  @JsonProperty
-  long count;
-  @NotEmpty
-  @JsonProperty
-  String name;
-  @NotEmpty
-  double rate;
-  @NotEmpty
-  @JsonProperty
-  long timestamp;
-
   @JsonProperty
   long x;
   @JsonProperty
-
-  double y;
-
-  public long getCount()
-  {
-    return count;
-  }
-
-  public String getName()
-  {
-    return name;
-  }
-
-  public double getRate()
-  {
-    return rate;
-  }
-
-  public long getTimestamp()
-  {
-    return timestamp;
-  }
+  long y;
 
   public long getX()
   {
     return x;
   }
 
-  public double getY()
+  public long getY()
   {
     return y;
-  }
-
-  public void setCount(final long count_)
-  {
-    count = count_;
-  }
-
-  public void setName(final String name_)
-  {
-    name = name_;
-  }
-
-  public void setRate(final double rate_)
-  {
-    rate = rate_;
-  }
-
-  public void setTimestamp(final long timestamp_)
-  {
-    timestamp = timestamp_;
   }
 
   public void setX(final long x_)
@@ -102,19 +48,8 @@ public class DataPoint
     x = x_;
   }
 
-  public void setY(final double y_)
+  public void setY(final long y_)
   {
     y = y_;
-  }
-
-  @Override
-  public String toString()
-  {
-    return "DataPoint{" +
-      "timestamp=" + getTimestamp() +
-      ", name='" + getName() + '\'' +
-      ", count=" + getCount() +
-      ", rate=" + getRate() +
-      '}';
   }
 }

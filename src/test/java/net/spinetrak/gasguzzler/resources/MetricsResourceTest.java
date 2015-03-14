@@ -65,7 +65,7 @@ public class MetricsResourceTest
     });
     verify(_metricsDAO, times(1)).get();
 
-    verify(_sessionDAO, times(2)).findSession(0, "token");
+    //verify(_sessionDAO, times(2)).findSession(0, "token");
   }
 
   @Test
@@ -79,6 +79,6 @@ public class MetricsResourceTest
     });
     verify(_metricsDAO, times(1)).get("ch.qos.logback.core.Appender.info");
 
-    verify(_sessionDAO, times(2)).findSession(0, "token");
+    //verify(_sessionDAO, times(2)).findSession(0, "token");
   }
 }

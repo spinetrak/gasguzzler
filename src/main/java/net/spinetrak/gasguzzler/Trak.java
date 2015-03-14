@@ -40,6 +40,7 @@ import net.spinetrak.gasguzzler.dao.MetricsDAO;
 import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
 import net.spinetrak.gasguzzler.metrics.DbReporter;
+import net.spinetrak.gasguzzler.resources.BuildInfoResource;
 import net.spinetrak.gasguzzler.resources.MetricsResource;
 import net.spinetrak.gasguzzler.resources.SessionResource;
 import net.spinetrak.gasguzzler.resources.UserResource;
@@ -115,6 +116,7 @@ public class Trak extends Application<TrakConfiguration>
     configuration_.addDAO("metricsDAO", metricsDAO);
 
     environment_.jersey().setUrlPattern("/api/*");
+    environment_.jersey().register(new BuildInfoResource());
     environment_.jersey().register(new UserResource(userDAO, sessionDAO));
     environment_.jersey().register(new SessionResource(userDAO, sessionDAO));
     environment_.jersey().register(new MetricsResource(metricsDAO, sessionDAO));
