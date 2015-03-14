@@ -35,8 +35,10 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import net.spinetrak.gasguzzler.admin.SessionHealthCheck;
 import net.spinetrak.gasguzzler.admin.UserHealthCheck;
+import net.spinetrak.gasguzzler.dao.MetricsDAO;
 import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
+import net.spinetrak.gasguzzler.metrics.DbReporter;
 import net.spinetrak.gasguzzler.resources.BuildInfoResource;
 import net.spinetrak.gasguzzler.resources.SessionResource;
 import net.spinetrak.gasguzzler.resources.UserResource;
@@ -49,6 +51,7 @@ import org.skife.jdbi.v2.DBI;
 
 import javax.servlet.DispatcherType;
 import java.util.EnumSet;
+import java.util.concurrent.TimeUnit;
 
 public class Trak extends Application<TrakConfiguration>
 {
@@ -103,6 +106,7 @@ public class Trak extends Application<TrakConfiguration>
     final DBI jdbi = new DBIFactory().build(environment_, configuration_.getDataSourceFactory(), "postgres");
     final UserDAO userDAO = jdbi.onDemand(UserDAO.class);
     final SessionDAO sessionDAO = jdbi.onDemand(SessionDAO.class);
+    final MetricsDAO metricsDAO = jdbi.onDemand(MetricsDAO.class);
 
     configuration_.addDAO("userDAO", userDAO);
     configuration_.addDAO("sessionDAO", sessionDAO);
@@ -123,5 +127,11 @@ public class Trak extends Application<TrakConfiguration>
 
     environment_.admin().setSecurityHandler(
       new AdminSecurityHandler(configuration_.getAdmin().getUsername(), configuration_.getAdmin().getPassword()));
+
+    final DbReporter reporter = DbReporter.forRegistry(environment_.metrics())
+      .convertRatesTo(TimeUnit.SECONDS)
+      .convertDurationsTo(TimeUnit.MILLISECONDS)
+      .build(metricsDAO);
+    reporter.start(10, TimeUnit.SECONDS);
   }
 }
