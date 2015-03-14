@@ -24,7 +24,6 @@
 
 package net.spinetrak.gasguzzler.dao;
 
-import net.spinetrak.gasguzzler.core.SessionMapper;
 import net.spinetrak.gasguzzler.security.Session;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;

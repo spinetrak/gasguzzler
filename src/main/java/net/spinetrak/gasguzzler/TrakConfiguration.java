@@ -29,6 +29,7 @@ import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.flyway.FlywayFactory;
 import net.spinetrak.gasguzzler.core.AdminUser;
+import net.spinetrak.gasguzzler.metrics.DbReporter;
 import net.spinetrak.gasguzzler.security.EncryptedDataSourceFactory;
 
 import javax.validation.Valid;
@@ -41,7 +42,7 @@ public class TrakConfiguration extends Configuration
   @Valid
   @NotNull
   @JsonProperty
-  private AdminUser admin;
+  private AdminUser admin = null;
   private Map<String, Object> daos = new HashMap<>();
   @Valid
   @NotNull
@@ -55,9 +56,9 @@ public class TrakConfiguration extends Configuration
   @NotNull
   @JsonProperty
   private Boolean isHttps = false;
+  private DbReporter reporter;
 
-  public AdminUser
-  getAdmin()
+  public AdminUser getAdmin()
   {
     return admin;
   }
@@ -77,6 +78,11 @@ public class TrakConfiguration extends Configuration
     return flyway;
   }
 
+  public DbReporter getReporter()
+  {
+    return reporter;
+  }
+
   public Boolean isHttps()
   {
     return isHttps;
@@ -85,6 +91,11 @@ public class TrakConfiguration extends Configuration
   protected void addDAO(final String key_, final Object dao_)
   {
     daos.put(key_, dao_);
+  }
+
+  protected void addReporter(final DbReporter reporter_)
+  {
+    reporter = reporter_;
   }
 
 }

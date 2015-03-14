@@ -1,18 +1,18 @@
 /*
  * The MIT License (MIT)
- *  
+ *
  * Copyright (c) 2014-2015 spinetrak
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- *  
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,26 +22,26 @@
  * SOFTWARE.
  */
 
-package net.spinetrak.gasguzzler.resources;
+package net.spinetrak.gasguzzler.dao;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import net.spinetrak.gasguzzler.core.BuildInfo;
+import net.spinetrak.gasguzzler.security.Session;
+import org.skife.jdbi.v2.StatementContext;
+import org.skife.jdbi.v2.tweak.ResultSetMapper;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-@Path("/buildinfo")
-@JsonAutoDetect
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes({MediaType.APPLICATION_JSON})
-public class BuildInfoResource
+public class SessionMapper implements ResultSetMapper<Session>
 {
-  @GET
-  public BuildInfo get()
+
+  @Override
+  public Session map(final int i_, final ResultSet resultSet_, final StatementContext statementContext_) throws
+                                                                                                         SQLException
   {
-    return BuildInfo.getInstance();
+    final Session session = new Session();
+    session.setUserid(resultSet_.getInt("userid"));
+    session.setToken(resultSet_.getString("token"));
+
+    return session;
   }
 }

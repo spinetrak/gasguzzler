@@ -27,13 +27,21 @@ package net.spinetrak.gasguzzler.dao;
 import net.spinetrak.gasguzzler.core.DataPoint;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.BindBean;
+import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
+import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
+
+import java.util.List;
 
 public interface MetricsDAO
 {
-  @SqlUpdate("insert into st_metrics (m_timestamp, m_name, m_count) values (:timestamp, :name, :count)")
-  void insert(@BindBean final DataPoint data);
+  @SqlUpdate("delete from st_metrics where m_name = :name")
+  void delete(@Bind("name") final String name_);
 
-  @SqlUpdate("insert into st_metrics (m_timestamp, m_name, m_count, m_rate) values (:timestamp, :name, :count, :rate)")
-  void insert(@BindBean final DataPoint data, @Bind double rate);
+  @SqlQuery("select * from st_metrics where m_name = :name")
+  @Mapper(MetricsMapper.class)
+  List<DataPoint> get(@Bind("name") final String name);
+
+  @SqlUpdate("insert into st_metrics (m_timestamp, m_name, m_count, m_rate) values (:dp.timestamp, :dp.name, :dp.count, :dp.rate)")
+  void insert(@BindBean("dp") final DataPoint data);
 }

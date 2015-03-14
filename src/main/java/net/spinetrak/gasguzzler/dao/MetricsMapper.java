@@ -22,75 +22,28 @@
  * SOFTWARE.
  */
 
-package net.spinetrak.gasguzzler.core;
+package net.spinetrak.gasguzzler.dao;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.hibernate.validator.constraints.NotEmpty;
+import net.spinetrak.gasguzzler.core.DataPoint;
+import org.skife.jdbi.v2.StatementContext;
+import org.skife.jdbi.v2.tweak.ResultSetMapper;
 
-public class DataPoint
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class MetricsMapper implements ResultSetMapper<DataPoint>
 {
-  @NotEmpty
-
-  @JsonProperty
-  long count;
-  @NotEmpty
-  @JsonProperty
-  String name;
-  @NotEmpty
-  double rate;
-  @NotEmpty
-  @JsonProperty
-  long timestamp;
-
-  public long getCount()
-  {
-    return count;
-  }
-
-  public String getName()
-  {
-    return name;
-
-  }
-
-  public double getRate()
-  {
-    return rate;
-  }
-
-  public long getTimestamp()
-  {
-    return timestamp;
-  }
-
-  public void setCount(final long count_)
-  {
-    count = count_;
-  }
-
-  public void setName(final String name_)
-  {
-    name = name_;
-  }
-
-  public void setRate(final double rate_)
-  {
-    rate = rate_;
-  }
-
-  public void setTimestamp(final long timestamp_)
-  {
-    timestamp = timestamp_;
-  }
 
   @Override
-  public String toString()
+  public DataPoint map(final int i_, final ResultSet resultSet_, final StatementContext statementContext_) throws
+                                                                                                           SQLException
   {
-    return "DataPoint{" +
-      "timestamp=" + getTimestamp() +
-      ", name='" + getName() + '\'' +
-      ", count=" + getCount() +
-      ", rate=" + getRate() +
-      '}';
+    final DataPoint dataPoint = new DataPoint();
+    dataPoint.setCount(resultSet_.getLong("m_count"));
+    dataPoint.setName(resultSet_.getString("m_name"));
+    dataPoint.setRate(resultSet_.getDouble("m_rate"));
+    dataPoint.setTimestamp(resultSet_.getLong("m_timestamp"));
+
+    return dataPoint;
   }
 }

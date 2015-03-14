@@ -42,21 +42,23 @@ public class DbReporter extends ScheduledReporter
   private MetricsDAO _dao;
 
 
-  private DbReporter(MetricRegistry registry_,
-                     MetricsDAO dao_,
-                     TimeUnit rateUnit_,
-                     TimeUnit durationUnit_,
-                     Clock clock_,
-                     MetricFilter filter_)
+  private DbReporter(final MetricRegistry registry_,
+                     final MetricsDAO dao_,
+                     final TimeUnit rateUnit_,
+                     final TimeUnit durationUnit_,
+                     final Clock clock_,
+                     final MetricFilter filter_)
   {
     super(registry_, "db-reporter", filter_, rateUnit_, durationUnit_);
     _dao = dao_;
     _clock = clock_;
+
+    LOGGER.info("DbReporter created: " + this);
   }
 
-  public static Builder forRegistry(MetricRegistry registry)
+  public static Builder forRegistry(final MetricRegistry registry_)
   {
-    return new Builder(registry);
+    return new Builder(registry_);
   }
 
   @Override
@@ -64,7 +66,7 @@ public class DbReporter extends ScheduledReporter
                      final SortedMap<String, Histogram> histograms_, final SortedMap<String, Meter> meters_,
                      final SortedMap<String, Timer> timers_)
   {
-    LOGGER.debug("start reporting metrics now");
+    LOGGER.info("start reporting metrics now");
 
     final long timestamp = TimeUnit.MILLISECONDS.toSeconds(_clock.getTime());
 
@@ -84,35 +86,40 @@ public class DbReporter extends ScheduledReporter
     }
   }
 
-  private void report(final DataPoint dataPoint_, final double rate_)
-  {
-    _dao.insert(dataPoint_, rate_);
-  }
-
   private void report(final DataPoint dataPoint_)
   {
+    LOGGER.info("start reporting dat point: " + dataPoint_);
     _dao.insert(dataPoint_);
   }
 
   private void reportCounter(final long timestamp_, final String name_, final Counter counter_)
   {
-    report(new DataPoint(timestamp_, name_, counter_.getCount()));
+    final DataPoint dp = new DataPoint();
+    dp.setTimestamp(timestamp_);
+    dp.setRate(-1);
+    dp.setName(name_);
+    dp.setCount(counter_.getCount());
+    report(dp);
   }
 
   private void reportMeter(final long timestamp_, final String name_, final Meter meter_)
   {
-    report(new DataPoint(timestamp_,
-                         name_,
-                         meter_.getCount()),
-           convertRate(meter_.getOneMinuteRate()));
+    final DataPoint dp = new DataPoint();
+    dp.setTimestamp(timestamp_);
+    dp.setRate(convertRate(meter_.getOneMinuteRate()));
+    dp.setName(name_);
+    dp.setCount(meter_.getCount());
+    report(dp);
   }
 
   private void reportTimer(final long timestamp_, final String name_, final Timer timer_)
   {
-    report(new DataPoint(timestamp_,
-                         name_,
-                         timer_.getCount()),
-           convertRate(timer_.getOneMinuteRate()));
+    final DataPoint dp = new DataPoint();
+    dp.setTimestamp(timestamp_);
+    dp.setRate(convertRate(timer_.getOneMinuteRate()));
+    dp.setName(name_);
+    dp.setCount(timer_.getCount());
+    report(dp);
   }
 
   /**
@@ -136,13 +143,6 @@ public class DbReporter extends ScheduledReporter
       _filter = MetricFilter.ALL;
     }
 
-    /**
-     * Builds a {@link CsvReporter} with the given properties, writing {@code .csv} files to the
-     * given directory.
-     *
-     * @param dao_ the dao interface to persist the metrics to a database
-     * @return a {@link CsvReporter}
-     */
     public DbReporter build(final MetricsDAO dao_)
     {
       return new DbReporter(_registry,
@@ -153,39 +153,22 @@ public class DbReporter extends ScheduledReporter
                             _filter);
     }
 
-    /**
-     * Convert durations to the given time unit.
-     *
-     * @param durationUnit a unit of time
-     * @return {@code this}
-     */
-    public Builder convertDurationsTo(TimeUnit durationUnit)
+    public Builder convertDurationsTo(final TimeUnit durationUnit_)
     {
-      _durationUnit = durationUnit;
+      _durationUnit = durationUnit_;
       return this;
     }
 
-    /**
-     * Convert rates to the given time unit.
-     *
-     * @param rateUnit a unit of time
-     * @return {@code this}
-     */
-    public Builder convertRatesTo(TimeUnit rateUnit)
+    public Builder convertRatesTo(final TimeUnit rateUnit_)
     {
-      _rateUnit = rateUnit;
+      _rateUnit = rateUnit_;
       return this;
     }
 
-    /**
-     * Only report metrics which match the given filter.
-     *
-     * @param filter a {@link MetricFilter}
-     * @return {@code this}
-     */
-    public Builder filter(MetricFilter filter)
+
+    public Builder filter(final MetricFilter filter_)
     {
-      _filter = filter;
+      _filter = filter_;
       return this;
     }
   }
