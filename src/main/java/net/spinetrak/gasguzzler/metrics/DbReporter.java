@@ -28,6 +28,7 @@ import com.codahale.metrics.*;
 import net.spinetrak.gasguzzler.core.DataPoint;
 import net.spinetrak.gasguzzler.dao.MetricsDAO;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.concurrent.TimeUnit;
@@ -80,6 +81,8 @@ public class DbReporter extends ScheduledReporter
 
   private void report(final DataPoint dataPoint_)
   {
+    final long cutoff = Math.round((new Date().getTime() - TimeUnit.MILLISECONDS.convert(45, TimeUnit.DAYS)) / 1000);
+    _dao.deleteStale(cutoff);
     _dao.insert(dataPoint_);
   }
 

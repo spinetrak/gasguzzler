@@ -38,7 +38,10 @@ import java.util.List;
 public interface MetricsDAO
 {
   @SqlUpdate("delete from st_metrics where m_name = :name")
-  void delete(@Bind("name") final String name_);
+  int delete(@Bind("name") final String name_);
+
+  @SqlUpdate("delete from st_metrics where m_timestamp < :old")
+  int deleteStale(@Bind("old") final long time_);
 
   @SqlQuery("select distinct m_name from st_metrics where m_count > 0")
   List<String> get();

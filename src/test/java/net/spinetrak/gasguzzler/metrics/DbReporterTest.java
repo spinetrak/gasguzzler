@@ -76,7 +76,8 @@ public class DbReporterTest
 
     assertTrue(0 < _metricsDAO.getCount("test").size());
 
-    _metricsDAO.delete("test");
+    final int deleted = _metricsDAO.delete("test");
+    assertTrue(0 < deleted);
 
     assertEquals(0, _metricsDAO.getCount("test").size());
   }

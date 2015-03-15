@@ -59,8 +59,9 @@ public class MetricsDAOTest
 
     final List<String> dataPoints2 = _metricsDAO.get();
     assertTrue(!dataPoints2.isEmpty());
-    
-    _metricsDAO.delete("test");
+
+    final int deleted = _metricsDAO.delete("test");
+    assertTrue(0 < deleted);
 
     final List<RateDataPoint> dataPoints3 = _metricsDAO.getRate("test");
     assertTrue(dataPoints3.isEmpty());
