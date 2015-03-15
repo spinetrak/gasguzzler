@@ -25,14 +25,16 @@
 package net.spinetrak.gasguzzler.resources;
 
 
+import io.dropwizard.auth.Auth;
 import net.spinetrak.gasguzzler.core.CountDataPoint;
-import net.spinetrak.gasguzzler.core.DataPoint;
 import net.spinetrak.gasguzzler.core.RateDataPoint;
+import net.spinetrak.gasguzzler.core.User;
 import net.spinetrak.gasguzzler.dao.MetricsDAO;
 import net.spinetrak.gasguzzler.dao.SessionDAO;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.List;
 
 @Path("/metrics")
@@ -51,60 +53,35 @@ public class MetricsResource
     sessionDAO = sessionDAO_;
   }
 
-
   @GET
-  @Path("/{name}")
-  public List<DataPoint> get(@PathParam("name") final String name_)
+  public List<String> get(@Auth final User user_)
   {
-    /*
-    if (null != sessionDAO.findSession(user_.getUserid(), user_.getToken()))
-    {
-      return metricsDAO.get(name_);
-    }
-    throw new WebApplicationException(Response.Status.FORBIDDEN);
-    */
-    return metricsDAO.get(name_);
-  }
-
-  @GET
-  public List<DataPoint> get()
-  {
-    /*
     if (null != sessionDAO.findSession(user_.getUserid(), user_.getToken()))
     {
       return metricsDAO.get();
     }
     throw new WebApplicationException(Response.Status.FORBIDDEN);
-    */
-
-    return metricsDAO.get();
   }
 
   @GET
   @Path("/{name}/counts")
-  public List<CountDataPoint> getCounts(@PathParam("name") final String name_)
+  public List<CountDataPoint> getCounts(@Auth final User user_, @PathParam("name") final String name_)
   {
-    /*
     if (null != sessionDAO.findSession(user_.getUserid(), user_.getToken()))
     {
-      return metricsDAO.get(name_);
+      return metricsDAO.getCount(name_);
     }
     throw new WebApplicationException(Response.Status.FORBIDDEN);
-    */
-    return metricsDAO.getCount(name_);
   }
 
   @GET
   @Path("/{name}/rates")
-  public List<RateDataPoint> getRates(@PathParam("name") final String name_)
+  public List<RateDataPoint> getRates(@Auth final User user_, @PathParam("name") final String name_)
   {
-    /*
     if (null != sessionDAO.findSession(user_.getUserid(), user_.getToken()))
     {
-      return metricsDAO.get(name_);
+      return metricsDAO.getRate(name_);
     }
     throw new WebApplicationException(Response.Status.FORBIDDEN);
-    */
-    return metricsDAO.getRate(name_);
   }
 }

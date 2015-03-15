@@ -40,13 +40,8 @@ public interface MetricsDAO
   @SqlUpdate("delete from st_metrics where m_name = :name")
   void delete(@Bind("name") final String name_);
 
-  @SqlQuery("select * from st_metrics where m_name = :name")
-  @Mapper(AllMetricsMapper.class)
-  List<DataPoint> get(@Bind("name") final String name);
-
   @SqlQuery("select distinct m_name from st_metrics where m_count > 0")
-  @Mapper(AvailableMetricsMapper.class)
-  List<DataPoint> get();
+  List<String> get();
 
   @SqlQuery("select m_timestamp, m_count from st_metrics where m_name = :name order by m_timestamp")
   @Mapper(CountMetricsMapper.class)

@@ -27,8 +27,10 @@ package net.spinetrak.gasguzzler.dao;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import net.spinetrak.gasguzzler.Trak;
 import net.spinetrak.gasguzzler.TrakConfiguration;
+import net.spinetrak.gasguzzler.core.CountDataPoint;
 import net.spinetrak.gasguzzler.core.DataPoint;
 import net.spinetrak.gasguzzler.core.DataPointTest;
+import net.spinetrak.gasguzzler.core.RateDataPoint;
 import org.junit.ClassRule;
 import org.junit.Test;
 
@@ -51,16 +53,16 @@ public class MetricsDAOTest
 
     _metricsDAO.insert(dataPoint);
 
-    final List<DataPoint> dataPoints1 = _metricsDAO.get("test");
+    final List<CountDataPoint> dataPoints1 = _metricsDAO.getCount("test");
 
     assertTrue(!dataPoints1.isEmpty());
 
-    final List<DataPoint> dataPoints2 = _metricsDAO.get();
+    final List<String> dataPoints2 = _metricsDAO.get();
     assertTrue(!dataPoints2.isEmpty());
     
     _metricsDAO.delete("test");
 
-    final List<DataPoint> dataPoints3 = _metricsDAO.get("test");
+    final List<RateDataPoint> dataPoints3 = _metricsDAO.getRate("test");
     assertTrue(dataPoints3.isEmpty());
   }
 

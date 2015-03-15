@@ -37,6 +37,7 @@ import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class DbReporterTest
 {
@@ -73,11 +74,11 @@ public class DbReporterTest
 
     _reporter.report(gauges, counters, histograms, meters, timers);
 
-    assertEquals(3, _metricsDAO.get("test").size());
+    assertTrue(0 < _metricsDAO.getCount("test").size());
 
     _metricsDAO.delete("test");
 
-    assertEquals(0, _metricsDAO.get("test").size());
+    assertEquals(0, _metricsDAO.getCount("test").size());
   }
 
 }

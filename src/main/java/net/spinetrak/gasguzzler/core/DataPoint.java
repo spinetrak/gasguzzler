@@ -41,12 +41,6 @@ public class DataPoint
   @JsonProperty
   long timestamp;
 
-  @JsonProperty
-  long x;
-  @JsonProperty
-
-  double y;
-
   public long getCount()
   {
     return count;
@@ -67,16 +61,6 @@ public class DataPoint
     return timestamp;
   }
 
-  public long getX()
-  {
-    return x;
-  }
-
-  public double getY()
-  {
-    return y;
-  }
-
   public void setCount(final long count_)
   {
     count = count_;
@@ -95,16 +79,6 @@ public class DataPoint
   public void setTimestamp(final long timestamp_)
   {
     timestamp = timestamp_;
-  }
-
-  public void setX(final long x_)
-  {
-    x = x_;
-  }
-
-  public void setY(final double y_)
-  {
-    y = y_;
   }
 
   @Override

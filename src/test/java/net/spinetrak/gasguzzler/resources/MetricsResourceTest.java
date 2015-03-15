@@ -69,15 +69,29 @@ public class MetricsResourceTest
   }
 
   @Test
-  public void getMetrics()
+  public void getCountMetrics()
   {
     when(_sessionDAO.findSession(0, "token")).thenReturn(session);
-    resources.client().resource("/metrics/ch.qos.logback.core.Appender.info").header(SecurityProvider.TOKEN,
+    resources.client().resource("/metrics/ch.qos.logback.core.Appender.info/counts").header(SecurityProvider.TOKEN,
+                                                                                            "token").header(
+      SecurityProvider.USERID, "0").type(MediaType.APPLICATION_JSON_TYPE).get(new GenericType<List<DataPoint>>()
+    {
+    });
+    verify(_metricsDAO, times(1)).getCount("ch.qos.logback.core.Appender.info");
+
+    //verify(_sessionDAO, times(2)).findSession(0, "token");
+  }
+
+  @Test
+  public void getRateMetrics()
+  {
+    when(_sessionDAO.findSession(0, "token")).thenReturn(session);
+    resources.client().resource("/metrics/ch.qos.logback.core.Appender.info/rates").header(SecurityProvider.TOKEN,
                                                                                      "token").header(
       SecurityProvider.USERID, "0").type(MediaType.APPLICATION_JSON_TYPE).get(new GenericType<List<DataPoint>>()
     {
     });
-    verify(_metricsDAO, times(1)).get("ch.qos.logback.core.Appender.info");
+    verify(_metricsDAO, times(1)).getRate("ch.qos.logback.core.Appender.info");
 
     //verify(_sessionDAO, times(2)).findSession(0, "token");
   }
