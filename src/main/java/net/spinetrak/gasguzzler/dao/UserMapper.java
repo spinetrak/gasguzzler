@@ -22,21 +22,30 @@
  * SOFTWARE.
  */
 
-define(function (require) {
-    var router = require('plugins/router');
+package net.spinetrak.gasguzzler.dao;
 
-    var routeArr = [
-        {route: '', title: 'Home', moduleId: 'home/home', nav: true},
-        {route: 'stats', title: 'Stats', moduleId: 'site/stats', nav: true},
-        {route: 'user', title: 'You', moduleId: 'user/user', nav: true},
-        {route: 'metrics', title: 'Metrics', moduleId: 'metrics/metrics', nav: true}
-    ];
+import net.spinetrak.gasguzzler.core.User;
+import org.skife.jdbi.v2.StatementContext;
+import org.skife.jdbi.v2.tweak.ResultSetMapper;
 
-    return {
-        router: router,
-        activate: function () {
-            router.map(routeArr).buildNavigationModel();
-            return router.activate();
-        }
-    };
-});
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class UserMapper implements ResultSetMapper<User>
+{
+
+  @Override
+  public User map(final int i_, final ResultSet resultSet_, final StatementContext statementContext_) throws
+                                                                                                      SQLException
+  {
+    final User user = new User();
+
+    user.setUsername(resultSet_.getString("username"));
+    user.setPassword(resultSet_.getString("password"));
+    user.setUserid(resultSet_.getInt("userid"));
+    user.setEmail(resultSet_.getString("email"));
+    user.setRole(resultSet_.getString("role"));
+
+    return user;
+  }
+}

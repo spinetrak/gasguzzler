@@ -23,20 +23,20 @@
  */
 
 define(function (require) {
-    var router = require('plugins/router');
-
-    var routeArr = [
-        {route: '', title: 'Home', moduleId: 'home/home', nav: true},
-        {route: 'stats', title: 'Stats', moduleId: 'site/stats', nav: true},
-        {route: 'user', title: 'You', moduleId: 'user/user', nav: true},
-        {route: 'metrics', title: 'Metrics', moduleId: 'metrics/metrics', nav: true}
-    ];
+    var http = require('plugins/http'),
+        app = require('durandal/app'),
+        system = require('durandal/system'),
+        shell = require('services/shell'),
+        router = require('plugins/router'),
+        ko = require('knockout');
 
     return {
-        router: router,
+        logMetrics: ko.observable(),
+        jettyMetrics: ko.observable(),
+
         activate: function () {
-            router.map(routeArr).buildNavigationModel();
-            return router.activate();
+            this.logMetrics('metrics/logMetrics');
+            this.jettyMetrics('metrics/jettyMetrics');
         }
     };
 });

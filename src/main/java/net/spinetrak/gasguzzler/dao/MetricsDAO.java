@@ -24,30 +24,36 @@
 
 package net.spinetrak.gasguzzler.dao;
 
-import net.spinetrak.gasguzzler.security.Session;
+import net.spinetrak.gasguzzler.core.CountDataPoint;
+import net.spinetrak.gasguzzler.core.DataPoint;
+import net.spinetrak.gasguzzler.core.RateDataPoint;
 import org.skife.jdbi.v2.sqlobject.Bind;
+import org.skife.jdbi.v2.sqlobject.BindBean;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
 
 import java.util.List;
 
-public interface SessionDAO
+public interface MetricsDAO
 {
-  @SqlUpdate("delete from st_session where userid = :userid and token = :token")
-  void delete(@Bind("userid") int userid, @Bind("token") String token);
+  @SqlUpdate("delete from st_metrics where m_name = :name")
+  int delete(@Bind("name") final String name_);
 
-  @SqlUpdate("delete from st_session where userid = :userid")
-  void delete(@Bind("userid") int userid);
+  @SqlUpdate("delete from st_metrics where m_timestamp < :old")
+  int deleteStale(@Bind("old") final long time_);
 
-  @SqlQuery("select * from st_session")
-  @Mapper(SessionMapper.class)
-  List<Session> findAll();
-  
-  @SqlQuery("select userid, token from st_session where userid = :userid and token = :token limit 1")
-  @Mapper(SessionMapper.class)
-  Session findSession(@Bind("userid") int userid, @Bind("token") String token);
+  @SqlQuery("select distinct m_name from st_metrics where m_count > 0")
+  List<String> get();
 
-  @SqlUpdate("insert into st_session (userid, token, created) values (:userid, :token, :created)")
-  void insert(@Bind("userid") int userid, @Bind("token") String token, @Bind("created") java.util.Date created);
+  @SqlQuery("select m_timestamp, m_count from st_metrics where m_name = :name order by m_timestamp")
+  @Mapper(CountMetricsMapper.class)
+  List<CountDataPoint> getCount(@Bind("name") final String name);
+
+  @SqlQuery("select m_timestamp, m_rate from st_metrics where m_name = :name order by m_timestamp")
+  @Mapper(RateMetricsMapper.class)
+  List<RateDataPoint> getRate(@Bind("name") final String name);
+
+  @SqlUpdate("insert into st_metrics (m_timestamp, m_name, m_count, m_rate) values (:dp.timestamp, :dp.name, :dp.count, :dp.rate)")
+  void insert(@BindBean("dp") final DataPoint data);
 }

@@ -55,6 +55,7 @@ public class BuildInfo
   @NotEmpty
   @JsonProperty
   final private String buildVersion;
+
   private BuildInfo()
   {
     buildVersion = Manifests.exists(BUILD_VERSION) ? Manifests.read(BUILD_VERSION) : "n/a";
@@ -64,19 +65,6 @@ public class BuildInfo
     buildURL = Manifests.exists(BUILD_URL) ? Manifests.read(BUILD_URL) : "n/a";
   }
 
-  public static String getBuildDate(final String buildDate_)
-  {
-    try
-    {
-      final Date d = new Date(Long.parseLong(buildDate_));
-      return FORMATTER.format(d);
-    }
-    catch (final Exception ex_)
-    {
-      return buildDate_;
-    }
-  }
-
   public static BuildInfo getInstance()
   {
     if (null == _buildInfo)
@@ -84,5 +72,53 @@ public class BuildInfo
       _buildInfo = new BuildInfo();
     }
     return _buildInfo;
+  }
+
+  @Override
+  public boolean equals(final Object o)
+  {
+    if (this == o)
+    {
+      return true;
+    }
+    if (!(o instanceof BuildInfo))
+    {
+      return false;
+    }
+
+    final BuildInfo buildInfo = (BuildInfo) o;
+
+    if (!buildBranch.equals(buildInfo.buildBranch))
+    {
+      return false;
+    }
+    if (!buildDate.equals(buildInfo.buildDate))
+    {
+      return false;
+    }
+    if (!buildNumber.equals(buildInfo.buildNumber))
+    {
+      return false;
+    }
+    if (!buildURL.equals(buildInfo.buildURL))
+    {
+      return false;
+    }
+    return buildVersion.equals(buildInfo.buildVersion);
+
+  }
+
+  private String getBuildDate(final String buildDate_)
+  {
+    try
+    {
+      final Date d = new Date(Long.parseLong(buildDate_));
+      return FORMATTER.format(d);
+    }
+
+    catch (final Exception ex_)
+    {
+      return buildDate_;
+    }
   }
 }

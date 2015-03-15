@@ -31,13 +31,17 @@ import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.flyway.FlywayBundle;
 import io.dropwizard.flyway.FlywayFactory;
 import io.dropwizard.jdbi.DBIFactory;
+import io.dropwizard.jdbi.bundles.DBIExceptionsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import net.spinetrak.gasguzzler.admin.SessionHealthCheck;
 import net.spinetrak.gasguzzler.admin.UserHealthCheck;
+import net.spinetrak.gasguzzler.dao.MetricsDAO;
 import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
+import net.spinetrak.gasguzzler.metrics.DbReporter;
 import net.spinetrak.gasguzzler.resources.BuildInfoResource;
+import net.spinetrak.gasguzzler.resources.MetricsResource;
 import net.spinetrak.gasguzzler.resources.SessionResource;
 import net.spinetrak.gasguzzler.resources.UserResource;
 import net.spinetrak.gasguzzler.security.AdminSecurityHandler;
@@ -49,6 +53,7 @@ import org.skife.jdbi.v2.DBI;
 
 import javax.servlet.DispatcherType;
 import java.util.EnumSet;
+import java.util.concurrent.TimeUnit;
 
 public class Trak extends Application<TrakConfiguration>
 {
@@ -73,7 +78,7 @@ public class Trak extends Application<TrakConfiguration>
     bootstrap_.addBundle(new AssetsBundle("/assets/js", "/js", null, "js"));
 
     bootstrap_.addBundle(CryptoBundle.builder().build());
-
+    bootstrap_.addBundle(new DBIExceptionsBundle());
     bootstrap_.addBundle(new FlywayBundle<TrakConfiguration>()
     {
       @Override
@@ -101,16 +106,20 @@ public class Trak extends Application<TrakConfiguration>
     flyway.migrate();
 
     final DBI jdbi = new DBIFactory().build(environment_, configuration_.getDataSourceFactory(), "postgres");
+
     final UserDAO userDAO = jdbi.onDemand(UserDAO.class);
     final SessionDAO sessionDAO = jdbi.onDemand(SessionDAO.class);
+    final MetricsDAO metricsDAO = jdbi.onDemand(MetricsDAO.class);
 
     configuration_.addDAO("userDAO", userDAO);
     configuration_.addDAO("sessionDAO", sessionDAO);
+    configuration_.addDAO("metricsDAO", metricsDAO);
 
     environment_.jersey().setUrlPattern("/api/*");
+    environment_.jersey().register(new BuildInfoResource());
     environment_.jersey().register(new UserResource(userDAO, sessionDAO));
     environment_.jersey().register(new SessionResource(userDAO, sessionDAO));
-    environment_.jersey().register(new BuildInfoResource());
+    environment_.jersey().register(new MetricsResource(metricsDAO, sessionDAO));
     environment_.jersey().register(new SecurityProvider<>(new Authenticator(sessionDAO)));
 
     if (configuration_.isHttps())
@@ -123,5 +132,12 @@ public class Trak extends Application<TrakConfiguration>
 
     environment_.admin().setSecurityHandler(
       new AdminSecurityHandler(configuration_.getAdmin().getUsername(), configuration_.getAdmin().getPassword()));
+
+    final DbReporter reporter = DbReporter.forRegistry(environment_.metrics())
+      .convertRatesTo(TimeUnit.SECONDS)
+      .convertDurationsTo(TimeUnit.MILLISECONDS)
+      .build(metricsDAO);
+    reporter.start(60, TimeUnit.SECONDS);
+    configuration_.addReporter(reporter);
   }
 }

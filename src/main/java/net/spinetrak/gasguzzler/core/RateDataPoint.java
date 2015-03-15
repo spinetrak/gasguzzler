@@ -22,21 +22,34 @@
  * SOFTWARE.
  */
 
-define(function (require) {
-    var router = require('plugins/router');
+package net.spinetrak.gasguzzler.core;
 
-    var routeArr = [
-        {route: '', title: 'Home', moduleId: 'home/home', nav: true},
-        {route: 'stats', title: 'Stats', moduleId: 'site/stats', nav: true},
-        {route: 'user', title: 'You', moduleId: 'user/user', nav: true},
-        {route: 'metrics', title: 'Metrics', moduleId: 'metrics/metrics', nav: true}
-    ];
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    return {
-        router: router,
-        activate: function () {
-            router.map(routeArr).buildNavigationModel();
-            return router.activate();
-        }
-    };
-});
+public class RateDataPoint
+{
+  @JsonProperty
+  long x;
+  @JsonProperty
+  double y;
+
+  public long getX()
+  {
+    return x;
+  }
+
+  public double getY()
+  {
+    return y;
+  }
+
+  public void setX(final long x_)
+  {
+    x = x_;
+  }
+
+  public void setY(final double y_)
+  {
+    y = y_;
+  }
+}

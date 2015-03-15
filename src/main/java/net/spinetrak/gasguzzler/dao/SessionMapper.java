@@ -22,21 +22,26 @@
  * SOFTWARE.
  */
 
-define(function (require) {
-    var router = require('plugins/router');
+package net.spinetrak.gasguzzler.dao;
 
-    var routeArr = [
-        {route: '', title: 'Home', moduleId: 'home/home', nav: true},
-        {route: 'stats', title: 'Stats', moduleId: 'site/stats', nav: true},
-        {route: 'user', title: 'You', moduleId: 'user/user', nav: true},
-        {route: 'metrics', title: 'Metrics', moduleId: 'metrics/metrics', nav: true}
-    ];
+import net.spinetrak.gasguzzler.security.Session;
+import org.skife.jdbi.v2.StatementContext;
+import org.skife.jdbi.v2.tweak.ResultSetMapper;
 
-    return {
-        router: router,
-        activate: function () {
-            router.map(routeArr).buildNavigationModel();
-            return router.activate();
-        }
-    };
-});
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class SessionMapper implements ResultSetMapper<Session>
+{
+
+  @Override
+  public Session map(final int i_, final ResultSet resultSet_, final StatementContext statementContext_) throws
+                                                                                                         SQLException
+  {
+    final Session session = new Session();
+    session.setUserid(resultSet_.getInt("userid"));
+    session.setToken(resultSet_.getString("token"));
+
+    return session;
+  }
+}

@@ -46,3 +46,11 @@ database:
     keyLength: 256
     iterations: 2000
     encrypted: true
+logging:
+  level: INFO
+  appenders:
+    - type: console
+  loggers:
+      "org.skife.jdbi.v2": DEBUG
+      
+      

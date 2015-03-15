@@ -22,21 +22,73 @@
  * SOFTWARE.
  */
 
-define(function (require) {
-    var router = require('plugins/router');
+package net.spinetrak.gasguzzler.core;
 
-    var routeArr = [
-        {route: '', title: 'Home', moduleId: 'home/home', nav: true},
-        {route: 'stats', title: 'Stats', moduleId: 'site/stats', nav: true},
-        {route: 'user', title: 'You', moduleId: 'user/user', nav: true},
-        {route: 'metrics', title: 'Metrics', moduleId: 'metrics/metrics', nav: true}
-    ];
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.NotEmpty;
 
-    return {
-        router: router,
-        activate: function () {
-            router.map(routeArr).buildNavigationModel();
-            return router.activate();
-        }
-    };
-});
+public class DataPoint
+{
+  @NotEmpty
+  @JsonProperty
+  long count;
+  @NotEmpty
+  @JsonProperty
+  String name;
+  @NotEmpty
+  double rate;
+  @NotEmpty
+  @JsonProperty
+  long timestamp;
+
+  public long getCount()
+  {
+    return count;
+  }
+
+  public String getName()
+  {
+    return name;
+  }
+
+  public double getRate()
+  {
+    return rate;
+  }
+
+  public long getTimestamp()
+  {
+    return timestamp;
+  }
+
+  public void setCount(final long count_)
+  {
+    count = count_;
+  }
+
+  public void setName(final String name_)
+  {
+    name = name_;
+  }
+
+  public void setRate(final double rate_)
+  {
+    rate = rate_;
+  }
+
+  public void setTimestamp(final long timestamp_)
+  {
+    timestamp = timestamp_;
+  }
+
+  @Override
+  public String toString()
+  {
+    return "DataPoint{" +
+      "timestamp=" + getTimestamp() +
+      ", name='" + getName() + '\'' +
+      ", count=" + getCount() +
+      ", rate=" + getRate() +
+      '}';
+  }
+}
