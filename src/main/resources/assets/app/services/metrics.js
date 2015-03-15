@@ -28,8 +28,7 @@ define(function (require) {
         router = require('plugins/router'),
         system = require('durandal/system'),
         shell = require('services/shell'),
-        canvasjs = require('canvasjs'),
-        ko = require('knockout');
+        canvasjs = require('canvasjs');
 
     Object.deepExtend = function (destination, source) {
         for (var property in source) {
@@ -119,9 +118,9 @@ define(function (require) {
             myStart = setInterval(function () {
                 that.updateChart()
             }, 1000);
-            var myLoop = setInterval(function () {
+            setInterval(function () {
                 that.updateChart()
-            }, 10000);
+            }, 60000);
         },
 
         chart: function () {
