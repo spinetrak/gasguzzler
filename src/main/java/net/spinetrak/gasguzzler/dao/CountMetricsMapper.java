@@ -24,30 +24,24 @@
 
 package net.spinetrak.gasguzzler.dao;
 
-import net.spinetrak.gasguzzler.security.Session;
-import org.skife.jdbi.v2.sqlobject.Bind;
-import org.skife.jdbi.v2.sqlobject.SqlQuery;
-import org.skife.jdbi.v2.sqlobject.SqlUpdate;
-import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
+import net.spinetrak.gasguzzler.core.CountDataPoint;
+import org.skife.jdbi.v2.StatementContext;
+import org.skife.jdbi.v2.tweak.ResultSetMapper;
 
-import java.util.List;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public interface SessionDAO
+public class CountMetricsMapper implements ResultSetMapper<CountDataPoint>
 {
-  @SqlUpdate("delete from st_session where userid = :userid and token = :token")
-  void delete(@Bind("userid") int userid, @Bind("token") String token);
 
-  @SqlUpdate("delete from st_session where userid = :userid")
-  void delete(@Bind("userid") int userid);
+  @Override
+  public CountDataPoint map(final int i_, final ResultSet resultSet_, final StatementContext statementContext_) throws
+                                                                                                                SQLException
+  {
+    final CountDataPoint dataPoint = new CountDataPoint();
+    dataPoint.setY(resultSet_.getLong("m_count"));
+    dataPoint.setX(resultSet_.getLong("m_timestamp"));
 
-  @SqlQuery("select * from st_session")
-  @Mapper(SessionMapper.class)
-  List<Session> findAll();
-  
-  @SqlQuery("select userid, token from st_session where userid = :userid and token = :token limit 1")
-  @Mapper(SessionMapper.class)
-  Session findSession(@Bind("userid") int userid, @Bind("token") String token);
-
-  @SqlUpdate("insert into st_session (userid, token, created) values (:userid, :token, :created)")
-  void insert(@Bind("userid") int userid, @Bind("token") String token, @Bind("created") java.util.Date created);
+    return dataPoint;
+  }
 }

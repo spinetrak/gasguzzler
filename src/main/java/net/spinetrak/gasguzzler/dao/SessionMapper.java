@@ -25,29 +25,23 @@
 package net.spinetrak.gasguzzler.dao;
 
 import net.spinetrak.gasguzzler.security.Session;
-import org.skife.jdbi.v2.sqlobject.Bind;
-import org.skife.jdbi.v2.sqlobject.SqlQuery;
-import org.skife.jdbi.v2.sqlobject.SqlUpdate;
-import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
+import org.skife.jdbi.v2.StatementContext;
+import org.skife.jdbi.v2.tweak.ResultSetMapper;
 
-import java.util.List;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public interface SessionDAO
+public class SessionMapper implements ResultSetMapper<Session>
 {
-  @SqlUpdate("delete from st_session where userid = :userid and token = :token")
-  void delete(@Bind("userid") int userid, @Bind("token") String token);
 
-  @SqlUpdate("delete from st_session where userid = :userid")
-  void delete(@Bind("userid") int userid);
+  @Override
+  public Session map(final int i_, final ResultSet resultSet_, final StatementContext statementContext_) throws
+                                                                                                         SQLException
+  {
+    final Session session = new Session();
+    session.setUserid(resultSet_.getInt("userid"));
+    session.setToken(resultSet_.getString("token"));
 
-  @SqlQuery("select * from st_session")
-  @Mapper(SessionMapper.class)
-  List<Session> findAll();
-  
-  @SqlQuery("select userid, token from st_session where userid = :userid and token = :token limit 1")
-  @Mapper(SessionMapper.class)
-  Session findSession(@Bind("userid") int userid, @Bind("token") String token);
-
-  @SqlUpdate("insert into st_session (userid, token, created) values (:userid, :token, :created)")
-  void insert(@Bind("userid") int userid, @Bind("token") String token, @Bind("created") java.util.Date created);
+    return session;
+  }
 }

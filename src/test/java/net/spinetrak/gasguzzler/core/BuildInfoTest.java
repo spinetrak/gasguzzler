@@ -1,18 +1,18 @@
 /*
  * The MIT License (MIT)
- *
+ *  
  * Copyright (c) 2014-2015 spinetrak
- *
+ *  
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ *  
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- *
+ *  
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,32 +22,31 @@
  * SOFTWARE.
  */
 
-package net.spinetrak.gasguzzler.dao;
+package net.spinetrak.gasguzzler.core;
 
-import net.spinetrak.gasguzzler.security.Session;
-import org.skife.jdbi.v2.sqlobject.Bind;
-import org.skife.jdbi.v2.sqlobject.SqlQuery;
-import org.skife.jdbi.v2.sqlobject.SqlUpdate;
-import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.dropwizard.jackson.Jackson;
+import org.junit.Test;
 
-import java.util.List;
+import static io.dropwizard.testing.FixtureHelpers.fixture;
+import static org.junit.Assert.assertEquals;
 
-public interface SessionDAO
+public class BuildInfoTest
 {
-  @SqlUpdate("delete from st_session where userid = :userid and token = :token")
-  void delete(@Bind("userid") int userid, @Bind("token") String token);
+  private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
 
-  @SqlUpdate("delete from st_session where userid = :userid")
-  void delete(@Bind("userid") int userid);
+  @Test
+  public void deserializesFromJSON() throws Exception
+  {
+    assertEquals(BuildInfo.getInstance(),
+                 MAPPER.readValue(fixture("fixtures/buildinfo.json"), BuildInfo.class));
+  }
 
-  @SqlQuery("select * from st_session")
-  @Mapper(SessionMapper.class)
-  List<Session> findAll();
-  
-  @SqlQuery("select userid, token from st_session where userid = :userid and token = :token limit 1")
-  @Mapper(SessionMapper.class)
-  Session findSession(@Bind("userid") int userid, @Bind("token") String token);
 
-  @SqlUpdate("insert into st_session (userid, token, created) values (:userid, :token, :created)")
-  void insert(@Bind("userid") int userid, @Bind("token") String token, @Bind("created") java.util.Date created);
+  @Test
+  public void serializesToJson() throws Exception
+  {
+    assertEquals(fixture("fixtures/buildinfo.json").replaceAll("\\s", ""),
+                 MAPPER.writeValueAsString(BuildInfo.getInstance()));
+  }
 }

@@ -22,32 +22,73 @@
  * SOFTWARE.
  */
 
-package net.spinetrak.gasguzzler.dao;
+package net.spinetrak.gasguzzler.core;
 
-import net.spinetrak.gasguzzler.security.Session;
-import org.skife.jdbi.v2.sqlobject.Bind;
-import org.skife.jdbi.v2.sqlobject.SqlQuery;
-import org.skife.jdbi.v2.sqlobject.SqlUpdate;
-import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.NotEmpty;
 
-import java.util.List;
-
-public interface SessionDAO
+public class DataPoint
 {
-  @SqlUpdate("delete from st_session where userid = :userid and token = :token")
-  void delete(@Bind("userid") int userid, @Bind("token") String token);
+  @NotEmpty
+  @JsonProperty
+  long count;
+  @NotEmpty
+  @JsonProperty
+  String name;
+  @NotEmpty
+  double rate;
+  @NotEmpty
+  @JsonProperty
+  long timestamp;
 
-  @SqlUpdate("delete from st_session where userid = :userid")
-  void delete(@Bind("userid") int userid);
+  public long getCount()
+  {
+    return count;
+  }
 
-  @SqlQuery("select * from st_session")
-  @Mapper(SessionMapper.class)
-  List<Session> findAll();
-  
-  @SqlQuery("select userid, token from st_session where userid = :userid and token = :token limit 1")
-  @Mapper(SessionMapper.class)
-  Session findSession(@Bind("userid") int userid, @Bind("token") String token);
+  public String getName()
+  {
+    return name;
+  }
 
-  @SqlUpdate("insert into st_session (userid, token, created) values (:userid, :token, :created)")
-  void insert(@Bind("userid") int userid, @Bind("token") String token, @Bind("created") java.util.Date created);
+  public double getRate()
+  {
+    return rate;
+  }
+
+  public long getTimestamp()
+  {
+    return timestamp;
+  }
+
+  public void setCount(final long count_)
+  {
+    count = count_;
+  }
+
+  public void setName(final String name_)
+  {
+    name = name_;
+  }
+
+  public void setRate(final double rate_)
+  {
+    rate = rate_;
+  }
+
+  public void setTimestamp(final long timestamp_)
+  {
+    timestamp = timestamp_;
+  }
+
+  @Override
+  public String toString()
+  {
+    return "DataPoint{" +
+      "timestamp=" + getTimestamp() +
+      ", name='" + getName() + '\'' +
+      ", count=" + getCount() +
+      ", rate=" + getRate() +
+      '}';
+  }
 }

@@ -22,32 +22,34 @@
  * SOFTWARE.
  */
 
-package net.spinetrak.gasguzzler.dao;
+package net.spinetrak.gasguzzler.core;
 
-import net.spinetrak.gasguzzler.security.Session;
-import org.skife.jdbi.v2.sqlobject.Bind;
-import org.skife.jdbi.v2.sqlobject.SqlQuery;
-import org.skife.jdbi.v2.sqlobject.SqlUpdate;
-import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.List;
-
-public interface SessionDAO
+public class CountDataPoint
 {
-  @SqlUpdate("delete from st_session where userid = :userid and token = :token")
-  void delete(@Bind("userid") int userid, @Bind("token") String token);
+  @JsonProperty
+  long x;
+  @JsonProperty
+  long y;
 
-  @SqlUpdate("delete from st_session where userid = :userid")
-  void delete(@Bind("userid") int userid);
+  public long getX()
+  {
+    return x;
+  }
 
-  @SqlQuery("select * from st_session")
-  @Mapper(SessionMapper.class)
-  List<Session> findAll();
-  
-  @SqlQuery("select userid, token from st_session where userid = :userid and token = :token limit 1")
-  @Mapper(SessionMapper.class)
-  Session findSession(@Bind("userid") int userid, @Bind("token") String token);
+  public long getY()
+  {
+    return y;
+  }
 
-  @SqlUpdate("insert into st_session (userid, token, created) values (:userid, :token, :created)")
-  void insert(@Bind("userid") int userid, @Bind("token") String token, @Bind("created") java.util.Date created);
+  public void setX(final long x_)
+  {
+    x = x_;
+  }
+
+  public void setY(final long y_)
+  {
+    y = y_;
+  }
 }
