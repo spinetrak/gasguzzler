@@ -29,7 +29,7 @@ define(function (require) {
         {route: '', title: 'Home', moduleId: 'home/home', nav: true},
         {route: 'stats', title: 'Stats', moduleId: 'site/stats', nav: true},
         {route: 'user', title: 'You', moduleId: 'user/user', nav: true},
-        {route: 'metrics', title: 'Metrics', moduleId: '', hash: '/metrics', nav: true}
+        {route: 'metrics', title: 'Metrics', moduleId: 'services/metrics', nav: true}
     ];
 
     return {

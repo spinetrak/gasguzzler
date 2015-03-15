@@ -61,7 +61,7 @@ public class DbReporter extends ScheduledReporter
                      final SortedMap<String, Histogram> histograms_, final SortedMap<String, Meter> meters_,
                      final SortedMap<String, Timer> timers_)
   {
-    final long timestamp = TimeUnit.MILLISECONDS.toSeconds(_clock.getTime());
+    final long timestamp = _clock.getTime();
 
     for (Map.Entry<String, Counter> entry : counters_.entrySet())
     {
@@ -81,7 +81,7 @@ public class DbReporter extends ScheduledReporter
 
   private void report(final DataPoint dataPoint_)
   {
-    final long cutoff = Math.round((new Date().getTime() - TimeUnit.MILLISECONDS.convert(45, TimeUnit.DAYS)) / 1000);
+    final long cutoff = new Date().getTime() - TimeUnit.MILLISECONDS.convert(45, TimeUnit.DAYS);
     _dao.deleteStale(cutoff);
     _dao.insert(dataPoint_);
   }
