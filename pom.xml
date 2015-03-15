@@ -29,7 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <properties>
-        <project.version>0.1.0</project.version>
+        <project.version>0.1.1</project.version>
         <build.number>12345</build.number>
         <build.branch>dev</build.branch>
         <dropwizard.version>0.7.1</dropwizard.version>
