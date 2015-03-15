@@ -137,7 +137,7 @@ public class Trak extends Application<TrakConfiguration>
       .convertRatesTo(TimeUnit.SECONDS)
       .convertDurationsTo(TimeUnit.MILLISECONDS)
       .build(metricsDAO);
-    reporter.start(10, TimeUnit.SECONDS);
+    reporter.start(10, TimeUnit.MINUTES);
     configuration_.addReporter(reporter);
   }
 }
