@@ -45,14 +45,14 @@ define(function (require) {
 
 
     return {
-        infoCountDps: [],
-        warnCountDps: [],
-        errorCountDps: [],
-        infoRateDps: [],
-        warnRateDps: [],
-        errorRateDps: [],
+        twoxxCountDps: [],
+        fourxxCountDps: [],
+        fivexxCountDps: [],
+        twoxxRateDps: [],
+        fourxxRateDps: [],
+        fivexxRateDps: [],
         urlRoot: location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : ''),
-        myStart: [],
+        startMyJetty: [],
         updateChart: function () {
 
             var userModel = {
@@ -68,43 +68,43 @@ define(function (require) {
 
             var that = this;
 
-            http.get(that.urlRoot + '/api/metrics/ch.qos.logback.core.Appender.info/counts', '', userModel).then(function (response) {
-                    that.updateSeries(that.infoCountDps, response);
+            http.get(that.urlRoot + '/api/metrics/io.dropwizard.jetty.MutableServletContextHandler.2xx-responses/counts', '', userModel).then(function (response) {
+                    that.updateSeries(that.twoxxCountDps, response);
                 },
                 function (error) {
-                    app.showMessage(error, "Error!", ["Ok"], true, {"class": "notice error"});
+                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
                 });
-            http.get(that.urlRoot + '/api/metrics/ch.qos.logback.core.Appender.warn/counts', '', userModel).then(function (response) {
-                    that.updateSeries(that.warnCountDps, response);
+            http.get(that.urlRoot + '/api/metrics/io.dropwizard.jetty.MutableServletContextHandler.4xx-responses/counts', '', userModel).then(function (response) {
+                    that.updateSeries(that.fourxxCountDps, response);
                 },
                 function (error) {
-                    app.showMessage(error, "Error!", ["Ok"], true, {"class": "notice error"});
+                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
                 });
-            http.get(that.urlRoot + '/api/metrics/ch.qos.logback.core.Appender.error/counts', '', userModel).then(function (response) {
-                    that.updateSeries(that.errorCountDps, response);
+            http.get(that.urlRoot + '/api/metrics/io.dropwizard.jetty.MutableServletContextHandler.4xx-responses/counts', '', userModel).then(function (response) {
+                    that.updateSeries(that.fivexxCountDps, response);
                 },
                 function (error) {
-                    app.showMessage(error, "Error!", ["Ok"], true, {"class": "notice error"});
+                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
                 });
-            http.get(that.urlRoot + '/api/metrics/ch.qos.logback.core.Appender.info/rates', '', userModel).then(function (response) {
-                    that.updateSeries(that.infoRateDps, response);
+            http.get(that.urlRoot + '/api/metrics/io.dropwizard.jetty.MutableServletContextHandler.2xx-responses/rates', '', userModel).then(function (response) {
+                    that.updateSeries(that.twoxxRateDps, response);
                 },
                 function (error) {
-                    app.showMessage(error, "Error!", ["Ok"], true, {"class": "notice error"});
+                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
                 });
-            http.get(that.urlRoot + '/api/metrics/ch.qos.logback.core.Appender.warn/rates', '', userModel).then(function (response) {
-                    that.updateSeries(that.warnRateDps, response);
+            http.get(that.urlRoot + '/api/metrics/io.dropwizard.jetty.MutableServletContextHandler.5xx-responses/rates', '', userModel).then(function (response) {
+                    that.updateSeries(that.fourxxRateDps, response);
                 },
                 function (error) {
-                    app.showMessage(error, "Error!", ["Ok"], true, {"class": "notice error"});
+                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
                 });
-            http.get(that.urlRoot + '/api/metrics/ch.qos.logback.core.Appender.error/rates', '', userModel).then(function (response) {
-                    that.updateSeries(that.errorRateDps, response);
+            http.get(that.urlRoot + '/api/metrics/io.dropwizard.jetty.MutableServletContextHandler.5xx-responses/rates', '', userModel).then(function (response) {
+                    that.updateSeries(that.fivexxRateDps, response);
                 },
                 function (error) {
-                    app.showMessage(error, "Error!", ["Ok"], true, {"class": "notice error"});
+                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
                 });
-            window.clearInterval(myStart);
+            window.clearInterval(startMyJetty);
         },
 
 
@@ -114,21 +114,21 @@ define(function (require) {
         },
 
         activate: function () {
-            that = this;
-            myStart = setInterval(function () {
-                that.updateChart()
+            myJettyMetrics = this;
+            startMyJetty = setInterval(function () {
+                myJettyMetrics.updateChart()
             }, 1000);
             setInterval(function () {
-                that.updateChart()
+                myJettyMetrics.updateChart()
             }, 60000);
         },
 
         chart: function () {
-            return new CanvasJS.Chart("logChart", {
+            return new CanvasJS.Chart("jettyChart", {
                 zoomEnabled: true,
                 panEnabled: true,
                 title: {
-                    text: "Log Stats"
+                    text: "Jetty Stats"
                 },
                 axisX: {
                     title: "Time",
@@ -146,42 +146,42 @@ define(function (require) {
                 data: [{
                     type: "stackedColumn",
                     showInLegend: true,
-                    name: "info (count)",
+                    name: "2xx (count)",
                     xValueType: "dateTime",
-                    dataPoints: this.infoCountDps
+                    dataPoints: this.twoxxCountDps
                 }, {
                     type: "stackedColumn",
                     showInLegend: true,
-                    name: "warn (count)",
+                    name: "4xx (count)",
                     xValueType: "dateTime",
-                    dataPoints: this.warnCountDps
+                    dataPoints: this.fourxxCountDps
                 }, {
                     type: "stackedColumn",
                     showInLegend: true,
-                    name: "error (count)",
+                    name: "5xx (count)",
                     xValueType: "dateTime",
-                    dataPoints: this.errorCountDps
+                    dataPoints: this.fivexxCountDps
                 }, {
                     type: "line",
                     axisYType: "secondary",
                     showInLegend: true,
-                    name: "info (rate)",
+                    name: "2xx (rate)",
                     xValueType: "dateTime",
-                    dataPoints: this.infoRateDps
+                    dataPoints: this.twoxxRateDps
                 }, {
                     type: "line",
                     axisYType: "secondary",
                     showInLegend: true,
-                    name: "warn (rate)",
+                    name: "4xx (rate)",
                     xValueType: "dateTime",
-                    dataPoints: this.warnRateDps
+                    dataPoints: this.fourxxRateDps
                 }, {
                     type: "line",
                     axisYType: "secondary",
                     showInLegend: true,
-                    name: "error (rate)",
+                    name: "5xx (rate)",
                     xValueType: "dateTime",
-                    dataPoints: this.errorRateDps
+                    dataPoints: this.fivexxRateDps
                 }]
             });
         }
