@@ -33,10 +33,16 @@ define(function (require) {
     return {
         logMetrics: ko.observable(),
         jettyMetrics: ko.observable(),
+        jerseyMetrics: ko.observable(),
+        sessionDAOMetrics: ko.observable(),
+        userDAOMetrics: ko.observable(),
 
         activate: function () {
             this.logMetrics('metrics/logMetrics');
             this.jettyMetrics('metrics/jettyMetrics');
+            this.jerseyMetrics('metrics/jerseyMetrics');
+            this.sessionDAOMetrics('metrics/sessionDAOMetrics');
+            this.userDAOMetrics('metrics/userDAOMetrics');
         }
     };
 });

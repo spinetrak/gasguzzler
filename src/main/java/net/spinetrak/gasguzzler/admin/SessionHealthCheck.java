@@ -39,7 +39,7 @@ public class SessionHealthCheck extends HealthCheck
   @Override
   protected Result check() throws Exception
   {
-    if (_sessionDAO.findAll().isEmpty())
+    if (_sessionDAO.select().isEmpty())
     {
       return Result.unhealthy("No sessions in the sessions DB.");
     }

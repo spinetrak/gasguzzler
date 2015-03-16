@@ -133,6 +133,7 @@ public class Trak extends Application<TrakConfiguration>
     environment_.admin().setSecurityHandler(
       new AdminSecurityHandler(configuration_.getAdmin().getUsername(), configuration_.getAdmin().getPassword()));
 
+
     final DbReporter reporter = DbReporter.forRegistry(environment_.metrics())
       .convertRatesTo(TimeUnit.SECONDS)
       .convertDurationsTo(TimeUnit.MILLISECONDS)

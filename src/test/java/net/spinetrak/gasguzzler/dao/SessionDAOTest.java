@@ -53,11 +53,11 @@ public class SessionDAOTest
     user.setRole(User.ROLE_USER);
     _userDAO.insert(user.getUsername(), user.getPassword(), user.getEmail(), user.getRole(), new Date(),
                     new Date());
-    final User u = _userDAO.findByUsername(user.getUsername());
+    final User u = _userDAO.select(user.getUsername());
 
     final Session session = new Session(u.getUserid());
     _sessionDAO.insert(session.getUserid(), session.getToken(), new Date());
-    assertEquals(_sessionDAO.findSession(session.getUserid(), session.getToken()), session);
+    assertEquals(_sessionDAO.select(session.getUserid(), session.getToken()), session);
     _sessionDAO.delete(session.getUserid());
 
     _userDAO.delete(u.getUserid());
