@@ -39,7 +39,7 @@
 
     <groupId>net.spinetrak</groupId>
     <artifactId>gasguzzler</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.1</version>
 
     <scm>
         <connection>scm:git:git://github.com/spinetrak/gasguzzler.git</connection>
