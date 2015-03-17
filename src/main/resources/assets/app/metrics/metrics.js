@@ -36,6 +36,7 @@ define(function (require) {
         jerseyMetrics: ko.observable(),
         sessionDAOMetrics: ko.observable(),
         userDAOMetrics: ko.observable(),
+        jvmMetrics: ko.observable(),
 
         activate: function () {
             this.logMetrics('metrics/logMetrics');
@@ -43,6 +44,7 @@ define(function (require) {
             this.jerseyMetrics('metrics/jerseyMetrics');
             this.sessionDAOMetrics('metrics/sessionDAOMetrics');
             this.userDAOMetrics('metrics/userDAOMetrics');
+            this.jvmMetrics('metrics/jvmMetrics');
         }
     };
 });
