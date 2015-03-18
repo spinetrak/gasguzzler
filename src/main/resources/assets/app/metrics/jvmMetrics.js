@@ -98,7 +98,7 @@ define(function (require) {
                 function (error) {
                     app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
                 });
-            http.get(that.urlRoot + '/api/metrics/jvm.memory.non-heap.max/counts', '', userModel).then(function (response) {
+            http.get(that.urlRoot + '/api/metrics/jvm.memory.non-heap.used/counts', '', userModel).then(function (response) {
                     that.updateSeries(that.nonHeapUsedDps, response);
                 },
                 function (error) {

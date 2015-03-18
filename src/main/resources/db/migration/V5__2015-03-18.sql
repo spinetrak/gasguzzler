@@ -1,0 +1,1 @@
+ALTER TABLE st_metrics ALTER COLUMN m_count TYPE BIGINT;

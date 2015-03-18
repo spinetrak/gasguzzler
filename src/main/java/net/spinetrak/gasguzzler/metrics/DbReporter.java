@@ -84,6 +84,32 @@ public class DbReporter extends ScheduledReporter
     }
   }
 
+  private long getGaugeCount(final Object value_)
+  {
+    if (null != value_)
+    {
+      if ((value_ instanceof Long) || (value_ instanceof Integer))
+      {
+        return ((Number) value_).longValue();
+      }
+      return 0;
+    }
+    return 0;
+  }
+
+  private double getGaugeRate(final Object value_)
+  {
+    if (null != value_)
+    {
+      if ((value_ instanceof Float) || (value_ instanceof Double))
+      {
+        return ((Number) value_).doubleValue();
+      }
+      return 0;
+    }
+    return 0;
+  }
+
   private void report(final DataPoint dataPoint_)
   {
     final long cutoff = new Date().getTime() - TimeUnit.MILLISECONDS.convert(45, TimeUnit.DAYS);
@@ -105,9 +131,9 @@ public class DbReporter extends ScheduledReporter
   {
     final DataPoint dp = new DataPoint();
     dp.setTimestamp(timestamp_);
-    dp.setRate(-1);
+    dp.setRate(getGaugeRate(gauge_.getValue()));
     dp.setName(name_);
-    dp.setCount(Integer.valueOf(gauge_.getValue().toString()));
+    dp.setCount(getGaugeCount(gauge_.getValue()));
     report(dp);
   }
 
