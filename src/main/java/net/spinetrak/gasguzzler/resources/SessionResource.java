@@ -59,7 +59,7 @@ public class SessionResource
   {
     try
     {
-      final User u = userDAO.select(user_.getUsername());
+      final User u = userDAO.select(user_);
       if (null == u)
       {
         throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -73,8 +73,7 @@ public class SessionResource
       }
 
       final Session session = new Session(u.getUserid());
-      sessionDAO.insert(session.getUserid(), session.getToken(),
-                        new java.util.Date());
+      sessionDAO.insert(session);
 
       return session;
     }
@@ -87,9 +86,10 @@ public class SessionResource
   @DELETE
   public void delete(@Auth final User user_)
   {
-    if (null != sessionDAO.select(user_.getUserid(), user_.getToken()))
+    final Session session = sessionDAO.select(user_.getSession());
+    if (null != session)
     {
-      sessionDAO.delete(user_.getUserid(), user_.getToken());
+      sessionDAO.delete(session);
     }
   }
 }

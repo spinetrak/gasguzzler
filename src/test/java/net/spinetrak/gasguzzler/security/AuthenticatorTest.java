@@ -34,10 +34,8 @@ import org.junit.Test;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Date;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -52,14 +50,13 @@ public class AuthenticatorTest
   {
     try
     {
-      when(_userDAO.select(anyString())).thenReturn(_user);
+      when(_userDAO.select(_user)).thenReturn(_user);
 
-      _userDAO.insert(_user.getUsername(), _user.getPassword(), _user.getEmail(), _user.getRole(),
-                      new Date(), new Date());
-      final User user = _userDAO.select(_user.getUsername());
+      _userDAO.insert(_user);
+      final User user = _userDAO.select(_user);
 
       final Session session = new Session(user.getUserid());
-      _sessionDAO.insert(session.getUserid(), session.getToken(), new Date());
+      _sessionDAO.insert(session);
 
 
       final Authenticator authenticator = new Authenticator(_sessionDAO);

@@ -49,29 +49,34 @@ public class UserDAOTest
   public void createReadUpdateDelete()
   {
     final User user = UserTest.getUser();
+    final List<User> users1 = _userDAO.select(user.getUsername(), user.getEmail());
+    for (final User x : users1)
+    {
+      _userDAO.delete(x);
+    }
+    user.setCreated(new Date());
+    user.setUpdated(new Date());
+    _userDAO.insert(user);
 
-    _userDAO.insert(user.getUsername(), user.getPassword(), user.getEmail(), user.getRole(), new Date(),
-                    new Date());
-
-    final User u = _userDAO.select(user.getUsername());
+    final User u = _userDAO.select(user);
     user.setUserid(u.getUserid());
     assertEquals(user, u);
 
-    final List<User> users = _userDAO.select(user.getUsername(), user.getEmail());
-    assertTrue(users.size() > 0);
+    final List<User> users2 = _userDAO.select(user.getUsername(), user.getEmail());
+    assertTrue(users2.size() > 0);
 
     final User u2 = _userDAO.select(user.getUserid());
     assertEquals(user, u2);
 
     user.setUsername("new_username");
-    _userDAO.update(user.getUsername(), user.getPassword(), user.getEmail(), new Date(),
-                    user.getUserid());
+    user.setUpdated(new Date());
+    _userDAO.update(user);
     final User u3 = _userDAO.select(user.getUserid());
     assertEquals(user, u3);
 
-    for (User x : users)
+    for (final User x : users2)
     {
-      _userDAO.delete(x.getUserid());
+      _userDAO.delete(x);
     }
   }
 }

@@ -129,8 +129,7 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<Session, 
   public Optional<User> authenticate(final Session session_) throws AuthenticationException
   {
     LOGGER.info("Authenticating {}", session_);
-    if ((null == session_) || (null == sessionDAO) || (null == sessionDAO.select(session_.getUserid(),
-                                                                                 session_.getToken())))
+    if ((null == session_) || (null == sessionDAO) || (null == sessionDAO.select(session_)))
     {
       throw new AuthenticationException("Invalid credentials");
     }
@@ -138,7 +137,7 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<Session, 
     {
       final User user = new User();
       user.setUserid(session_.getUserid());
-      user.setToken(session_.getToken());
+      user.setSession(session_);
       user.setRole(session_.getToken().contains("Admin") ? User.ROLE_ADMIN : User.ROLE_USER);
 
       return Optional.fromNullable(user);

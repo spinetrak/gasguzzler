@@ -42,7 +42,7 @@ import static org.mockito.Mockito.*;
 
 public class MetricsResourceTest
 {
-  private final Session session = new Session(0, "token");
+  private final Session _session = new Session(0, "token");
   private MetricsDAO _metricsDAO = mock(MetricsDAO.class);
   private SessionDAO _sessionDAO = mock(SessionDAO.class);
   @Rule
@@ -57,7 +57,7 @@ public class MetricsResourceTest
   @Test
   public void getAvailableMetrics()
   {
-    when(_sessionDAO.select(0, "token")).thenReturn(session);
+    when(_sessionDAO.select(_session)).thenReturn(_session);
     resources.client().resource("/metrics").header(SecurityProvider.TOKEN, "token").header(SecurityProvider.USERID,
                                                                                            "0").type(
       MediaType.APPLICATION_JSON_TYPE).get(new GenericType<List<DataPoint>>()
@@ -71,7 +71,7 @@ public class MetricsResourceTest
   @Test
   public void getCountMetrics()
   {
-    when(_sessionDAO.select(0, "token")).thenReturn(session);
+    when(_sessionDAO.select(_session)).thenReturn(_session);
     resources.client().resource("/metrics/ch.qos.logback.core.Appender.info/counts").header(SecurityProvider.TOKEN,
                                                                                             "token").header(
       SecurityProvider.USERID, "0").type(MediaType.APPLICATION_JSON_TYPE).get(new GenericType<List<DataPoint>>()
@@ -85,7 +85,7 @@ public class MetricsResourceTest
   @Test
   public void getRateMetrics()
   {
-    when(_sessionDAO.select(0, "token")).thenReturn(session);
+    when(_sessionDAO.select(_session)).thenReturn(_session);
     resources.client().resource("/metrics/ch.qos.logback.core.Appender.info/rates").header(SecurityProvider.TOKEN,
                                                                                      "token").header(
       SecurityProvider.USERID, "0").type(MediaType.APPLICATION_JSON_TYPE).get(new GenericType<List<DataPoint>>()

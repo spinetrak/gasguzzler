@@ -34,6 +34,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 
 import java.util.Date;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -51,16 +52,24 @@ public class SessionDAOTest
     final User user = UserTest.getUser();
 
     user.setRole(User.ROLE_USER);
-    _userDAO.insert(user.getUsername(), user.getPassword(), user.getEmail(), user.getRole(), new Date(),
-                    new Date());
-    final User u = _userDAO.select(user.getUsername());
+    user.setCreated(new Date());
+    user.setUpdated(new Date());
+
+    final List<User> users1 = _userDAO.select(user.getUsername(), user.getEmail());
+    for (final User x : users1)
+    {
+      _userDAO.delete(x);
+    }
+
+    _userDAO.insert(user);
+    final User u = _userDAO.select(user);
 
     final Session session = new Session(u.getUserid());
-    _sessionDAO.insert(session.getUserid(), session.getToken(), new Date());
-    assertEquals(_sessionDAO.select(session.getUserid(), session.getToken()), session);
-    _sessionDAO.delete(session.getUserid());
+    _sessionDAO.insert(session);
+    assertEquals(_sessionDAO.select(session), session);
+    _sessionDAO.delete(session);
 
-    _userDAO.delete(u.getUserid());
+    _userDAO.delete(u);
   }
 
 }

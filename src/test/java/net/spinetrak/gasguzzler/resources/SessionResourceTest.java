@@ -59,8 +59,8 @@ public class SessionResourceTest
   public void create()
   {
 
-    when(_sessionDAO.select(0, "token")).thenReturn(session);
-    when(_userDAO.select(anyString())).thenReturn(UserTest.getUserWithHashedPassword());
+    when(_sessionDAO.select(session)).thenReturn(session);
+    when(_userDAO.select(_user)).thenReturn(UserTest.getUserWithHashedPassword());
 
     final Session mysession = resources.client().resource("/session")
       .type(MediaType.APPLICATION_JSON)
@@ -72,11 +72,11 @@ public class SessionResourceTest
   @Test
   public void delete()
   {
-    when(_sessionDAO.select(0, "token")).thenReturn(session);
+    when(_sessionDAO.select(session)).thenReturn(session);
 
     resources.client().resource("/session").header(SecurityProvider.TOKEN, "token").header(
       SecurityProvider.USERID, "0").type(MediaType.APPLICATION_JSON_TYPE).delete(_user);
 
-    verify(_sessionDAO, times(2)).select(0, "token");
+    verify(_sessionDAO, times(2)).select(session);
   }
 }

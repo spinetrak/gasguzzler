@@ -48,12 +48,12 @@ public interface MetricsDAO
 
   @SqlQuery("select m_timestamp, m_count from st_metrics where m_name = :name order by m_timestamp")
   @Mapper(CountMetricsMapper.class)
-  List<CountDataPoint> getCount(@Bind("name") final String name);
+  List<CountDataPoint> getCount(@Bind("name") final String name_);
 
   @SqlQuery("select m_timestamp, m_rate from st_metrics where m_name = :name order by m_timestamp")
   @Mapper(RateMetricsMapper.class)
-  List<RateDataPoint> getRate(@Bind("name") final String name);
+  List<RateDataPoint> getRate(@Bind("name") final String name_);
 
   @SqlUpdate("insert into st_metrics (m_timestamp, m_name, m_count, m_rate) values (:dp.timestamp, :dp.name, :dp.count, :dp.rate)")
-  void insert(@BindBean("dp") final DataPoint data);
+  void insert(@BindBean("dp") final DataPoint dataPoint_);
 }

@@ -27,10 +27,12 @@ package net.spinetrak.gasguzzler.security;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import java.util.Date;
 import java.util.UUID;
 
 public class Session
 {
+  private Date date;
   @NotEmpty
   @JsonProperty
   private String token;
@@ -40,42 +42,47 @@ public class Session
 
   public Session()
   {
-    userid = -1;
-    token = "";
+    this(-1, "");
   }
 
-  public Session(int userid)
+  public Session(final int userid_)
   {
-    this.userid = userid;
-    this.token = UUID.randomUUID().toString().substring(0, 23);
+    this(userid_, UUID.randomUUID().toString().substring(0, 23));
   }
 
-  public Session(int userid, String token)
+  public Session(final int userid_, final String token_)
   {
-    this.userid = userid;
-    this.token = token;
+    this(userid_, token_, new Date());
+  }
+
+  public Session(final int userid_, final String token_, final Date date_)
+  {
+    userid = userid_;
+    token = token_;
+    date = date_;
   }
 
   @Override
-  public boolean equals(Object o)
+  public boolean equals(final Object obj_)
   {
-    if (this == o)
+    if (this == obj_)
     {
       return true;
     }
-    if (!(o instanceof Session))
+    if (!(obj_ instanceof Session))
     {
       return false;
     }
 
-    Session that = (Session) o;
+    final Session that = (Session) obj_;
 
-    if (getUserid() != that.getUserid())
-    {
-      return false;
-    }
-    return getToken().equals(that.getToken());
+    return getUserid() == that.getUserid() && getToken().equals(that.getToken());
 
+  }
+
+  public Date getDate()
+  {
+    return date;
   }
 
   public String getToken()
@@ -86,6 +93,11 @@ public class Session
   public int getUserid()
   {
     return userid;
+  }
+
+  public void setDate(final Date date_)
+  {
+    date = date_;
   }
 
   public void setToken(final String token_)

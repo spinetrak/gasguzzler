@@ -25,13 +25,18 @@
 package net.spinetrak.gasguzzler.core;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import net.spinetrak.gasguzzler.security.Session;
 import org.hibernate.validator.constraints.NotEmpty;
+
+import java.util.Date;
 
 public class User
 {
 
   public static final String ROLE_ADMIN = "admin";
   public static final String ROLE_USER = "user";
+
+  private Date created;
   @NotEmpty
   @JsonProperty
   private String email;
@@ -41,7 +46,8 @@ public class User
   @NotEmpty
   @JsonProperty
   private String role;
-  private String token;
+  private Session session;
+  private Date updated;
   @NotEmpty
   @JsonProperty
   private int userid;
@@ -78,6 +84,11 @@ public class User
 
   }
 
+  public Date getCreated()
+  {
+    return created;
+  }
+
   public String getEmail()
   {
     return email;
@@ -93,9 +104,14 @@ public class User
     return role;
   }
 
-  public String getToken()
+  public Session getSession()
   {
-    return token;
+    return session;
+  }
+
+  public Date getUpdated()
+  {
+    return updated;
   }
 
   public int getUserid()
@@ -106,6 +122,11 @@ public class User
   public String getUsername()
   {
     return username;
+  }
+
+  public void setCreated(final Date created_)
+  {
+    created = created_;
   }
 
   public User setEmail(final String email_)
@@ -126,9 +147,14 @@ public class User
     return this;
   }
 
-  public void setToken(final String token_)
+  public void setSession(final Session session_)
   {
-    token = token_;
+    session = session_;
+  }
+
+  public void setUpdated(final Date updated_)
+  {
+    updated = updated_;
   }
 
   public void setUserid(final int userid_)

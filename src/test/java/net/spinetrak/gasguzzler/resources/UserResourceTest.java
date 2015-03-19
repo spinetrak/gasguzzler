@@ -65,9 +65,9 @@ public class UserResourceTest
   @Test
   public void create()
   {
-    when(_sessionDAO.select(0, "token")).thenReturn(_session);
+    when(_sessionDAO.select(_session)).thenReturn(_session);
     when(_userDAO.select(anyString(), anyString())).thenReturn(new ArrayList<>());
-    when(_userDAO.select(anyString())).thenReturn(user);
+    when(_userDAO.select(user)).thenReturn(user);
 
     final Session mysession = resources.client().resource("/user")
       .type(MediaType.APPLICATION_JSON)
@@ -79,19 +79,19 @@ public class UserResourceTest
   @Test
   public void delete()
   {
-    when(_sessionDAO.select(0, "token")).thenReturn(_session);
+    when(_sessionDAO.select(_session)).thenReturn(_session);
 
     resources.client().resource("/user/0").header(SecurityProvider.TOKEN, "token").header(
       SecurityProvider.USERID, "0").type(MediaType.APPLICATION_JSON_TYPE).delete(user);
 
-    verify(_sessionDAO, times(2)).select(0, "token");
+    verify(_sessionDAO, times(2)).select(_session);
   }
 
   @Test
   public void get()
   {
     when(_userDAO.select(0)).thenReturn(user);
-    when(_sessionDAO.select(0, "token")).thenReturn(_session);
+    when(_sessionDAO.select(_session)).thenReturn(_session);
 
     assertThat(resources.client().resource("/user/0").header(SecurityProvider.TOKEN, "token").header(
       SecurityProvider.USERID, "0").type(MediaType.APPLICATION_JSON_TYPE).get(User.class)).isEqualTo(user);
@@ -100,7 +100,7 @@ public class UserResourceTest
   @Test
   public void getAll()
   {
-    when(_sessionDAO.select(0, "Admintoken")).thenReturn(_session);
+    when(_sessionDAO.select(new Session(0, "Admintoken"))).thenReturn(_session);
 
     resources.client().resource("/user")
       .header(SecurityProvider.TOKEN, "Admintoken").header(SecurityProvider.USERID, "0").type(
@@ -115,7 +115,7 @@ public class UserResourceTest
   {
     try
     {
-      when(_sessionDAO.select(0, "token")).thenReturn(_session);
+      when(_sessionDAO.select(_session)).thenReturn(_session);
 
       resources.client().resource("/user")
         .header(SecurityProvider.TOKEN, "token").header(SecurityProvider.USERID, "0").type(
@@ -139,7 +139,7 @@ public class UserResourceTest
   @Test
   public void update()
   {
-    when(_sessionDAO.select(0, "token")).thenReturn(_session);
+    when(_sessionDAO.select(_session)).thenReturn(_session);
 
     assertThat(resources.client().resource("/user/0").header(SecurityProvider.TOKEN, "token").header(
       SecurityProvider.USERID, "0")
@@ -152,7 +152,7 @@ public class UserResourceTest
   {
     try
     {
-      when(_sessionDAO.select(0, "token")).thenReturn(_session);
+      when(_sessionDAO.select(_session)).thenReturn(_session);
 
       final User user = UserTest.getUser();
 

@@ -24,8 +24,9 @@
 
 package net.spinetrak.gasguzzler.dao;
 
+import net.spinetrak.gasguzzler.core.User;
 import net.spinetrak.gasguzzler.security.Session;
-import org.skife.jdbi.v2.sqlobject.Bind;
+import org.skife.jdbi.v2.sqlobject.BindBean;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
@@ -34,18 +35,18 @@ import java.util.List;
 
 public interface SessionDAO
 {
-  @SqlUpdate("delete from st_session where userid = :userid and token = :token")
-  void delete(@Bind("userid") int userid, @Bind("token") String token);
+  @SqlUpdate("delete from st_session where userid = :s.userid and token = :s.token")
+  void delete(@BindBean("s") final Session session_);
 
-  @SqlUpdate("delete from st_session where userid = :userid")
-  void delete(@Bind("userid") int userid);
+  @SqlUpdate("delete from st_session where userid = :u.userid")
+  void delete(@BindBean("u") final User user_);
 
-  @SqlUpdate("insert into st_session (userid, token, created) values (:userid, :token, :created)")
-  void insert(@Bind("userid") int userid, @Bind("token") String token, @Bind("created") java.util.Date created);
-  
-  @SqlQuery("select userid, token from st_session where userid = :userid and token = :token limit 1")
+  @SqlUpdate("insert into st_session (userid, token, created) values (:s.userid, :s.token, :s.date)")
+  void insert(@BindBean("s") final Session session_);
+
+  @SqlQuery("select userid, token from st_session where userid = :s.userid and token = :s.token limit 1")
   @Mapper(SessionMapper.class)
-  Session select(@Bind("userid") int userid, @Bind("token") String token);
+  Session select(@BindBean("s") final Session session_);
 
   @SqlQuery("select * from st_session")
   @Mapper(SessionMapper.class)

@@ -72,16 +72,15 @@ public class UserResource
       final String password = Authenticator.getSecurePassword(user_.getPassword());
 
       user_.setPassword(password);
-
       user_.setRole(User.ROLE_USER);
-      userDAO.insert(user_.getUsername(), user_.getPassword(), user_.getEmail(), user_.getRole(),
-                     new Date(),
-                     new Date());
+      user_.setCreated(new Date());
+      user_.setUpdated(new Date());
+      userDAO.insert(user_);
 
-      final User u = userDAO.select(user_.getUsername());
+      final User u = userDAO.select(user_);
 
       final Session session = new Session(u.getUserid());
-      sessionDAO.insert(session.getUserid(), session.getToken(), new java.util.Date());
+      sessionDAO.insert(session);
 
       return session;
     }
@@ -103,13 +102,13 @@ public class UserResource
     {
       throw new WebApplicationException(Response.Status.UNAUTHORIZED);
     }
-    if (null != sessionDAO.select(user_.getUserid(), user_.getToken()))
+    if (null != sessionDAO.select(user_.getSession()))
     {
-      sessionDAO.delete(user_.getUserid());
+      sessionDAO.delete(user_);
     }
     if (null != userDAO.select(user_.getUserid()))
     {
-      userDAO.delete(user_.getUserid());
+      userDAO.delete(user_);
     }
   }
 
@@ -151,9 +150,8 @@ public class UserResource
 
       final String password = Authenticator.getSecurePassword(modified_.getPassword());
       modified_.setPassword(password);
-      userDAO.update(modified_.getUsername(), modified_.getPassword(), modified_.getEmail(),
-                     new Date(),
-                     modified_.getUserid());
+      modified_.setUpdated(new Date());
+      userDAO.update(modified_);
       return modified_;
     }
     catch (WebApplicationException ex)

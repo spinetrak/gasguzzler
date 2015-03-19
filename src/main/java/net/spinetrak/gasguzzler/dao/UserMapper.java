@@ -45,6 +45,8 @@ public class UserMapper implements ResultSetMapper<User>
     user.setUserid(resultSet_.getInt("userid"));
     user.setEmail(resultSet_.getString("email"));
     user.setRole(resultSet_.getString("role"));
+    user.setCreated(resultSet_.getDate("created"));
+    user.setUpdated(resultSet_.getDate("updated"));
 
     return user;
   }
