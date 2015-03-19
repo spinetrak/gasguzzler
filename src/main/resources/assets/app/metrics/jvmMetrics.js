@@ -45,10 +45,8 @@ define(function (require) {
 
 
     return {
-        heapMaxDps: [],
         heapCommittedDps: [],
         heapUsedDps: [],
-        nonHeapMaxDps: [],
         nonHeapCommittedDps: [],
         nonHeapUsedDps: [],
         urlRoot: location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : ''),
@@ -68,12 +66,6 @@ define(function (require) {
 
             var that = this;
 
-            http.get(that.urlRoot + '/api/metrics/jvm.memory.heap.max/counts', '', userModel).then(function (response) {
-                    that.updateSeries(that.heapMaxDps, response);
-                },
-                function (error) {
-                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
-                });
             http.get(that.urlRoot + '/api/metrics/jvm.memory.heap.committed/counts', '', userModel).then(function (response) {
                     that.updateSeries(that.heapCommittedDps, response);
                 },
@@ -82,12 +74,6 @@ define(function (require) {
                 });
             http.get(that.urlRoot + '/api/metrics/jvm.memory.heap.used/counts', '', userModel).then(function (response) {
                     that.updateSeries(that.heapUsedDps, response);
-                },
-                function (error) {
-                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
-                });
-            http.get(that.urlRoot + '/api/metrics/jvm.memory.non-heap.max/counts', '', userModel).then(function (response) {
-                    that.updateSeries(that.nonHeapMaxDps, response);
                 },
                 function (error) {
                     app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
@@ -142,12 +128,6 @@ define(function (require) {
                 data: [{
                     type: "line",
                     showInLegend: true,
-                    name: "heap max",
-                    xValueType: "dateTime",
-                    dataPoints: this.heapMaxDps
-                }, {
-                    type: "line",
-                    showInLegend: true,
                     name: "heap committed",
                     xValueType: "dateTime",
                     dataPoints: this.heapCommittedDps
@@ -157,12 +137,6 @@ define(function (require) {
                     name: "heap used",
                     xValueType: "dateTime",
                     dataPoints: this.heapUsedDps
-                }, {
-                    type: "line",
-                    showInLegend: true,
-                    name: "non-heap max",
-                    xValueType: "dateTime",
-                    dataPoints: this.nonHeapMaxDps
                 }, {
                     type: "line",
                     showInLegend: true,
