@@ -56,7 +56,7 @@ public class MetricsResource
   @GET
   public List<String> get(@Auth final User user_)
   {
-    if (null != sessionDAO.findSession(user_.getUserid(), user_.getToken()))
+    if (null != sessionDAO.select(user_.getUserid(), user_.getToken()))
     {
       return metricsDAO.get();
     }
@@ -67,7 +67,7 @@ public class MetricsResource
   @Path("/{name}/counts")
   public List<CountDataPoint> getCounts(@Auth final User user_, @PathParam("name") final String name_)
   {
-    if (null != sessionDAO.findSession(user_.getUserid(), user_.getToken()))
+    if (null != sessionDAO.select(user_.getUserid(), user_.getToken()))
     {
       return metricsDAO.getCount(name_);
     }
@@ -78,7 +78,7 @@ public class MetricsResource
   @Path("/{name}/rates")
   public List<RateDataPoint> getRates(@Auth final User user_, @PathParam("name") final String name_)
   {
-    if (null != sessionDAO.findSession(user_.getUserid(), user_.getToken()))
+    if (null != sessionDAO.select(user_.getUserid(), user_.getToken()))
     {
       return metricsDAO.getRate(name_);
     }

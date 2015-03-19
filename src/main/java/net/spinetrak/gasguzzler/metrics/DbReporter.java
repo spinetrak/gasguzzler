@@ -77,6 +77,37 @@ public class DbReporter extends ScheduledReporter
     {
       reportTimer(timestamp, entry.getKey(), entry.getValue());
     }
+
+    for (Map.Entry<String, Gauge> entry : gauges_.entrySet())
+    {
+      reportGauge(timestamp, entry.getKey(), entry.getValue());
+    }
+  }
+
+  private long getGaugeCount(final Object value_)
+  {
+    if (null != value_)
+    {
+      if ((value_ instanceof Long) || (value_ instanceof Integer))
+      {
+        return ((Number) value_).longValue();
+      }
+      return 0;
+    }
+    return 0;
+  }
+
+  private double getGaugeRate(final Object value_)
+  {
+    if (null != value_)
+    {
+      if ((value_ instanceof Float) || (value_ instanceof Double))
+      {
+        return ((Number) value_).doubleValue();
+      }
+      return 0;
+    }
+    return 0;
   }
 
   private void report(final DataPoint dataPoint_)
@@ -93,6 +124,16 @@ public class DbReporter extends ScheduledReporter
     dp.setRate(-1);
     dp.setName(name_);
     dp.setCount(counter_.getCount());
+    report(dp);
+  }
+
+  private void reportGauge(final long timestamp_, final String name_, final Gauge gauge_)
+  {
+    final DataPoint dp = new DataPoint();
+    dp.setTimestamp(timestamp_);
+    dp.setRate(getGaugeRate(gauge_.getValue()));
+    dp.setName(name_);
+    dp.setCount(getGaugeCount(gauge_.getValue()));
     report(dp);
   }
 

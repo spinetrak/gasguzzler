@@ -53,20 +53,20 @@ public class UserDAOTest
     _userDAO.insert(user.getUsername(), user.getPassword(), user.getEmail(), user.getRole(), new Date(),
                     new Date());
 
-    final User u = _userDAO.findByUsername(user.getUsername());
+    final User u = _userDAO.select(user.getUsername());
     user.setUserid(u.getUserid());
     assertEquals(user, u);
 
-    final List<User> users = _userDAO.findUsersByUsernameOrEmail(user.getUsername(), user.getEmail());
+    final List<User> users = _userDAO.select(user.getUsername(), user.getEmail());
     assertTrue(users.size() > 0);
 
-    final User u2 = _userDAO.findUser(user.getUserid());
+    final User u2 = _userDAO.select(user.getUserid());
     assertEquals(user, u2);
 
     user.setUsername("new_username");
     _userDAO.update(user.getUsername(), user.getPassword(), user.getEmail(), new Date(),
                     user.getUserid());
-    final User u3 = _userDAO.findUser(user.getUserid());
+    final User u3 = _userDAO.select(user.getUserid());
     assertEquals(user, u3);
 
     for (User x : users)

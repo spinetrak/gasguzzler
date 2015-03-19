@@ -40,14 +40,14 @@ public interface SessionDAO
   @SqlUpdate("delete from st_session where userid = :userid")
   void delete(@Bind("userid") int userid);
 
-  @SqlQuery("select * from st_session")
-  @Mapper(SessionMapper.class)
-  List<Session> findAll();
+  @SqlUpdate("insert into st_session (userid, token, created) values (:userid, :token, :created)")
+  void insert(@Bind("userid") int userid, @Bind("token") String token, @Bind("created") java.util.Date created);
   
   @SqlQuery("select userid, token from st_session where userid = :userid and token = :token limit 1")
   @Mapper(SessionMapper.class)
-  Session findSession(@Bind("userid") int userid, @Bind("token") String token);
+  Session select(@Bind("userid") int userid, @Bind("token") String token);
 
-  @SqlUpdate("insert into st_session (userid, token, created) values (:userid, :token, :created)")
-  void insert(@Bind("userid") int userid, @Bind("token") String token, @Bind("created") java.util.Date created);
+  @SqlQuery("select * from st_session")
+  @Mapper(SessionMapper.class)
+  List<Session> select();
 }

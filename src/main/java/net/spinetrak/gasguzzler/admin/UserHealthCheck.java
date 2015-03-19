@@ -39,7 +39,7 @@ public class UserHealthCheck extends HealthCheck
   @Override
   protected Result check() throws Exception
   {
-    if (_userDAO.findAll().isEmpty())
+    if (_userDAO.select().isEmpty())
     {
       return Result.unhealthy("No users in the users DB.");
     }

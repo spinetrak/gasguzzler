@@ -57,7 +57,7 @@ public class MetricsResourceTest
   @Test
   public void getAvailableMetrics()
   {
-    when(_sessionDAO.findSession(0, "token")).thenReturn(session);
+    when(_sessionDAO.select(0, "token")).thenReturn(session);
     resources.client().resource("/metrics").header(SecurityProvider.TOKEN, "token").header(SecurityProvider.USERID,
                                                                                            "0").type(
       MediaType.APPLICATION_JSON_TYPE).get(new GenericType<List<DataPoint>>()
@@ -71,7 +71,7 @@ public class MetricsResourceTest
   @Test
   public void getCountMetrics()
   {
-    when(_sessionDAO.findSession(0, "token")).thenReturn(session);
+    when(_sessionDAO.select(0, "token")).thenReturn(session);
     resources.client().resource("/metrics/ch.qos.logback.core.Appender.info/counts").header(SecurityProvider.TOKEN,
                                                                                             "token").header(
       SecurityProvider.USERID, "0").type(MediaType.APPLICATION_JSON_TYPE).get(new GenericType<List<DataPoint>>()
@@ -85,7 +85,7 @@ public class MetricsResourceTest
   @Test
   public void getRateMetrics()
   {
-    when(_sessionDAO.findSession(0, "token")).thenReturn(session);
+    when(_sessionDAO.select(0, "token")).thenReturn(session);
     resources.client().resource("/metrics/ch.qos.logback.core.Appender.info/rates").header(SecurityProvider.TOKEN,
                                                                                      "token").header(
       SecurityProvider.USERID, "0").type(MediaType.APPLICATION_JSON_TYPE).get(new GenericType<List<DataPoint>>()

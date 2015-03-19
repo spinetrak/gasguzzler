@@ -44,19 +44,19 @@ import static org.mockito.Mockito.when;
 public class AuthenticatorTest
 {
   private SessionDAO _sessionDAO = mock(SessionDAO.class);
-  private UserDAO _userDAO = mock(UserDAO.class);
   private User _user = UserTest.getUser();
+  private UserDAO _userDAO = mock(UserDAO.class);
 
   @Test
   public void authenticateReturnsUserForValidSession() throws AuthenticationException
   {
     try
     {
-      when(_userDAO.findByUsername(anyString())).thenReturn(_user);
+      when(_userDAO.select(anyString())).thenReturn(_user);
 
       _userDAO.insert(_user.getUsername(), _user.getPassword(), _user.getEmail(), _user.getRole(),
                       new Date(), new Date());
-      final User user = _userDAO.findByUsername(_user.getUsername());
+      final User user = _userDAO.select(_user.getUsername());
 
       final Session session = new Session(user.getUserid());
       _sessionDAO.insert(session.getUserid(), session.getToken(), new Date());
