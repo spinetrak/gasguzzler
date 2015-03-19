@@ -46,11 +46,4 @@ database:
     keyLength: 256
     iterations: 2000
     encrypted: true
-logging:
-  level: INFO
-  loggers:
-    com.codahale.metrics: DEBUG
-  appenders:
-    - type: console
-      
       
