@@ -26,23 +26,28 @@ package net.spinetrak.gasguzzler.dao;
 
 import net.spinetrak.gasguzzler.core.User;
 import net.spinetrak.gasguzzler.security.Session;
+import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.BindBean;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
 
+import java.util.Date;
 import java.util.List;
 
 public interface SessionDAO
 {
+  @SqlUpdate("delete from st_session where created < :date")
+  int delete(@Bind("date") final Date date_);
+  
   @SqlUpdate("delete from st_session where userid = :s.userid and token = :s.token")
-  void delete(@BindBean("s") final Session session_);
+  int delete(@BindBean("s") final Session session_);
 
   @SqlUpdate("delete from st_session where userid = :u.userid")
-  void delete(@BindBean("u") final User user_);
+  int delete(@BindBean("u") final User user_);
 
   @SqlUpdate("insert into st_session (userid, token, created) values (:s.userid, :s.token, :s.date)")
-  void insert(@BindBean("s") final Session session_);
+  int insert(@BindBean("s") final Session session_);
 
   @SqlQuery("select userid, token from st_session where userid = :s.userid and token = :s.token limit 1")
   @Mapper(SessionMapper.class)

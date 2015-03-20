@@ -74,54 +74,59 @@ define(function (require) {
                     that.updateJerseySeries(that.getCountDps, response);
                 },
                 function (error) {
-                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
+                    that.handleError();
                 });
             http.get(that.urlRoot + '/api/metrics/io.dropwizard.jetty.MutableServletContextHandler.head-requests/counts', '', userModel).then(function (response) {
                     that.updateJerseySeries(that.headCountDps, response);
                 },
                 function (error) {
-                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
+                    that.handleError();
                 });
             http.get(that.urlRoot + '/api/metrics/io.dropwizard.jetty.MutableServletContextHandler.post-requests/counts', '', userModel).then(function (response) {
                     that.updateJerseySeries(that.postCountDps, response);
                 },
                 function (error) {
-                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
+                    that.handleError();
                 });
             http.get(that.urlRoot + '/api/metrics/io.dropwizard.jetty.MutableServletContextHandler.put-requests/counts', '', userModel).then(function (response) {
                     that.updateJerseySeries(that.putCountDps, response);
                 },
                 function (error) {
-                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
+                    that.handleError();
                 });
             http.get(that.urlRoot + '/api/metrics/io.dropwizard.jetty.MutableServletContextHandler.get-requests/rates', '', userModel).then(function (response) {
                     that.updateJerseySeries(that.getRateDps, response);
                 },
                 function (error) {
-                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
+                    that.handleError();
                 });
             http.get(that.urlRoot + '/api/metrics/io.dropwizard.jetty.MutableServletContextHandler.head-requests/rates', '', userModel).then(function (response) {
                     that.updateJerseySeries(that.headRateDps, response);
                 },
                 function (error) {
-                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
+                    that.handleError();
                 });
             http.get(that.urlRoot + '/api/metrics/io.dropwizard.jetty.MutableServletContextHandler.post-requests/rates', '', userModel).then(function (response) {
                     that.updateJerseySeries(that.postRateDps, response);
                 },
                 function (error) {
-                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
+                    that.handleError();
                 });
             http.get(that.urlRoot + '/api/metrics/io.dropwizard.jetty.MutableServletContextHandler.put-requests/rates', '', userModel).then(function (response) {
                     that.updateJerseySeries(that.putRateDps, response);
                 },
                 function (error) {
-                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
+                    that.handleError();
                 });
             window.clearInterval(startMyJersey);
         },
 
-
+        handleError: function () {
+            app.trigger("loggedin", false);
+            document.location.href = "/#user";
+            window.location.reload(true);
+        },
+        
         updateJerseySeries: function (theArray, theData) {
             Object.deepExtend(theArray, theData);
             this.jerseyChart().render();

@@ -74,53 +74,58 @@ define(function (require) {
                     that.updateUserDAOSeries(that.selectCountDps, response);
                 },
                 function (error) {
-                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
+                    that.handleError();
                 });
             http.get(that.urlRoot + '/api/metrics/net.spinetrak.gasguzzler.dao.UserDAO.update/counts', '', userModel).then(function (response) {
                     that.updateUserDAOSeries(that.updateCountDps, response);
                 },
                 function (error) {
-                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
+                    that.handleError();
                 });
             http.get(that.urlRoot + '/api/metrics/net.spinetrak.gasguzzler.dao.UserDAO.insert/counts', '', userModel).then(function (response) {
                     that.updateUserDAOSeries(that.insertCountDps, response);
                 },
                 function (error) {
-                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
+                    that.handleError();
                 });
             http.get(that.urlRoot + '/api/metrics/net.spinetrak.gasguzzler.dao.UserDAO.delete/counts', '', userModel).then(function (response) {
                     that.updateUserDAOSeries(that.deleteCountDps, response);
                 },
                 function (error) {
-                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
+                    that.handleError();
                 });
             http.get(that.urlRoot + '/api/metrics/net.spinetrak.gasguzzler.dao.UserDAO.select/rates', '', userModel).then(function (response) {
                     that.updateUserDAOSeries(that.selectRateDps, response);
                 },
                 function (error) {
-                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
+                    that.handleError();
                 });
             http.get(that.urlRoot + '/api/metrics/net.spinetrak.gasguzzler.dao.UserDAO.update/rates', '', userModel).then(function (response) {
                     that.updateUserDAOSeries(that.updateRateDps, response);
                 },
                 function (error) {
-                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
+                    that.handleError();
                 });
             http.get(that.urlRoot + '/api/metrics/net.spinetrak.gasguzzler.dao.UserDAO.insert/rates', '', userModel).then(function (response) {
                     that.updateUserDAOSeries(that.insertRateDps, response);
                 },
                 function (error) {
-                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
+                    that.handleError();
                 });
             http.get(that.urlRoot + '/api/metrics/net.spinetrak.gasguzzler.dao.UserDAO.delete/rates', '', userModel).then(function (response) {
                     that.updateUserDAOSeries(that.deleteRateDps, response);
                 },
                 function (error) {
-                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
+                    that.handleError();
                 });
             window.clearInterval(startMyUserDAO);
         },
 
+        handleError: function () {
+            app.trigger("loggedin", false);
+            document.location.href = "/#user";
+            window.location.reload(true);
+        },
 
         updateUserDAOSeries: function (theArray, theData) {
             Object.deepExtend(theArray, theData);

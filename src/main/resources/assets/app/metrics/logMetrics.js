@@ -72,41 +72,46 @@ define(function (require) {
                     that.updateLogSeries(that.infoCountDps, response);
                 },
                 function (error) {
-                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
+                    that.handleError();
                 });
             http.get(that.urlRoot + '/api/metrics/ch.qos.logback.core.Appender.warn/counts', '', userModel).then(function (response) {
                     that.updateLogSeries(that.warnCountDps, response);
                 },
                 function (error) {
-                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
+                    that.handleError();
                 });
             http.get(that.urlRoot + '/api/metrics/ch.qos.logback.core.Appender.error/counts', '', userModel).then(function (response) {
                     that.updateLogSeries(that.errorCountDps, response);
                 },
                 function (error) {
-                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
+                    that.handleError();
                 });
             http.get(that.urlRoot + '/api/metrics/ch.qos.logback.core.Appender.info/rates', '', userModel).then(function (response) {
                     that.updateLogSeries(that.infoRateDps, response);
                 },
                 function (error) {
-                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
+                    that.handleError();
                 });
             http.get(that.urlRoot + '/api/metrics/ch.qos.logback.core.Appender.warn/rates', '', userModel).then(function (response) {
                     that.updateLogSeries(that.warnRateDps, response);
                 },
                 function (error) {
-                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
+                    that.handleError();
                 });
             http.get(that.urlRoot + '/api/metrics/ch.qos.logback.core.Appender.error/rates', '', userModel).then(function (response) {
                     that.updateLogSeries(that.errorRateDps, response);
                 },
                 function (error) {
-                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
+                    that.handleError();
                 });
             window.clearInterval(startMyLog);
         },
 
+        handleError: function () {
+            app.trigger("loggedin", false);
+            document.location.href = "/#user";
+            window.location.reload(true);
+        },
 
         updateLogSeries: function (theArray, theData) {
             Object.deepExtend(theArray, theData);

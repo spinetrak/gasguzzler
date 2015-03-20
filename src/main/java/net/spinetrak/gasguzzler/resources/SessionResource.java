@@ -72,6 +72,7 @@ public class SessionResource
         throw new WebApplicationException(Response.Status.NOT_FOUND);
       }
 
+      sessionDAO.delete(u);
       final Session session = new Session(u.getUserid());
       sessionDAO.insert(session);
 

@@ -39,6 +39,7 @@ import net.spinetrak.gasguzzler.admin.UserHealthCheck;
 import net.spinetrak.gasguzzler.dao.MetricsDAO;
 import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
+import net.spinetrak.gasguzzler.jobs.SessionCleanupJob;
 import net.spinetrak.gasguzzler.metrics.DbReporter;
 import net.spinetrak.gasguzzler.resources.BuildInfoResource;
 import net.spinetrak.gasguzzler.resources.MetricsResource;
@@ -115,6 +116,11 @@ public class Trak extends Application<TrakConfiguration>
     configuration_.addDAO("sessionDAO", sessionDAO);
     configuration_.addDAO("metricsDAO", metricsDAO);
 
+    environment_.lifecycle().scheduledExecutorService("sessionCleanupJob").build().scheduleAtFixedRate(
+      new SessionCleanupJob(sessionDAO), 0,
+      30,
+      TimeUnit.MINUTES);
+    
     environment_.jersey().setUrlPattern("/api/*");
     environment_.jersey().register(new BuildInfoResource());
     environment_.jersey().register(new UserResource(userDAO, sessionDAO));

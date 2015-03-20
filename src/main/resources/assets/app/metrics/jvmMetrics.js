@@ -70,29 +70,34 @@ define(function (require) {
                     that.updateSeries(that.heapCommittedDps, response);
                 },
                 function (error) {
-                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
+                    that.handleError();
                 });
             http.get(that.urlRoot + '/api/metrics/jvm.memory.heap.used/counts', '', userModel).then(function (response) {
                     that.updateSeries(that.heapUsedDps, response);
                 },
                 function (error) {
-                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
+                    that.handleError();
                 });
             http.get(that.urlRoot + '/api/metrics/jvm.memory.non-heap.committed/counts', '', userModel).then(function (response) {
                     that.updateSeries(that.nonHeapCommittedDps, response);
                 },
                 function (error) {
-                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
+                    that.handleError();
                 });
             http.get(that.urlRoot + '/api/metrics/jvm.memory.non-heap.used/counts', '', userModel).then(function (response) {
                     that.updateSeries(that.nonHeapUsedDps, response);
                 },
                 function (error) {
-                    app.showMessage("Service currently unavailable.", "Error!", ["Ok"], true, {"class": "notice error"});
+                    that.handleError();
                 });
             window.clearInterval(startMyJVM);
         },
 
+        handleError: function () {
+            app.trigger("loggedin", false);
+            document.location.href = "/#user";
+            window.location.reload(true);
+        },
 
         updateSeries: function (theArray, theData) {
             Object.deepExtend(theArray, theData);

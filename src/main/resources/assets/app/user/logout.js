@@ -63,6 +63,9 @@ define(function (require) {
                 },
                 function (error) {
                     app.showDialog(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"});
+                    app.trigger("loggedin", false);
+                    document.location.href = "/#user";
+                    window.location.reload(true);
                 });
         },
 
