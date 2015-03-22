@@ -139,7 +139,7 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<Session, 
     else
     {
       final User user = userDAO.select(session_.getUserid());
-
+      user.setSession(session_);
       return Optional.fromNullable(user);
     }
   }
