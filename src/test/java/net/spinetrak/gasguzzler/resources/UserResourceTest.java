@@ -86,7 +86,7 @@ public class UserResourceTest
     resources.client().resource("/user/0").header(SecurityProvider.TOKEN, "token").header(
       SecurityProvider.USERID, "0").type(MediaType.APPLICATION_JSON_TYPE).delete(_adminUser);
 
-    verify(_sessionDAO, times(1)).select(_session);
+    verify(_sessionDAO, times(2)).select(_session);
   }
 
   @Test
@@ -162,7 +162,7 @@ public class UserResourceTest
 
       fail("Updated _adminUser should be invalid " + updatedUser);
     }
-    catch (UniformInterfaceException ex_)
+    catch (final UniformInterfaceException ex_)
     {
       assertEquals("Client response status: 401", ex_.getMessage());
     }

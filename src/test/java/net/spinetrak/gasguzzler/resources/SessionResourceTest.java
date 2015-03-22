@@ -77,6 +77,6 @@ public class SessionResourceTest
     resources.client().resource("/session").header(SecurityProvider.TOKEN, "token").header(
       SecurityProvider.USERID, "0").type(MediaType.APPLICATION_JSON_TYPE).delete(_user);
 
-    verify(_sessionDAO, times(1)).select(_session);
+    verify(_sessionDAO, times(2)).select(_session);
   }
 }

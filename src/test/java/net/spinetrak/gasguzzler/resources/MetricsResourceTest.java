@@ -70,7 +70,7 @@ public class MetricsResourceTest
     {
     });
     verify(_metricsDAO, times(1)).get();
-    verify(_sessionDAO, times(1)).select(_session);
+    verify(_sessionDAO, times(2)).select(_session);
   }
 
   @Test
@@ -84,7 +84,7 @@ public class MetricsResourceTest
     {
     });
     verify(_metricsDAO, times(1)).getCount("ch.qos.logback.core.Appender.info");
-    verify(_sessionDAO, times(1)).select(_session);
+    verify(_sessionDAO, times(2)).select(_session);
   }
 
   @Test
@@ -98,6 +98,6 @@ public class MetricsResourceTest
     {
     });
     verify(_metricsDAO, times(1)).getRate("ch.qos.logback.core.Appender.info");
-    verify(_sessionDAO, times(1)).select(_session);
+    verify(_sessionDAO, times(2)).select(_session);
   }
 }
