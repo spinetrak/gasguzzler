@@ -46,6 +46,7 @@ public class User
   @NotNull
   @JsonProperty
   private Role role;
+  @JsonIgnore
   private Session session;
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
   private Date updated;

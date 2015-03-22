@@ -76,12 +76,15 @@ define(function (require) {
             var myemail = this.email();
             var myusername = this.username();
 
-            var userModel = {
-                "userid": sessionStorage.getItem("userid"),
-                "token": sessionStorage.getItem("token"),
+            var dataModel = {
                 "username": myusername,
                 "email": myemail,
-                "password": CryptoJS.SHA256(myusername + "|" + mypassword).toString()
+                "password": CryptoJS.SHA256(myusername + "|" + mypassword).toString(),
+                "userid": sessionStorage.getItem("userid")
+            };
+            var headerModel = {
+                "userid": sessionStorage.getItem("userid"),
+                "token": sessionStorage.getItem("token")
             };
 
             if (!myusername || myusername.length < 3 || !mypassword || mypassword.length < 6 || !myemail || myemail.length < 5 || !this.doValidateEmail(myemail)) {
@@ -90,10 +93,10 @@ define(function (require) {
             }
 
 
-            var url = this.urlRoot + '/api/user/' + userModel.userid;
+            var url = this.urlRoot + '/api/user/' + dataModel.userid;
 
             var that = this;
-            return http.put(url, userModel, userModel).then(
+            return http.put(url, dataModel, headerModel).then(
                 function (response) {
                     app.showMessage("Profile updated for " + that.username() + " (" + that.email() + ")!", "Profile updated!", ["Ok"], true, {"class": "notice success"});
                 },
