@@ -61,11 +61,11 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<Session, 
   {
   }
 
-  public static String getSecurePassword(String password) throws NoSuchAlgorithmException,
+  public static String getSecurePassword(final String password_) throws NoSuchAlgorithmException,
                                                                  InvalidKeySpecException
   {
     int iterations = 1000;
-    char[] chars = password.toCharArray();
+    char[] chars = password_.toCharArray();
     byte[] salt = getSalt().getBytes();
 
     PBEKeySpec spec = new PBEKeySpec(chars, salt, iterations, 64 * 8);
@@ -74,16 +74,16 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<Session, 
     return iterations + ":" + toHex(salt) + ":" + toHex(hash);
   }
 
-  public static boolean validatePassword(String originalPassword, String storedPassword) throws
+  public static boolean validatePassword(final String originalPassword_, final String storedPassword_) throws
                                                                                          NoSuchAlgorithmException,
                                                                                          InvalidKeySpecException
   {
-    String[] parts = storedPassword.split(":");
+    String[] parts = storedPassword_.split(":");
     int iterations = Integer.parseInt(parts[0]);
     byte[] salt = fromHex(parts[1]);
     byte[] hash = fromHex(parts[2]);
 
-    PBEKeySpec spec = new PBEKeySpec(originalPassword.toCharArray(), salt, iterations, hash.length * 8);
+    PBEKeySpec spec = new PBEKeySpec(originalPassword_.toCharArray(), salt, iterations, hash.length * 8);
     SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
     byte[] testHash = skf.generateSecret(spec).getEncoded();
 
@@ -95,12 +95,12 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<Session, 
     return diff == 0;
   }
 
-  private static byte[] fromHex(String hex) throws NoSuchAlgorithmException
+  private static byte[] fromHex(final String hex_) throws NoSuchAlgorithmException
   {
-    byte[] bytes = new byte[hex.length() / 2];
+    byte[] bytes = new byte[hex_.length() / 2];
     for (int i = 0; i < bytes.length; i++)
     {
-      bytes[i] = (byte) Integer.parseInt(hex.substring(2 * i, 2 * i + 2), 16);
+      bytes[i] = (byte) Integer.parseInt(hex_.substring(2 * i, 2 * i + 2), 16);
     }
     return bytes;
   }
@@ -113,11 +113,11 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<Session, 
     return new String(salt);
   }
 
-  private static String toHex(byte[] array) throws NoSuchAlgorithmException
+  private static String toHex(final byte[] array_) throws NoSuchAlgorithmException
   {
-    BigInteger bi = new BigInteger(1, array);
+    BigInteger bi = new BigInteger(1, array_);
     String hex = bi.toString(16);
-    int paddingLength = (array.length * 2) - hex.length();
+    int paddingLength = (array_.length * 2) - hex.length();
     if (paddingLength > 0)
     {
       return String.format("%0" + paddingLength + "d", 0) + hex;

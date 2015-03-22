@@ -25,6 +25,7 @@
 package net.spinetrak.gasguzzler.core;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import net.spinetrak.gasguzzler.security.Session;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -42,9 +43,9 @@ public class User
   @NotEmpty
   @JsonProperty
   private String password;
-  @NotEmpty
+  @NotNull
   @JsonProperty
-  private String role;
+  private Role role;
   private Session session;
   private Date updated;
   @NotNull
@@ -56,7 +57,7 @@ public class User
 
   public User()
   {
-    setRole(Role.USER.name());
+    setRole(Role.USER);
   }
   @Override
   public boolean equals(final Object object_)
@@ -102,9 +103,15 @@ public class User
     return password;
   }
 
-  public String getRole()
+  public Role getRole()
   {
     return role;
+  }
+
+  @JsonIgnore
+  public String getRoleAsString()
+  {
+    return role.name();
   }
 
   public Session getSession()
@@ -142,7 +149,7 @@ public class User
     password = password_;
   }
 
-  public void setRole(final String role_)
+  public void setRole(final Role role_)
   {
     role = role_;
   }

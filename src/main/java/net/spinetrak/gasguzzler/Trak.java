@@ -36,8 +36,6 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import net.spinetrak.gasguzzler.admin.SessionHealthCheck;
 import net.spinetrak.gasguzzler.admin.UserHealthCheck;
-import net.spinetrak.gasguzzler.core.Role;
-import net.spinetrak.gasguzzler.core.User;
 import net.spinetrak.gasguzzler.dao.MetricsDAO;
 import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
@@ -56,7 +54,6 @@ import org.skife.jdbi.v2.DBI;
 
 import javax.servlet.DispatcherType;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class Trak extends Application<TrakConfiguration>
@@ -124,10 +121,11 @@ public class Trak extends Application<TrakConfiguration>
       new SessionCleanupJob(sessionDAO), 0,
       30,
       TimeUnit.MINUTES);
+
     
     environment_.jersey().setUrlPattern("/api/*");
     environment_.jersey().register(new BuildInfoResource());
-    environment_.jersey().register(new UserResource(userDAO, sessionDAO));
+    environment_.jersey().register(new UserResource(userDAO, sessionDAO, configuration_.getAdmin().getEmail()));
     environment_.jersey().register(new SessionResource(userDAO, sessionDAO));
     environment_.jersey().register(new MetricsResource(metricsDAO, sessionDAO));
     environment_.jersey().register(new SecurityProvider<>(new Authenticator(sessionDAO, userDAO)));
@@ -140,23 +138,8 @@ public class Trak extends Application<TrakConfiguration>
     environment_.healthChecks().register("users", new UserHealthCheck(userDAO));
     environment_.healthChecks().register("sessions", new SessionHealthCheck(sessionDAO));
 
-    final String admin = configuration_.getAdmin();
-    final List<User> theAdmin = userDAO.select(null, admin);
-
-    if (1 == theAdmin.size())
-    {
-      final User adminUser = theAdmin.get(0);
-
-      environment_.admin().setSecurityHandler(
-        new AdminSecurityHandler(adminUser.getUsername(), adminUser.getPassword()));
-
-
-      if (!adminUser.getRole().equals(Role.ADMIN.name()))
-      {
-        adminUser.setRole(Role.ADMIN.name());
-        userDAO.update(adminUser);
-      }
-    }
+    environment_.admin().setSecurityHandler(
+      new AdminSecurityHandler(configuration_.getAdmin().getUsername(), configuration_.getAdmin().getPassword()));
 
     final DbReporter reporter = DbReporter.forRegistry(environment_.metrics())
       .convertRatesTo(TimeUnit.SECONDS)

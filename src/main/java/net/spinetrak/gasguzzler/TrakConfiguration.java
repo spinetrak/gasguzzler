@@ -28,6 +28,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.flyway.FlywayFactory;
+import net.spinetrak.gasguzzler.core.AdminUser;
 import net.spinetrak.gasguzzler.metrics.DbReporter;
 import net.spinetrak.gasguzzler.security.EncryptedDataSourceFactory;
 
@@ -41,7 +42,7 @@ public class TrakConfiguration extends Configuration
   @Valid
   @NotNull
   @JsonProperty
-  private String admin = null;
+  private AdminUser admin = null;
   private Map<String, Object> daos = new HashMap<>();
   @Valid
   @NotNull
@@ -57,7 +58,7 @@ public class TrakConfiguration extends Configuration
   private Boolean isHttps = false;
   private DbReporter reporter;
 
-  public String getAdmin()
+  public AdminUser getAdmin()
   {
     return admin;
   }

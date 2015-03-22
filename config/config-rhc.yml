@@ -7,7 +7,26 @@ server:
     bindHost: @OPENSHIFT_DIY_IP@
     port: @OPENSHIFT_DIY_PORT@
 isHttps: true
-admin: spinetrak@spinetrak.net
+admin:
+  email: "spinetrak@spinetrak.net"
+  username:
+    salt: "67XFnA=="
+    iv: "uWiHOq7etiJPft7SHPHNrQ=="
+    value: "PMPXa86M0G7PBSeUTRFOzA=="
+    cipher: "aes-256-cbc"
+    keyDerivation: "pbkdf2"
+    keyLength: 256
+    iterations: 2000
+    encrypted: true
+  password:
+    salt: "hA0mjQ=="
+    iv: "x+fbSq9p5Fp1lpE79oSp/g=="
+    value: "H6z1+AzBDeq6lGxX1DQrgw=="
+    cipher: "aes-256-cbc"
+    keyDerivation: "pbkdf2"
+    keyLength: 256
+    iterations: 2000
+    encrypted: true
 database:
   driverClass: "org.postgresql.Driver"
   url: "jdbc:postgresql://@OPENSHIFT_POSTGRESQL_DB_HOST@:@OPENSHIFT_POSTGRESQL_DB_PORT@/gasguzzler"

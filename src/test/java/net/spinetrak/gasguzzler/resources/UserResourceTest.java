@@ -57,7 +57,8 @@ public class UserResourceTest
   public ResourceTestRule resources = ResourceTestRule.builder()
     .addResource(new UserResource(
       _userDAO,
-      _sessionDAO))
+      _sessionDAO,
+      "admin@example.com"))
     .addProvider(new SecurityProvider<>(new Authenticator(_sessionDAO, _userDAO)))
     .build();
 
@@ -105,7 +106,7 @@ public class UserResourceTest
     when(_userDAO.select(_session.getUserid())).thenReturn(_adminUser);
 
     resources.client().resource("/user")
-      .header(SecurityProvider.TOKEN, "Admintoken").header(SecurityProvider.USERID, "0").type(
+      .header(SecurityProvider.TOKEN, "token").header(SecurityProvider.USERID, "0").type(
       MediaType.APPLICATION_JSON_TYPE)
       .get(new GenericType<List<User>>()
       {

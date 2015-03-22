@@ -39,7 +39,7 @@ public class UserTest
   public static User getAdminUser()
   {
     User admin = new User();
-    admin.setRole(Role.ADMIN.name());
+    admin.setRole(Role.ADMIN);
     admin.setUsername("myName");
     admin.setPassword(
       "063450be3449991e2ae85c11f8ac2721ad252cb4046b6099f2c5bfd688a63eee");

@@ -45,14 +45,16 @@ import java.util.List;
 @Consumes({MediaType.APPLICATION_JSON})
 public class UserResource
 {
-  private SessionDAO sessionDAO;
-  private UserDAO userDAO;
+  private final String adminEmail;
+  private final SessionDAO sessionDAO;
+  private final UserDAO userDAO;
 
-  public UserResource(final UserDAO userDAO_, final SessionDAO sessionDAO_)
+  public UserResource(final UserDAO userDAO_, final SessionDAO sessionDAO_, final String adminEmail_)
   {
     super();
     userDAO = userDAO_;
     sessionDAO = sessionDAO_;
+    adminEmail = adminEmail_;
   }
 
   @POST
@@ -73,7 +75,8 @@ public class UserResource
       final String password = Authenticator.getSecurePassword(user_.getPassword());
 
       user_.setPassword(password);
-      user_.setRole(Role.USER.name());
+      user_.setRole(
+        null != user_.getEmail() && adminEmail.toLowerCase().equals(user_.getEmail()) ? Role.ADMIN : Role.USER);
       userDAO.insert(user_);
 
       final User u = userDAO.select(user_);
@@ -97,7 +100,7 @@ public class UserResource
   @Path("/{userid}")
   public void delete(@PathParam("userid") final int userid_, @Auth final User user_)
   {
-    if ((userid_ != user_.getUserid()) && (!user_.getRole().equals(Role.ADMIN.name())))
+    if ((userid_ != user_.getUserid()) && (user_.getRole() != Role.ADMIN))
     {
       throw new WebApplicationException(Response.Status.UNAUTHORIZED);
     }
@@ -126,7 +129,7 @@ public class UserResource
   @GET
   public List<User> getAll(@Auth final User principal_)
   {
-    if (!principal_.getRole().equals(Role.ADMIN.name()))
+    if (principal_.getRole() != Role.ADMIN)
     {
       throw new WebApplicationException(Response.Status.UNAUTHORIZED);
     }
@@ -141,7 +144,7 @@ public class UserResource
     try
     {
       if (((userid_ != modified_.getUserid()) || (userid_ != current_.getUserid())) &&
-        ((null != current_.getRole()) && (!current_.getRole().equals(Role.ADMIN.name()))))
+        ((null != current_.getRole()) && (current_.getRole() != Role.ADMIN)))
       {
         throw new WebApplicationException(Response.Status.UNAUTHORIZED);
       }
@@ -149,6 +152,8 @@ public class UserResource
       final String password = Authenticator.getSecurePassword(modified_.getPassword());
       modified_.setPassword(password);
       modified_.setUpdated(new Date());
+      modified_.setRole(
+        null != modified_.getEmail() && adminEmail.toLowerCase().equals(modified_.getEmail()) ? Role.ADMIN : Role.USER);
       userDAO.update(modified_);
       return modified_;
     }
