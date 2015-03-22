@@ -46,7 +46,7 @@ public interface SessionDAO
   @SqlUpdate("delete from st_session where userid = :u.userid")
   int delete(@BindBean("u") final User user_);
 
-  @SqlUpdate("insert into st_session (userid, token, created) values (:s.userid, :s.token, :s.date)")
+  @SqlUpdate("insert into st_session (userid, token) values (:s.userid, :s.token)")
   int insert(@BindBean("s") final Session session_);
 
   @SqlQuery("select userid, token from st_session where userid = :s.userid and token = :s.token limit 1")

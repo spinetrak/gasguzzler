@@ -59,7 +59,7 @@ public class AuthenticatorTest
       _sessionDAO.insert(session);
 
 
-      final Authenticator authenticator = new Authenticator(_sessionDAO);
+      final Authenticator authenticator = new Authenticator(_sessionDAO, _userDAO);
 
       final Optional<User> result = authenticator.authenticate(session);
       assertTrue(result.isPresent());

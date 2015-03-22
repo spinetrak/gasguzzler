@@ -26,6 +26,7 @@ package net.spinetrak.gasguzzler.resources;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import io.dropwizard.auth.Auth;
+import net.spinetrak.gasguzzler.core.Role;
 import net.spinetrak.gasguzzler.core.User;
 import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
@@ -47,7 +48,7 @@ public class UserResource
   private SessionDAO sessionDAO;
   private UserDAO userDAO;
 
-  public UserResource(UserDAO userDAO_, SessionDAO sessionDAO_)
+  public UserResource(final UserDAO userDAO_, final SessionDAO sessionDAO_)
   {
     super();
     userDAO = userDAO_;
@@ -72,9 +73,7 @@ public class UserResource
       final String password = Authenticator.getSecurePassword(user_.getPassword());
 
       user_.setPassword(password);
-      user_.setRole(User.ROLE_USER);
-      user_.setCreated(new Date());
-      user_.setUpdated(new Date());
+      user_.setRole(Role.USER.name());
       userDAO.insert(user_);
 
       final User u = userDAO.select(user_);
@@ -98,7 +97,7 @@ public class UserResource
   @Path("/{userid}")
   public void delete(@PathParam("userid") final int userid_, @Auth final User user_)
   {
-    if ((userid_ != user_.getUserid()) && !user_.getRole().equals(User.ROLE_ADMIN))
+    if ((userid_ != user_.getUserid()) && (!user_.getRole().equals(Role.ADMIN.name())))
     {
       throw new WebApplicationException(Response.Status.UNAUTHORIZED);
     }
@@ -127,8 +126,7 @@ public class UserResource
   @GET
   public List<User> getAll(@Auth final User principal_)
   {
-
-    if (!principal_.getRole().equals(User.ROLE_ADMIN))
+    if (!principal_.getRole().equals(Role.ADMIN.name()))
     {
       throw new WebApplicationException(Response.Status.UNAUTHORIZED);
     }
@@ -142,8 +140,8 @@ public class UserResource
   {
     try
     {
-      if ((userid_ != modified_.getUserid() || userid_ != current_.getUserid()) && (null != current_.getRole() && !current_.getRole().equals(
-        User.ROLE_ADMIN)))
+      if (((userid_ != modified_.getUserid()) || (userid_ != current_.getUserid())) &&
+        ((null != current_.getRole()) && (!current_.getRole().equals(Role.ADMIN.name()))))
       {
         throw new WebApplicationException(Response.Status.UNAUTHORIZED);
       }

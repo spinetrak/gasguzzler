@@ -24,6 +24,7 @@
 
 package net.spinetrak.gasguzzler.dao;
 
+import net.spinetrak.gasguzzler.core.Role;
 import net.spinetrak.gasguzzler.core.User;
 import org.skife.jdbi.v2.StatementContext;
 import org.skife.jdbi.v2.tweak.ResultSetMapper;
@@ -44,9 +45,9 @@ public class UserMapper implements ResultSetMapper<User>
     user.setPassword(resultSet_.getString("password"));
     user.setUserid(resultSet_.getInt("userid"));
     user.setEmail(resultSet_.getString("email"));
-    user.setRole(resultSet_.getString("role"));
-    user.setCreated(resultSet_.getDate("created"));
-    user.setUpdated(resultSet_.getDate("updated"));
+    user.setRole(Role.parseFromString(resultSet_.getString("role")).name());
+    user.setCreated(resultSet_.getTimestamp("created"));
+    user.setUpdated(resultSet_.getTimestamp("updated"));
 
     return user;
   }

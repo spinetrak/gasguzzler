@@ -24,18 +24,17 @@
 
 package net.spinetrak.gasguzzler.core;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import net.spinetrak.gasguzzler.security.Session;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 public class User
 {
-
-  public static final String ROLE_ADMIN = "admin";
-  public static final String ROLE_USER = "user";
-
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
   private Date created;
   @NotEmpty
   @JsonProperty
@@ -48,13 +47,17 @@ public class User
   private String role;
   private Session session;
   private Date updated;
-  @NotEmpty
+  @NotNull
   @JsonProperty
   private int userid;
   @NotEmpty
   @JsonProperty
   private String username;
 
+  public User()
+  {
+    setRole(Role.USER.name());
+  }
   @Override
   public boolean equals(final Object object_)
   {
@@ -129,22 +132,19 @@ public class User
     created = created_;
   }
 
-  public User setEmail(final String email_)
+  public void setEmail(final String email_)
   {
     email = email_;
-    return this;
   }
 
-  public User setPassword(final String password_)
+  public void setPassword(final String password_)
   {
     password = password_;
-    return this;
   }
 
-  public User setRole(final String role_)
+  public void setRole(final String role_)
   {
     role = role_;
-    return this;
   }
 
   public void setSession(final Session session_)
@@ -162,9 +162,8 @@ public class User
     userid = userid_;
   }
 
-  public User setUsername(final String username_)
+  public void setUsername(final String username_)
   {
     username = username_;
-    return this;
   }
 }

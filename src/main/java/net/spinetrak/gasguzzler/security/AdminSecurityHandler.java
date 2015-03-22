@@ -36,7 +36,6 @@ import java.io.IOException;
 
 public class AdminSecurityHandler extends ConstraintSecurityHandler
 {
-
   private static final String ADMIN_ROLE = "admin";
 
   public AdminSecurityHandler(final String userName_, final String password_)

@@ -29,6 +29,9 @@ define(function (require) {
         {route: '', title: 'Home', moduleId: 'home/home', nav: true},
         {route: 'stats', title: 'Stats', moduleId: 'site/stats', nav: true},
         {route: 'user', title: 'You', moduleId: 'user/user', nav: true},
+        {route: 'user', title: 'Profile', moduleId: 'user/profile', nav: false},
+        {route: 'user', title: 'Your Account', moduleId: 'user/account', nav: false},
+        {route: 'user', title: 'Admin Area', moduleId: 'user/admin', nav: false},
         {route: 'metrics', title: 'Metrics', moduleId: 'metrics/metrics', nav: true}
     ];
 

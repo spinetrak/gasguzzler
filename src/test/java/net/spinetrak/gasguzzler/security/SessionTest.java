@@ -62,7 +62,9 @@ public class SessionTest
   @Test
   public void serializesToJson() throws Exception
   {
-    assertEquals(fixture("fixtures/session.json").replaceAll("\\s", "").substring(54),
-                 MAPPER.writeValueAsString(getSession()).substring(54));
+    assertEquals(fixture("fixtures/session.json").replaceAll("\\s", "").substring(
+                   "{\"date\":1426804227821,\"token\":\"244026f7-3496-4bfe-a44f\",".length()),
+                 MAPPER.writeValueAsString(getSession()).substring(
+                   "{\"date\":1426804227821,\"token\":\"244026f7-3496-4bfe-a44f\",".length()));
   }
 }

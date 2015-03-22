@@ -29,6 +29,7 @@ import com.google.common.base.Optional;
 import io.dropwizard.auth.AuthenticationException;
 import net.spinetrak.gasguzzler.core.User;
 import net.spinetrak.gasguzzler.dao.SessionDAO;
+import net.spinetrak.gasguzzler.dao.UserDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,10 +49,12 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<Session, 
   private final static Logger LOGGER = LoggerFactory.getLogger(Authenticator.class.getName());
   
   private SessionDAO sessionDAO;
+  private UserDAO userDAO;
 
-  public Authenticator(SessionDAO sessionDAO_)
+  public Authenticator(final SessionDAO sessionDAO_, final UserDAO userDAO_)
   {
     sessionDAO = sessionDAO_;
+    userDAO = userDAO_;
   }
 
   public Authenticator()
@@ -135,10 +138,7 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<Session, 
     }
     else
     {
-      final User user = new User();
-      user.setUserid(session_.getUserid());
-      user.setSession(session_);
-      user.setRole(session_.getToken().contains("Admin") ? User.ROLE_ADMIN : User.ROLE_USER);
+      final User user = userDAO.select(session_.getUserid());
 
       return Optional.fromNullable(user);
     }

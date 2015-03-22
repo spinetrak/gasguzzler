@@ -36,13 +36,24 @@ public class UserTest
 
   private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
 
+  public static User getAdminUser()
+  {
+    User admin = new User();
+    admin.setRole(Role.ADMIN.name());
+    admin.setUsername("myName");
+    admin.setPassword(
+      "063450be3449991e2ae85c11f8ac2721ad252cb4046b6099f2c5bfd688a63eee");
+    admin.setEmail("my@mail.de");
+    admin.setUserid(0);
+    return admin;
+  }
+
   public static User getUser()
   {
     User user = new User();
     user.setUsername("myName");
     user.setPassword(
       "063450be3449991e2ae85c11f8ac2721ad252cb4046b6099f2c5bfd688a63eee");
-    user.setRole("myDisplayRole");
     user.setEmail("my@mail.de");
     user.setUserid(0);
     return user;
@@ -54,7 +65,6 @@ public class UserTest
     user.setUsername("myName");
     user.setPassword(
       "1000:5b42403464356230396335:f02fee958cd89aa99b9f04655db032b207da0fa352055238462f2e139edf4eee71e8dab92e541e293e8634348a0564184014e1aaf39e90e28e1a4fb8c83143b9");
-    user.setRole("myDisplayRole");
     user.setEmail("my@mail.de");
     user.setUserid(0);
     return user;

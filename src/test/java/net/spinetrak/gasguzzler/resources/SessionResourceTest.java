@@ -42,8 +42,8 @@ import static org.mockito.Mockito.*;
 
 public class SessionResourceTest
 {
+  private final Session _session = new Session(0, "token");
   private final User _user = UserTest.getUser();
-  private final Session session = new Session(0, "token");
   private SessionDAO _sessionDAO = mock(SessionDAO.class);
   private UserDAO _userDAO = mock(UserDAO.class);
 
@@ -52,31 +52,31 @@ public class SessionResourceTest
     .addResource(new SessionResource(
       _userDAO,
       _sessionDAO))
-    .addProvider(new SecurityProvider<>(new Authenticator(_sessionDAO)))
+    .addProvider(new SecurityProvider<>(new Authenticator(_sessionDAO, _userDAO)))
     .build();
 
   @Test
   public void create()
   {
-
-    when(_sessionDAO.select(session)).thenReturn(session);
+    when(_sessionDAO.select(_session)).thenReturn(_session);
     when(_userDAO.select(_user)).thenReturn(UserTest.getUserWithHashedPassword());
 
     final Session mysession = resources.client().resource("/session")
       .type(MediaType.APPLICATION_JSON)
       .post(Session.class, _user);
-    assertThat(mysession).isNotEqualTo(session);
-    assertThat(mysession.getUserid()).isEqualTo(session.getUserid());
+    assertThat(mysession).isNotEqualTo(_session);
+    assertThat(mysession.getUserid()).isEqualTo(_session.getUserid());
   }
 
   @Test
   public void delete()
   {
-    when(_sessionDAO.select(session)).thenReturn(session);
+    when(_userDAO.select(_session.getUserid())).thenReturn(_user);
+    when(_sessionDAO.select(_session)).thenReturn(_session);
 
     resources.client().resource("/session").header(SecurityProvider.TOKEN, "token").header(
       SecurityProvider.USERID, "0").type(MediaType.APPLICATION_JSON_TYPE).delete(_user);
 
-    verify(_sessionDAO, times(2)).select(session);
+    verify(_sessionDAO, times(1)).select(_session);
   }
 }

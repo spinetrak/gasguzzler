@@ -26,30 +26,16 @@ define(function (require) {
     var http = require('plugins/http'),
         app = require('durandal/app'),
         system = require('durandal/system'),
-        shell = require('services/shell'),
         router = require('plugins/router'),
+        shell = require('services/shell'),
         ko = require('knockout');
 
-
-    var loginStatusSubscription = app.on('loggedin').then(function (loggedin, response) {
-        if (loggedin) {
-            if (response) {
-                sessionStorage.setItem("token", response.token);
-                sessionStorage.setItem("userid", response.userid);
-            }
-        }
-        else {
-            sessionStorage.removeItem("token");
-            sessionStorage.removeItem("userid");
-        }
-    });
-
     return {
-        accountScreen: ko.observable(),
-        adminScreen: ko.observable(),
-        role: ko.observable(),
+        users: ko.observableArray(),
+
         urlRoot: location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : ''),
-        
+
+
         activate: function () {
             var userModel = {
                 "userid": sessionStorage.getItem("userid"),
@@ -62,21 +48,12 @@ define(function (require) {
                 window.location.reload(true);
             }
 
-            var url = this.urlRoot + '/api/user/' + userModel.userid;
+            var url = this.urlRoot + '/api/user';
 
             var that = this;
 
-            http.get(url, '', userModel).then(function (response) {
-                    var myRole = response.role;
-                    if ("ADMIN" === myRole) {
-                        that.accountScreen('user/account');
-                        that.adminScreen('user/admin');
-                    }
-                    else {
-                        that.accountScreen('user/account');
-                        that.adminScreen('');
-                    }
-                    that.role(myRole);
+            return http.get(url, '', userModel).then(function (response) {
+                    that.users = response;
                 },
                 function (error) {
                     app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"});
@@ -84,6 +61,32 @@ define(function (require) {
                     document.location.href = "/#user";
                     window.location.reload(true);
                 });
+        },
+
+        doDeleteUser: function () {
+            var userModel = {
+                "userid": sessionStorage.getItem("userid"),
+                "token": sessionStorage.getItem("token")
+            };
+
+            var urlRoot = location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
+            var url = urlRoot + '/api/user/' + this.userid;
+
+            return http.remove(url, '', userModel).then(
+                function (response) {
+                    document.location.href = "/#user";
+                    window.location.reload(true);
+                },
+                function (error) {
+                    console.log(error);
+                    document.location.href = "/#user";
+                    window.location.reload(true);
+                });
+        },
+
+        doValidateEmail: function (email) {
+            var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(email);
         }
     };
 });

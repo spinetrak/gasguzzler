@@ -54,8 +54,6 @@ public class UserDAOTest
     {
       _userDAO.delete(x);
     }
-    user.setCreated(new Date());
-    user.setUpdated(new Date());
     _userDAO.insert(user);
 
     final User u = _userDAO.select(user);

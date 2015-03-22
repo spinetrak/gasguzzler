@@ -33,7 +33,6 @@ import net.spinetrak.gasguzzler.security.Session;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -50,10 +49,6 @@ public class SessionDAOTest
   public void createReadDelete()
   {
     final User user = UserTest.getUser();
-
-    user.setRole(User.ROLE_USER);
-    user.setCreated(new Date());
-    user.setUpdated(new Date());
 
     final List<User> users1 = _userDAO.select(user.getUsername(), user.getEmail());
     for (final User x : users1)

@@ -39,7 +39,7 @@ public interface UserDAO
   @SqlUpdate("delete from st_user where userid = :u.userid")
   void delete(@BindBean("u") final User user_);
 
-  @SqlUpdate("insert into st_user (username, password, email, role, created, updated) values (:u.username, :u.password, :u.email, :u.role, :u.created, :u.updated)")
+  @SqlUpdate("insert into st_user (username, password, email, role) values (:u.username, :u.password, :u.email, :u.role)")
   void insert(@BindBean("u") final User user_);
 
   @SqlQuery("select * from st_user where username = :u.username")
@@ -58,6 +58,6 @@ public interface UserDAO
   @Mapper(UserMapper.class)
   List<User> select();
 
-  @SqlUpdate("update st_user set username = :u.username, password = :u.password, email = :u.email, updated = :u.updated where userid = :u.userid")
+  @SqlUpdate("update st_user set username = :u.username, password = :u.password, email = :u.email, role = :u.role, updated = :u.updated where userid = :u.userid")
   void update(@BindBean("u") final User user_);
 }

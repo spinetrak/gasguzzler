@@ -26,30 +26,20 @@ define(function (require) {
     var http = require('plugins/http'),
         app = require('durandal/app'),
         system = require('durandal/system'),
-        shell = require('services/shell'),
         router = require('plugins/router'),
+        shell = require('services/shell'),
         ko = require('knockout');
 
-
-    var loginStatusSubscription = app.on('loggedin').then(function (loggedin, response) {
-        if (loggedin) {
-            if (response) {
-                sessionStorage.setItem("token", response.token);
-                sessionStorage.setItem("userid", response.userid);
-            }
-        }
-        else {
-            sessionStorage.removeItem("token");
-            sessionStorage.removeItem("userid");
-        }
-    });
-
     return {
-        accountScreen: ko.observable(),
-        adminScreen: ko.observable(),
-        role: ko.observable(),
+        userid: ko.observable(),
+        username: ko.observable(),
+        email: ko.observable(),
+        password: ko.observable(),
+        logoutScreen: ko.observable('user/logout'),
+
         urlRoot: location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : ''),
-        
+
+
         activate: function () {
             var userModel = {
                 "userid": sessionStorage.getItem("userid"),
@@ -66,17 +56,10 @@ define(function (require) {
 
             var that = this;
 
-            http.get(url, '', userModel).then(function (response) {
-                    var myRole = response.role;
-                    if ("ADMIN" === myRole) {
-                        that.accountScreen('user/account');
-                        that.adminScreen('user/admin');
-                    }
-                    else {
-                        that.accountScreen('user/account');
-                        that.adminScreen('');
-                    }
-                    that.role(myRole);
+            return http.get(url, '', userModel).then(function (response) {
+                    that.userid(response.userid);
+                    that.username(response.username);
+                    that.email(response.email);
                 },
                 function (error) {
                     app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"});
@@ -84,6 +67,47 @@ define(function (require) {
                     document.location.href = "/#user";
                     window.location.reload(true);
                 });
+        },
+
+
+        doChangeProfile: function () {
+
+            var mypassword = this.password();
+            var myemail = this.email();
+            var myusername = this.username();
+
+            var userModel = {
+                "userid": sessionStorage.getItem("userid"),
+                "token": sessionStorage.getItem("token"),
+                "username": myusername,
+                "email": myemail,
+                "password": CryptoJS.SHA256(myusername + "|" + mypassword).toString()
+            };
+
+            if (!myusername || myusername.length < 3 || !mypassword || mypassword.length < 6 || !myemail || myemail.length < 5 || !this.doValidateEmail(myemail)) {
+                app.showMessage("Please make sure that you have entered a valid username, email, and password", "Error!", ["Ok"], true, {"class": "notice error"});
+                return;
+            }
+
+
+            var url = this.urlRoot + '/api/user/' + userModel.userid;
+
+            var that = this;
+            return http.put(url, userModel, userModel).then(
+                function (response) {
+                    app.showMessage("Profile updated for " + that.username() + " (" + that.email() + ")!", "Profile updated!", ["Ok"], true, {"class": "notice success"});
+                },
+                function (error) {
+                    app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"});
+                    app.trigger("loggedin", false);
+                    document.location.href = "/#user";
+                    window.location.reload(true);
+                });
+        },
+
+        doValidateEmail: function (email) {
+            var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(email);
         }
     };
 });

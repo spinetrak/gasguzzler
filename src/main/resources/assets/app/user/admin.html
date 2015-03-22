@@ -22,7 +22,38 @@
   ~ SOFTWARE.
   -->
 
-<section>
-    <div data-bind="compose:accountScreen"></div>
-    <div data-bind="compose:adminScreen"></div>
-</section>
+<fieldset>
+    <legend>Users</legend>
+    <table class="tight sortable">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Created</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody data-bind="foreach: users">
+        <tr>
+            <td><p id="userid" data-bind="text: userid"></p></td>
+            <td><input id="username" name="username" type="text" required data-bind="value: username"
+                       pattern="[\w]{3,}"/></td>
+            <td><input id="email" name="email" type="email" required data-bind="value: email"/></td>
+            <td><input id="role" name="role" type="text" required data-bind="value: role"/></td>
+            <td><input id="created" name="created" type="datetime" required data-bind="value: created"/></td>
+            <td>
+                <button class="small orange fa fa-trash" type="submit" data-bind="click: $parent.doDeleteUser"> Delete
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</fieldset>
+
+<fieldset>
+    <legend>Sessions</legend>
+</fieldset>
+
+

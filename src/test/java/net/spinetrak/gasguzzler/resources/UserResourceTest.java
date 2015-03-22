@@ -34,7 +34,6 @@ import net.spinetrak.gasguzzler.dao.UserDAO;
 import net.spinetrak.gasguzzler.security.Authenticator;
 import net.spinetrak.gasguzzler.security.SecurityProvider;
 import net.spinetrak.gasguzzler.security.Session;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -49,8 +48,8 @@ import static org.mockito.Mockito.*;
 
 public class UserResourceTest
 {
+  private final User _adminUser = UserTest.getAdminUser();
   private final Session _session = new Session(0, "token");
-  private final User user = UserTest.getUser();
   private SessionDAO _sessionDAO = mock(SessionDAO.class);
   private UserDAO _userDAO = mock(UserDAO.class);
 
@@ -59,7 +58,7 @@ public class UserResourceTest
     .addResource(new UserResource(
       _userDAO,
       _sessionDAO))
-    .addProvider(new SecurityProvider<>(new Authenticator(_sessionDAO)))
+    .addProvider(new SecurityProvider<>(new Authenticator(_sessionDAO, _userDAO)))
     .build();
 
   @Test
@@ -67,7 +66,8 @@ public class UserResourceTest
   {
     when(_sessionDAO.select(_session)).thenReturn(_session);
     when(_userDAO.select(anyString(), anyString())).thenReturn(new ArrayList<>());
-    when(_userDAO.select(user)).thenReturn(user);
+    when(_userDAO.select(_adminUser)).thenReturn(_adminUser);
+
 
     final Session mysession = resources.client().resource("/user")
       .type(MediaType.APPLICATION_JSON)
@@ -79,28 +79,30 @@ public class UserResourceTest
   @Test
   public void delete()
   {
-    when(_sessionDAO.select(_session)).thenReturn(_session);
+    when(_sessionDAO.select(any())).thenReturn(_session);
+    when(_userDAO.select(_session.getUserid())).thenReturn(_adminUser);
 
     resources.client().resource("/user/0").header(SecurityProvider.TOKEN, "token").header(
-      SecurityProvider.USERID, "0").type(MediaType.APPLICATION_JSON_TYPE).delete(user);
+      SecurityProvider.USERID, "0").type(MediaType.APPLICATION_JSON_TYPE).delete(_adminUser);
 
-    verify(_sessionDAO, times(2)).select(_session);
+    verify(_sessionDAO, times(1)).select(_session);
   }
 
   @Test
   public void get()
   {
-    when(_userDAO.select(0)).thenReturn(user);
+    when(_userDAO.select(0)).thenReturn(_adminUser);
     when(_sessionDAO.select(_session)).thenReturn(_session);
 
     assertThat(resources.client().resource("/user/0").header(SecurityProvider.TOKEN, "token").header(
-      SecurityProvider.USERID, "0").type(MediaType.APPLICATION_JSON_TYPE).get(User.class)).isEqualTo(user);
+      SecurityProvider.USERID, "0").type(MediaType.APPLICATION_JSON_TYPE).get(User.class)).isEqualTo(_adminUser);
   }
 
   @Test
   public void getAll()
   {
-    when(_sessionDAO.select(new Session(0, "Admintoken"))).thenReturn(_session);
+    when(_sessionDAO.select(any())).thenReturn(_session);
+    when(_userDAO.select(_session.getUserid())).thenReturn(_adminUser);
 
     resources.client().resource("/user")
       .header(SecurityProvider.TOKEN, "Admintoken").header(SecurityProvider.USERID, "0").type(
@@ -130,16 +132,11 @@ public class UserResourceTest
     }
   }
 
-  @Before
-  public void setup()
-  {
-    user.setRole(User.ROLE_ADMIN);
-  }
-
   @Test
   public void update()
   {
-    when(_sessionDAO.select(_session)).thenReturn(_session);
+    when(_sessionDAO.select(any())).thenReturn(_session);
+    when(_userDAO.select(_session.getUserid())).thenReturn(_adminUser);
 
     assertThat(resources.client().resource("/user/0").header(SecurityProvider.TOKEN, "token").header(
       SecurityProvider.USERID, "0")
@@ -156,12 +153,13 @@ public class UserResourceTest
 
       final User user = UserTest.getUser();
 
-      final User updatedUser = resources.client().resource("/user/1").header(SecurityProvider.TOKEN, "token").header(
+      final User updatedUser = resources.client().resource("/user/1").header(SecurityProvider.TOKEN,
+                                                                             "token").header(
         SecurityProvider.USERID, "0")
         .type(MediaType.APPLICATION_JSON)
         .put(User.class, user);
 
-      fail("Updated user should be invalid " + updatedUser);
+      fail("Updated _adminUser should be invalid " + updatedUser);
     }
     catch (UniformInterfaceException ex_)
     {

@@ -52,14 +52,9 @@ public class Session
 
   public Session(final int userid_, final String token_)
   {
-    this(userid_, token_, new Date());
-  }
-
-  public Session(final int userid_, final String token_, final Date date_)
-  {
     userid = userid_;
     token = token_;
-    date = date_;
+    date = new Date();
   }
 
   @Override
