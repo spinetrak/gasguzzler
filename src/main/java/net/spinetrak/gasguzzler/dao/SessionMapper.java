@@ -41,6 +41,7 @@ public class SessionMapper implements ResultSetMapper<Session>
     final Session session = new Session();
     session.setUserid(resultSet_.getInt("userid"));
     session.setToken(resultSet_.getString("token"));
+    session.setCreated(resultSet_.getTimestamp("created"));
     return session;
   }
 }

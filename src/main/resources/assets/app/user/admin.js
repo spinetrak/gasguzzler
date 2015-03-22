@@ -32,6 +32,7 @@ define(function (require) {
 
     return {
         users: ko.observableArray(),
+        sessions: ko.observableArray(),
 
         urlRoot: location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : ''),
 
@@ -48,11 +49,12 @@ define(function (require) {
                 window.location.reload(true);
             }
 
-            var url = this.urlRoot + '/api/user';
-
+            var userUrl = this.urlRoot + '/api/user';
+            var sessionUrl = this.urlRoot + '/api/session';
+            
             var that = this;
 
-            return http.get(url, '', userModel).then(function (response) {
+            http.get(userUrl, '', userModel).then(function (response) {
                     that.users = response;
                 },
                 function (error) {
@@ -61,6 +63,17 @@ define(function (require) {
                     document.location.href = "/#user";
                     window.location.reload(true);
                 });
+
+            return http.get(sessionUrl, '', userModel).then(function (response) {
+                    that.sessions = response;
+                },
+                function (error) {
+                    app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"});
+                    app.trigger("loggedin", false);
+                    document.location.href = "/#user";
+                    window.location.reload(true);
+                });
+
         },
 
         doDeleteUser: function () {
@@ -71,6 +84,27 @@ define(function (require) {
 
             var urlRoot = location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
             var url = urlRoot + '/api/user/' + this.userid;
+
+            return http.remove(url, '', userModel).then(
+                function (response) {
+                    document.location.href = "/#user";
+                    window.location.reload(true);
+                },
+                function (error) {
+                    console.log(error);
+                    document.location.href = "/#user";
+                    window.location.reload(true);
+                });
+        },
+
+        doDeleteSession: function () {
+            var userModel = {
+                "userid": sessionStorage.getItem("userid"),
+                "token": sessionStorage.getItem("token")
+            };
+
+            var urlRoot = location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
+            var url = urlRoot + '/api/session';
 
             return http.remove(url, '', userModel).then(
                 function (response) {

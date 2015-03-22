@@ -49,7 +49,7 @@ public interface SessionDAO
   @SqlUpdate("insert into st_session (userid, token) values (:s.userid, :s.token)")
   int insert(@BindBean("s") final Session session_);
 
-  @SqlQuery("select userid, token from st_session where userid = :s.userid and token = :s.token limit 1")
+  @SqlQuery("select * from st_session where userid = :s.userid and token = :s.token limit 1")
   @Mapper(SessionMapper.class)
   Session select(@BindBean("s") final Session session_);
 

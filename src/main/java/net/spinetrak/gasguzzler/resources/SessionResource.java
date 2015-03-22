@@ -26,6 +26,7 @@ package net.spinetrak.gasguzzler.resources;
 
 
 import io.dropwizard.auth.Auth;
+import net.spinetrak.gasguzzler.core.Role;
 import net.spinetrak.gasguzzler.core.User;
 import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
@@ -37,6 +38,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.List;
 
 @Path("/session")
 @Produces(MediaType.APPLICATION_JSON)
@@ -92,5 +94,16 @@ public class SessionResource
     {
       sessionDAO.delete(session);
     }
+  }
+
+  @GET
+  public List<Session> getAll(@Auth final User principal_)
+  {
+    if (principal_.getRole() != Role.ADMIN)
+    {
+      throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+    }
+
+    return sessionDAO.select();
   }
 }

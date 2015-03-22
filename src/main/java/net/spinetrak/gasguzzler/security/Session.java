@@ -24,6 +24,7 @@
 
 package net.spinetrak.gasguzzler.security;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -32,7 +33,8 @@ import java.util.UUID;
 
 public class Session
 {
-  private Date date;
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+  private Date created;
   @NotEmpty
   @JsonProperty
   private String token;
@@ -54,7 +56,7 @@ public class Session
   {
     userid = userid_;
     token = token_;
-    date = new Date();
+    created = new Date();
   }
 
   @Override
@@ -75,9 +77,9 @@ public class Session
 
   }
 
-  public Date getDate()
+  public Date getCreated()
   {
-    return date;
+    return created;
   }
 
   public String getToken()
@@ -90,9 +92,9 @@ public class Session
     return userid;
   }
 
-  public void setDate(final Date date_)
+  public void setCreated(final Date created_)
   {
-    date = date_;
+    created = created_;
   }
 
   public void setToken(final String token_)
