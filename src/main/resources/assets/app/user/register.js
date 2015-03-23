@@ -72,15 +72,19 @@ define(function (require) {
 
             return http.post(url, userModel).then(
                 function (response) {
-                    app.trigger("loggedin", true, response);
-                    document.location.href = "/#user";
-                    window.location.reload(true);
+                    app.showMessage("Welcome on board!", "Hi there!", ["Ok"], true, {"class": "notice success"}).then(function () {
+                        app.trigger("loggedin", true, response);
+                        document.location.href = "/#user";
+                        window.location.reload(true);
+                    });
                 },
                 function (error) {
-                    console.log(error);
-                    app.trigger("loggedin", false);
-                    document.location.href = "/#user";
-                    window.location.reload(true);
+                    app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"}).then(function () {
+                        console.log(error);
+                        app.trigger("loggedin", false);
+                        document.location.href = "/#user";
+                        window.location.reload(true);
+                    });
                 });
         },
 

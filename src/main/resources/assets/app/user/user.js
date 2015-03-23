@@ -36,6 +36,7 @@ define(function (require) {
             if (response) {
                 sessionStorage.setItem("token", response.token);
                 sessionStorage.setItem("userid", response.userid);
+                sessionStorage.removeItem("forgotPassword");
             }
         }
         else {
@@ -44,21 +45,41 @@ define(function (require) {
         }
     });
 
+    var forgotPasswordSubscription = app.on('forgotPassword').then(function (forgotPassword) {
+        if (forgotPassword) {
+            sessionStorage.setItem("forgotPassword", "true");
+            sessionStorage.removeItem("token");
+            sessionStorage.removeItem("userid");
+        }
+        else {
+            sessionStorage.removeItem("forgotPassword");
+        }
+
+    });
+
     return {
         loginScreen: ko.observable(),
         registerScreen: ko.observable(),
         profileScreen: ko.observable(),
+        passwordResetScreen: ko.observable(),
 
         activate: function () {
             if (sessionStorage.getItem("userid") && sessionStorage.getItem("token")) {
                 this.profileScreen('user/profile');
                 this.loginScreen('');
                 this.registerScreen('');
+                this.passwordResetScreen('');
             }
             else {
-                this.loginScreen('user/login');
-                this.registerScreen('user/register');
-                this.profileScreen('');
+                if (sessionStorage.getItem("forgotPassword")) {
+                    this.passwordResetScreen('user/forgotPassword');
+                }
+                else {
+                    this.loginScreen('user/login');
+                    this.registerScreen('user/register');
+                    this.profileScreen('');
+                    this.passwordResetScreen('');
+                }
             }
         }
     };

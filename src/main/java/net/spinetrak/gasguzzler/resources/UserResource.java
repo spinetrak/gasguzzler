@@ -28,6 +28,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import io.dropwizard.auth.Auth;
 import net.spinetrak.gasguzzler.core.Role;
 import net.spinetrak.gasguzzler.core.User;
+import net.spinetrak.gasguzzler.core.notifications.EmailQueue;
+import net.spinetrak.gasguzzler.core.notifications.PasswordForgottenEmail;
 import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
 import net.spinetrak.gasguzzler.security.Authenticator;
@@ -86,13 +88,13 @@ public class UserResource
 
       return session;
     }
-    catch (WebApplicationException ex)
+    catch (final WebApplicationException ex_)
     {
-      throw ex;
+      throw ex_;
     }
-    catch (Exception ex)
+    catch (final Exception ex_)
     {
-      throw new WebApplicationException(ex, Response.Status.INTERNAL_SERVER_ERROR);
+      throw new WebApplicationException(ex_, Response.Status.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -135,6 +137,35 @@ public class UserResource
     }
 
     return userDAO.select();
+  }
+
+  @POST
+  @Path("/pwreset")
+  public void resetPassword(final User user_)
+  {
+    final String email = user_.getEmail();
+
+    if (null == email)
+    {
+      throw new WebApplicationException(Response.Status.OK);
+    }
+
+    final List<User> users = userDAO.select(null, email);
+    if ((users == null) || (users.size() != 1))
+    {
+      throw new WebApplicationException(Response.Status.OK);
+    }
+    try
+    {
+      final User user = users.get(0);
+      final Session session = new Session(user.getUserid());
+      sessionDAO.insert(session);
+      new EmailQueue().send(new PasswordForgottenEmail(user.getEmail(), session.getToken()));
+    }
+    catch (final Exception ex_)
+    {
+      throw new WebApplicationException(ex_, Response.Status.OK);
+    }
   }
 
   @PUT

@@ -58,20 +58,22 @@ define(function (require) {
                     that.users = response;
                 },
                 function (error) {
-                    app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"});
-                    app.trigger("loggedin", false);
-                    document.location.href = "/#user";
-                    window.location.reload(true);
+                    app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"}).then(function () {
+                        app.trigger("loggedin", false);
+                        document.location.href = "/#user";
+                        window.location.reload(true);
+                    });
                 });
 
             return http.get(sessionUrl, '', userModel).then(function (response) {
                     that.sessions = response;
                 },
                 function (error) {
-                    app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"});
-                    app.trigger("loggedin", false);
-                    document.location.href = "/#user";
-                    window.location.reload(true);
+                    app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"}).then(function () {
+                        app.trigger("loggedin", false);
+                        document.location.href = "/#user";
+                        window.location.reload(true);
+                    });
                 });
 
         },
@@ -87,13 +89,17 @@ define(function (require) {
 
             return http.remove(url, '', userModel).then(
                 function (response) {
-                    document.location.href = "/#user";
-                    window.location.reload(true);
+                    app.showMessage("User has been deleted", "Good bye!", ["Ok"], true, {"class": "notice success"}).then(function () {
+                        document.location.href = "/#user";
+                        window.location.reload(true);
+                    });
                 },
                 function (error) {
-                    console.log(error);
-                    document.location.href = "/#user";
-                    window.location.reload(true);
+                    app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"}).then(function () {
+                        console.log(error);
+                        document.location.href = "/#user";
+                        window.location.reload(true);
+                    });
                 });
         },
 
@@ -108,13 +114,17 @@ define(function (require) {
 
             return http.remove(url, '', userModel).then(
                 function (response) {
-                    document.location.href = "/#user";
-                    window.location.reload(true);
+                    app.showMessage("Session has been deleted", "Good bye!", ["Ok"], true, {"class": "notice success"}).then(function () {
+                        document.location.href = "/#user";
+                        window.location.reload(true);
+                    });
                 },
                 function (error) {
-                    console.log(error);
-                    document.location.href = "/#user";
-                    window.location.reload(true);
+                    app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"}).then(function () {
+                        console.log(error);
+                        document.location.href = "/#user";
+                        window.location.reload(true);
+                    });
                 });
         },
 

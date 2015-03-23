@@ -101,10 +101,11 @@ define(function (require) {
                     app.showMessage("Profile updated for " + that.username() + " (" + that.email() + ")!", "Profile updated!", ["Ok"], true, {"class": "notice success"});
                 },
                 function (error) {
-                    app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"});
-                    app.trigger("loggedin", false);
-                    document.location.href = "/#user";
-                    window.location.reload(true);
+                    app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"}).then(function () {
+                        app.trigger("loggedin", false);
+                        document.location.href = "/#user";
+                        window.location.reload(true);
+                    });
                 });
         },
 

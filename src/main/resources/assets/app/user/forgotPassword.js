@@ -1,18 +1,18 @@
 /*
  * The MIT License (MIT)
- *
+ *  
  * Copyright (c) 2014-2015 spinetrak
- *
+ *  
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ *  
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- *
+ *  
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,11 +25,14 @@
 define(function (require) {
     var http = require('plugins/http'),
         app = require('durandal/app'),
-        router = require('plugins/router'),
         system = require('durandal/system'),
-        shell = require('services/shell');
+        router = require('plugins/router'),
+        shell = require('services/shell'),
+        ko = require('knockout');
 
     return {
+        username: ko.observable(),
+        email: ko.observable(),
         urlRoot: location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : ''),
 
 
@@ -39,64 +42,50 @@ define(function (require) {
                 "token": sessionStorage.getItem("token")
             };
 
-            if (!(userModel.userid && userModel.token)) {
+            if (userModel.userid && userModel.token) {
                 app.trigger("loggedin", false);
                 document.location.href = "/#user";
                 window.location.reload(true);
             }
         },
 
-        doLogout: function () {
+
+        doRequestPasswordReset: function () {
+
+            var myemail = this.email();
 
             var userModel = {
-                "userid": sessionStorage.getItem("userid"),
-                "token": sessionStorage.getItem("token")
+                "email": myemail
             };
 
-            var url = this.urlRoot + '/api/session';
+            if ((!myemail) || (myemail && (myemail.length < 5 || !this.doValidateEmail(myemail)))) {
+                app.showMessage("Please make sure that you have entered a valid email address", "Error!", ["Ok"], true, {"class": "notice error"});
+                return;
+            }
 
-            return http.remove(url, '', userModel).then(
+            var url = this.urlRoot + '/api/user/pwreset';
+
+            http.post(url, userModel).then(
                 function (response) {
-                    app.showDialog("See you soon!", "Good bye!", ["Ok"], true, {"class": "notice success"}).then(function () {
-                        app.trigger("loggedin", false);
+                    app.showMessage("Further instructions will be sent via e-mail", "Thank you!", ["Ok"], false, {"class": "notice success"}).then(function () {
+                        app.trigger("forgotPassword", false);
                         document.location.href = "/#user";
                         window.location.reload(true);
                     });
                 },
                 function (error) {
-                    app.showDialog(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"}).then(function () {
-                        app.trigger("loggedin", false);
+                    console.log(error);
+                    app.showMessage(error.statusText, "Error!", ["Ok"], false, {"class": "notice error"}).then(function () {
+                        app.trigger("forgotPassword", false);
                         document.location.href = "/#user";
                         window.location.reload(true);
                     });
                 });
         },
 
-        doDelete: function () {
-
-            var userModel = {
-                "userid": sessionStorage.getItem("userid"),
-                "token": sessionStorage.getItem("token")
-            };
-
-            var url = this.urlRoot + '/api/user/' + userModel.userid;
-
-            return http.remove(url, '', userModel).then(
-                function (response) {
-                    app.showDialog("Sorry to see you go!!", "Bye bye!", ["Ok"], true, {"class": "notice success"}).then(function () {
-                        app.trigger("loggedin", false);
-                        document.location.href = "/#user";
-                        window.location.reload(true);
-                    });
-                },
-                function (error) {
-                    app.showDialog(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"}).then(function () {
-                        console.log(error);
-                        app.trigger("loggedin", false);
-                        document.location.href = "/#user";
-                        window.location.reload(true);
-                    });
-                });
+        doValidateEmail: function (email) {
+            var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(email);
         }
     };
 });

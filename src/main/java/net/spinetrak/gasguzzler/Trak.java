@@ -39,6 +39,7 @@ import net.spinetrak.gasguzzler.admin.UserHealthCheck;
 import net.spinetrak.gasguzzler.dao.MetricsDAO;
 import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
+import net.spinetrak.gasguzzler.jobs.EmailNotificationJob;
 import net.spinetrak.gasguzzler.jobs.SessionCleanupJob;
 import net.spinetrak.gasguzzler.metrics.DbReporter;
 import net.spinetrak.gasguzzler.resources.BuildInfoResource;
@@ -120,6 +121,11 @@ public class Trak extends Application<TrakConfiguration>
     environment_.lifecycle().scheduledExecutorService("sessionCleanupJob").build().scheduleAtFixedRate(
       new SessionCleanupJob(sessionDAO), 0,
       30,
+      TimeUnit.MINUTES);
+
+    environment_.lifecycle().scheduledExecutorService("emailNotificationJob").build().scheduleAtFixedRate(
+      new EmailNotificationJob(), 0,
+      5,
       TimeUnit.MINUTES);
 
     

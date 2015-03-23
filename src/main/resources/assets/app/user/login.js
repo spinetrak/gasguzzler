@@ -67,14 +67,22 @@ define(function (require) {
 
             return http.post(url, userModel).then(
                 function (response) {
-                    app.trigger("loggedin", true, response);
-                    document.location.href = "/#user";
-                    window.location.reload(true);
+                    app.showMessage("Welcome back!", "Hello!", ["Ok"], true, {"class": "notice success"}).then(function () {
+                        app.trigger("loggedin", true, response);
+                        document.location.href = "/#user";
+                        window.location.reload(true);
+                    });
                 },
                 function (error) {
-                    app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"});
-                    app.trigger("loggedin", false);
+                    app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"}).then(function () {
+                        app.trigger("loggedin", false);
+                    });
                 });
+        },
+        doForgotPassword: function () {
+            app.trigger("forgotPassword", true);
+            document.location.href = "/#user";
+            window.location.reload(true);
         }
     };
 });
