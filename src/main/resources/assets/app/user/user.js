@@ -73,7 +73,6 @@ define(function (require) {
                 this.loginScreen('');
                 this.registerScreen('');
                 this.forgotPasswordScreen('');
-                this.resetPasswordScreen('');
             }
             else {
                 if (sessionStorage.getItem("forgotPassword")) {
@@ -81,7 +80,6 @@ define(function (require) {
                     this.loginScreen('');
                     this.registerScreen('');
                     this.profileScreen('');
-                    this.resetPasswordScreen('');
                 }
                 else {
                     var token = this.getURLParams('t');
@@ -100,7 +98,6 @@ define(function (require) {
                         this.registerScreen('user/register');
                         this.profileScreen('');
                         this.forgotPasswordScreen('');
-                        this.resetPasswordScreen('');
                     }
                 }
             }
