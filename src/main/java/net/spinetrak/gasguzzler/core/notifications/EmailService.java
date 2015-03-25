@@ -39,18 +39,19 @@ public class EmailService
   private String from;
   @NotNull
   @JsonProperty
+  @Encrypted
   private String key;
   @NotNull
   @JsonProperty
   private String root;
 
-  @Encrypted
+
   public String endpoint()
   {
     return endpoint;
   }
 
-  @Encrypted
+
   public String from()
   {
     return from;
@@ -62,7 +63,7 @@ public class EmailService
     return key;
   }
 
-  @Encrypted
+
   public String root()
   {
     return root;
