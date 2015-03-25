@@ -54,31 +54,54 @@ define(function (require) {
         else {
             sessionStorage.removeItem("forgotPassword");
         }
-
     });
+
 
     return {
         loginScreen: ko.observable(),
         registerScreen: ko.observable(),
         profileScreen: ko.observable(),
-        passwordResetScreen: ko.observable(),
+        forgotPasswordScreen: ko.observable(),
+        resetPasswordScreen: ko.observable(),
+        getURLParams: function (name) {
+            return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(window.location.hash) || [, ""])[1].replace(/\+/g, '%20')) || null
+        },
 
         activate: function () {
             if (sessionStorage.getItem("userid") && sessionStorage.getItem("token")) {
                 this.profileScreen('user/profile');
                 this.loginScreen('');
                 this.registerScreen('');
-                this.passwordResetScreen('');
+                this.forgotPasswordScreen('');
+                this.resetPasswordScreen('');
             }
             else {
                 if (sessionStorage.getItem("forgotPassword")) {
-                    this.passwordResetScreen('user/forgotPassword');
+                    this.forgotPasswordScreen('user/forgotPassword');
+                    this.loginScreen('');
+                    this.registerScreen('');
+                    this.profileScreen('');
+                    this.resetPasswordScreen('');
                 }
                 else {
-                    this.loginScreen('user/login');
-                    this.registerScreen('user/register');
-                    this.profileScreen('');
-                    this.passwordResetScreen('');
+                    var token = this.getURLParams('t');
+                    var userid = this.getURLParams('i');
+                    if (token && userid) {
+                        var userModel = {
+                            "userid": userid,
+                            "token": token
+                        };
+                        app.trigger("loggedin", true, userModel);
+                        document.location.href = "/#user";
+                        window.location.reload(true);
+                    }
+                    else {
+                        this.loginScreen('user/login');
+                        this.registerScreen('user/register');
+                        this.profileScreen('');
+                        this.forgotPasswordScreen('');
+                        this.resetPasswordScreen('');
+                    }
                 }
             }
         }

@@ -24,19 +24,34 @@
 
 package net.spinetrak.gasguzzler.core.notifications;
 
+import com.sun.jersey.core.util.MultivaluedMapImpl;
+
 public abstract class EmailNotification
 {
-  private String _email;
+  private EmailService _emailService;
+  private String _to;
 
-  public abstract String format();
+  public abstract MultivaluedMapImpl format();
 
-  public String getEmail()
+  public EmailService getEmailService()
   {
-    return _email;
+    return _emailService;
   }
 
-  public void setEmail(final String email_)
+  public void setEmailService(final EmailService emailService_)
   {
-    _email = email_;
+    _emailService = emailService_;
+  }
+
+  protected abstract String getBodyHTML();
+
+  protected String to()
+  {
+    return _to;
+  }
+
+  protected void to(final String to_)
+  {
+    _to = to_;
   }
 }

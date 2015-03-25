@@ -160,7 +160,7 @@ public class UserResource
       final User user = users.get(0);
       final Session session = new Session(user.getUserid());
       sessionDAO.insert(session);
-      new EmailQueue().send(new PasswordForgottenEmail(user.getEmail(), session.getToken()));
+      new EmailQueue().send(new PasswordForgottenEmail(user.getEmail(), user.getUserid(), session.getToken()));
     }
     catch (final Exception ex_)
     {

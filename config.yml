@@ -6,6 +6,11 @@ server:
     type: http
     port: 8080
 isHttps: false
+emailService:
+  from: "The Gasguzzler <mailgun@mg.spinetrak.net>"
+  root: "http://localhost:8080"
+  endpoint: "https://api.mailgun.net/v2/mg.spinetrak.net/messages"
+  key: "key-39bb335a752bb5e2e552e3b662023782"
 admin:
   email: "spinetrak@spinetrak.net"
   username:

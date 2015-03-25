@@ -124,8 +124,8 @@ public class Trak extends Application<TrakConfiguration>
       TimeUnit.MINUTES);
 
     environment_.lifecycle().scheduledExecutorService("emailNotificationJob").build().scheduleAtFixedRate(
-      new EmailNotificationJob(), 0,
-      5,
+      new EmailNotificationJob(configuration_.getEmailService()), 0,
+      1,
       TimeUnit.MINUTES);
 
     

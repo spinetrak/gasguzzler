@@ -24,17 +24,30 @@
 
 package net.spinetrak.gasguzzler.jobs;
 
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import net.spinetrak.gasguzzler.core.notifications.EmailNotification;
 import net.spinetrak.gasguzzler.core.notifications.EmailQueue;
+import net.spinetrak.gasguzzler.core.notifications.EmailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.core.MediaType;
 import java.util.Queue;
 
 public class EmailNotificationJob implements Runnable
 {
   private final Logger LOGGER = LoggerFactory.getLogger(EmailNotificationJob.class);
 
+  private final EmailService _emailService;
+
+  public EmailNotificationJob(final EmailService emailService_)
+  {
+    _emailService = emailService_;
+  }
 
   @Override
   public void run()
@@ -58,7 +71,26 @@ public class EmailNotificationJob implements Runnable
     {
       return;
     }
-    //TODO: send email
-    LOGGER.info("Sending " + email_.format());
+    email_.setEmailService(_emailService);
+    LOGGER.info("Sending " + email_);
+
+    final Client client = Client.create();
+    client.addFilter(new HTTPBasicAuthFilter("api", _emailService.key()));
+    final WebResource webResource =
+      client.resource(_emailService.endpoint());
+    final MultivaluedMapImpl data = email_.format();
+    data.add("from", _emailService.from());
+
+    final ClientResponse response = webResource.type(MediaType.APPLICATION_FORM_URLENCODED).
+      post(ClientResponse.class, data);
+
+    if (200 == response.getStatusInfo().getStatusCode())
+    {
+      LOGGER.info("Message sent successfully!");
+    }
+    else
+    {
+      LOGGER.error("Error sending message: " + response.toString());
+    }
   }
 }

@@ -56,4 +56,8 @@ public interface SessionDAO
   @SqlQuery("select * from st_session")
   @Mapper(SessionMapper.class)
   List<Session> select();
+
+  @SqlQuery("select * from st_session where token = :token limit 1")
+  @Mapper(SessionMapper.class)
+  Session selectToken(@Bind("token") final String token_);
 }

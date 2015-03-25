@@ -29,6 +29,7 @@ import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.flyway.FlywayFactory;
 import net.spinetrak.gasguzzler.core.AdminUser;
+import net.spinetrak.gasguzzler.core.notifications.EmailService;
 import net.spinetrak.gasguzzler.metrics.DbReporter;
 import net.spinetrak.gasguzzler.security.EncryptedDataSourceFactory;
 
@@ -48,6 +49,10 @@ public class TrakConfiguration extends Configuration
   @NotNull
   @JsonProperty
   private EncryptedDataSourceFactory database = new EncryptedDataSourceFactory();
+  @Valid
+  @NotNull
+  @JsonProperty
+  private EmailService emailService = null;
   @Valid
   @NotNull
   @JsonProperty
@@ -71,6 +76,11 @@ public class TrakConfiguration extends Configuration
   public DataSourceFactory getDataSourceFactory()
   {
     return database;
+  }
+
+  public EmailService getEmailService()
+  {
+    return emailService;
   }
 
   public FlywayFactory getFlywayFactory()
