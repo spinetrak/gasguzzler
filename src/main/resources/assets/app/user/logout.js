@@ -57,14 +57,14 @@ define(function (require) {
 
             return http.remove(url, '', userModel).then(
                 function (response) {
-                    app.showDialog("See you soon!", "Good bye!", ["Ok"], true, {"class": "notice success"}).then(function () {
+                    app.showMessage("See you soon!", "Good bye!", ["Ok"], true, {"class": "notice success"}).then(function () {
                         app.trigger("loggedin", false);
                         document.location.href = "/#user";
                         window.location.reload(true);
                     });
                 },
                 function (error) {
-                    app.showDialog(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"}).then(function () {
+                    app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"}).then(function () {
                         app.trigger("loggedin", false);
                         document.location.href = "/#user";
                         window.location.reload(true);
@@ -83,14 +83,14 @@ define(function (require) {
 
             return http.remove(url, '', userModel).then(
                 function (response) {
-                    app.showDialog("Sorry to see you go!!", "Bye bye!", ["Ok"], true, {"class": "notice success"}).then(function () {
+                    app.showMessage("Sorry to see you go!!", "Bye bye!", ["Ok"], true, {"class": "notice success"}).then(function () {
                         app.trigger("loggedin", false);
                         document.location.href = "/#user";
                         window.location.reload(true);
                     });
                 },
                 function (error) {
-                    app.showDialog(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"}).then(function () {
+                    app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"}).then(function () {
                         console.log(error);
                         app.trigger("loggedin", false);
                         document.location.href = "/#user";
