@@ -6,6 +6,18 @@ server:
     type: http
     port: 9080
 isHttps: false
+emailService:
+  from: "The Gasguzzler <mailgun@mg.spinetrak.net>"
+  root: "http://localhost:8080"
+  endpoint: "https://api.mailgun.net/v2/mg.spinetrak.net/messages"
+  key:
+    salt: "rbvrnQ=="
+    iv: "3Z1JoQHNkOLaAnMMTAY+xg=="
+    value: "UD+fUM/qpgK5P25q9vuffwJOtI8eObTZ9wdJWgDNt1DNFQW+xzcaQUs/eIctuEtJ"
+    cipher: "aes-256-cbc"
+    keyDerivation: "pbkdf2"
+    keyLength: 256
+    iterations: 2000
 admin:
   email: "spinetrak@spinetrak.net"
   username:

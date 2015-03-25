@@ -7,6 +7,18 @@ server:
     bindHost: @OPENSHIFT_DIY_IP@
     port: @OPENSHIFT_DIY_PORT@
 isHttps: true
+emailService:
+  from: "The Gasguzzler <mailgun@mg.spinetrak.net>"
+  root: "https://gasguzzler-spinetrak.rhcloud.com"
+  endpoint: "https://api.mailgun.net/v2/mg.spinetrak.net/messages"
+  key:
+    salt: "rbvrnQ=="
+    iv: "3Z1JoQHNkOLaAnMMTAY+xg=="
+    value: "UD+fUM/qpgK5P25q9vuffwJOtI8eObTZ9wdJWgDNt1DNFQW+xzcaQUs/eIctuEtJ"
+    cipher: "aes-256-cbc"
+    keyDerivation: "pbkdf2"
+    keyLength: 256
+    iterations: 2000
 admin:
   email: "spinetrak@spinetrak.net"
   username:
