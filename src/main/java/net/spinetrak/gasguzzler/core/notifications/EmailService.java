@@ -51,10 +51,42 @@ public class EmailService
     return endpoint;
   }
 
+  @Override
+  public boolean equals(final Object o)
+  {
+    if (this == o)
+    {
+      return true;
+    }
+    if (!(o instanceof EmailService))
+    {
+      return false;
+    }
+
+    final EmailService that = (EmailService) o;
+
+    if (endpoint != null ? !endpoint.equals(that.endpoint) : that.endpoint != null)
+    {
+      return false;
+    }
+    return !(from != null ? !from.equals(that.from) : that.from != null) && !(key != null ? !key.equals(
+      that.key) : that.key != null) && !(root != null ? !root.equals(that.root) : that.root != null);
+
+  }
 
   public String from()
   {
     return from;
+  }
+
+  @Override
+  public int hashCode()
+  {
+    int result = endpoint != null ? endpoint.hashCode() : 0;
+    result = 31 * result + (from != null ? from.hashCode() : 0);
+    result = 31 * result + (key != null ? key.hashCode() : 0);
+    result = 31 * result + (root != null ? root.hashCode() : 0);
+    return result;
   }
 
   @Encrypted
@@ -63,10 +95,8 @@ public class EmailService
     return key;
   }
 
-
   public String root()
   {
     return root;
   }
-
 }
