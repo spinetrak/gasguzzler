@@ -1,18 +1,18 @@
 /*
  * The MIT License (MIT)
- *
+ *  
  * Copyright (c) 2014-2015 spinetrak
- *
+ *  
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ *  
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- *
+ *  
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,43 +22,30 @@
  * SOFTWARE.
  */
 
-package net.spinetrak.gasguzzler.core;
+package net.spinetrak.gasguzzler.core.notifications;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
+import net.spinetrak.gasguzzler.security.Session;
+import org.junit.Test;
 
-public class RateDataPoint
+import static org.junit.Assert.*;
+
+public class PasswordForgottenEmailTest
 {
-  @JsonProperty
-  long x;
-  @JsonProperty
-  double y;
-
-  public long getX()
+  @Test
+  public void testPasswordForgottenEmail()
   {
-    return x;
-  }
+    final Session session = new Session(0);
+    final PasswordForgottenEmail email = new PasswordForgottenEmail("foo@bar.net", session.getUserid(),
+                                                                    session.getToken());
+    email.setEmailService(new EmailService());
+    assertNotNull(email);
+    assertEquals("foo@bar.net", email.to());
+    assertEquals("foo@bar.net", email.toString());
 
-  public double getY()
-  {
-    return y;
-  }
-
-  public void setX(final long x_)
-  {
-    x = x_;
-  }
-
-  public void setY(final double y_)
-  {
-    y = y_;
-  }
-
-  @Override
-  public String toString()
-  {
-    return "RateDataPoint{" +
-      "x=" + x +
-      ", y=" + y +
-      '}';
+    final MultivaluedMapImpl map = email.format();
+    assertNotNull(map);
+    assertEquals("[foo@bar.net]", map.get("to", String.class).toString());
+    assertTrue(email.getPasswordResetLink().endsWith("/#user?t=" + session.getToken() + "&i=" + session.getUserid()));
   }
 }

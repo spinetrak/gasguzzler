@@ -52,4 +52,13 @@ public class CountDataPoint
   {
     y = y_;
   }
+
+  @Override
+  public String toString()
+  {
+    return "CountDataPoint{" +
+      "x=" + x +
+      ", y=" + y +
+      '}';
+  }
 }
