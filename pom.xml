@@ -33,7 +33,7 @@
         <build.number>12345</build.number>
         <build.branch>dev</build.branch>
         <dropwizard.version>0.8.0</dropwizard.version>
-        <jersey.version>2.17</jersey.version>
+        <jersey.version>2.16</jersey.version>
         <crypto.version>0.1.0</crypto.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss z</maven.build.timestamp.format>
