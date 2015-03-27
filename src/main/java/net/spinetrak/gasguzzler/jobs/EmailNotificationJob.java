@@ -24,18 +24,20 @@
 
 package net.spinetrak.gasguzzler.jobs;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 import net.spinetrak.gasguzzler.core.notifications.EmailNotification;
 import net.spinetrak.gasguzzler.core.notifications.EmailQueue;
 import net.spinetrak.gasguzzler.core.notifications.EmailService;
+import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import java.util.Queue;
 
 public class EmailNotificationJob implements Runnable
@@ -74,15 +76,16 @@ public class EmailNotificationJob implements Runnable
     email_.setEmailService(_emailService);
     LOGGER.info("Sending " + email_);
 
-    final Client client = Client.create();
-    client.addFilter(new HTTPBasicAuthFilter("api", _emailService.key()));
-    final WebResource webResource =
-      client.resource(_emailService.endpoint());
-    final MultivaluedMapImpl data = email_.format();
+    final Client client = ClientBuilder.newClient();
+    final WebTarget target = client.target(_emailService.endpoint());
+
+    target.register(HttpAuthenticationFeature.basic("api", _emailService.key()));
+
+    final MultivaluedMap data = email_.format();
     data.add("from", _emailService.from());
 
-    final ClientResponse response = webResource.type(MediaType.APPLICATION_FORM_URLENCODED).
-      post(ClientResponse.class, data);
+    final Response response = target.request(MediaType.APPLICATION_FORM_URLENCODED).
+      post(Entity.form(data));
 
     if (200 == response.getStatusInfo().getStatusCode())
     {

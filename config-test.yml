@@ -2,6 +2,7 @@ server:
   type: simple
   applicationContextPath: /
   adminContextPath: /admin
+  rootPath: '/api/*'
   connector:
     type: http
     port: 9080

@@ -100,7 +100,7 @@ public class UserResource
 
   @DELETE
   @Path("/{userid}")
-  public void delete(@PathParam("userid") final int userid_, @Auth final User user_)
+  public void delete(@Auth final User user_, @PathParam("userid") final int userid_)
   {
     if ((userid_ != user_.getUserid()) && (user_.getRole() != Role.ADMIN))
     {

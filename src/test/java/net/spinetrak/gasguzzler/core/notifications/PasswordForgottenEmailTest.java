@@ -24,9 +24,10 @@
 
 package net.spinetrak.gasguzzler.core.notifications;
 
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 import net.spinetrak.gasguzzler.security.Session;
 import org.junit.Test;
+
+import javax.ws.rs.core.MultivaluedMap;
 
 import static org.junit.Assert.*;
 
@@ -43,9 +44,9 @@ public class PasswordForgottenEmailTest
     assertEquals("foo@bar.net", email.to());
     assertEquals("foo@bar.net", email.toString());
 
-    final MultivaluedMapImpl map = email.format();
+    final MultivaluedMap map = email.format();
     assertNotNull(map);
-    assertEquals("[foo@bar.net]", map.get("to", String.class).toString());
+    assertEquals("[foo@bar.net]", map.get("to").toString());
     assertTrue(email.getPasswordResetLink().endsWith("/#user?t=" + session.getToken() + "&i=" + session.getUserid()));
   }
 }
