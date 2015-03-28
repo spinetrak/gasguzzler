@@ -63,8 +63,8 @@ public class SessionTest
   public void serializesToJson() throws Exception
   {
     assertEquals(fixture("fixtures/session.json").replaceAll("\\s", "").substring(
-                   "{\"created\":yyyy-MM-dd HH:mm:ss,\"token\":\"244026f7-3496-4bfe-a44f\",".length() - 1),
+                   "{\"created\":yyyy-MM-dd HH:mm:ss,\"token\":\"7s1l4ek8945tvjgtvf283k49kl\",".length() - 1),
                  MAPPER.writeValueAsString(getSession()).substring(
-                   "{\"created\":yyyy-MM-dd HH:mm:ss,\"token\":\"244026f7-3496-4bfe-a44f\",".length()));
+                   "{\"created\":yyyy-MM-dd HH:mm:ss,\"token\":\"7s1l4ek8945tvjgtvf283k49kl\",".length()));
   }
 }

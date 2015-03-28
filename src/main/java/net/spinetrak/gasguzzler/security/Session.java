@@ -28,8 +28,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.Date;
-import java.util.UUID;
 
 public class Session
 {
@@ -42,6 +43,7 @@ public class Session
   @JsonProperty
   private int userid;
 
+
   public Session()
   {
     this(-1, "");
@@ -49,7 +51,7 @@ public class Session
 
   public Session(final int userid_)
   {
-    this(userid_, UUID.randomUUID().toString().substring(0, 23));
+    this(userid_, new SessionIdentifierGenerator().nextSessionId());
   }
 
   public Session(final int userid_, final String token_)
@@ -114,5 +116,15 @@ public class Session
       "userid=" + userid +
       ", token='" + token + '\'' +
       '}';
+  }
+
+  public final static class SessionIdentifierGenerator
+  {
+    private static SecureRandom random = new SecureRandom();
+
+    public String nextSessionId()
+    {
+      return new BigInteger(130, random).toString(32);
+    }
   }
 }

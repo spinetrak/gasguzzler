@@ -1,0 +1,1 @@
+ALTER TABLE st_session ALTER COLUMN token TYPE VARCHAR(32);
