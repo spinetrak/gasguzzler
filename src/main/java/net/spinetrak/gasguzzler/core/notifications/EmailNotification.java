@@ -24,14 +24,14 @@
 
 package net.spinetrak.gasguzzler.core.notifications;
 
-import com.sun.jersey.core.util.MultivaluedMapImpl;
+import javax.ws.rs.core.MultivaluedMap;
 
 public abstract class EmailNotification
 {
   private EmailService _emailService;
   private String _to;
 
-  public abstract MultivaluedMapImpl format();
+  public abstract MultivaluedMap format();
 
   public EmailService getEmailService()
   {

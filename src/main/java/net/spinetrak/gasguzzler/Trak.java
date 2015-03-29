@@ -27,6 +27,7 @@ package net.spinetrak.gasguzzler;
 import com.meltmedia.dropwizard.crypto.CryptoBundle;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
+import io.dropwizard.auth.AuthFactory;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.flyway.FlywayBundle;
 import io.dropwizard.flyway.FlywayFactory;
@@ -36,6 +37,7 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import net.spinetrak.gasguzzler.admin.SessionHealthCheck;
 import net.spinetrak.gasguzzler.admin.UserHealthCheck;
+import net.spinetrak.gasguzzler.core.User;
 import net.spinetrak.gasguzzler.dao.MetricsDAO;
 import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
@@ -49,7 +51,7 @@ import net.spinetrak.gasguzzler.resources.UserResource;
 import net.spinetrak.gasguzzler.security.AdminSecurityHandler;
 import net.spinetrak.gasguzzler.security.Authenticator;
 import net.spinetrak.gasguzzler.security.HttpRedirectFilter;
-import net.spinetrak.gasguzzler.security.SecurityProvider;
+import net.spinetrak.gasguzzler.security.SessionAuthFactory;
 import org.flywaydb.core.Flyway;
 import org.skife.jdbi.v2.DBI;
 
@@ -128,13 +130,12 @@ public class Trak extends Application<TrakConfiguration>
       1,
       TimeUnit.MINUTES);
 
-    
-    environment_.jersey().setUrlPattern("/api/*");
     environment_.jersey().register(new BuildInfoResource());
     environment_.jersey().register(new UserResource(userDAO, sessionDAO, configuration_.getAdmin().getEmail()));
     environment_.jersey().register(new SessionResource(userDAO, sessionDAO));
     environment_.jersey().register(new MetricsResource(metricsDAO, sessionDAO));
-    environment_.jersey().register(new SecurityProvider<>(new Authenticator(sessionDAO, userDAO)));
+    environment_.jersey().register(
+      AuthFactory.binder(new SessionAuthFactory<>(new Authenticator(sessionDAO, userDAO), "gasguzzler", User.class)));
 
     if (configuration_.isHttps())
     {
