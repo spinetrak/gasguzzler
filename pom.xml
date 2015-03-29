@@ -32,14 +32,16 @@
         <project.version>0.0.0</project.version>
         <build.number>12345</build.number>
         <build.branch>dev</build.branch>
-        <dropwizard.version>0.7.1</dropwizard.version>
+        <dropwizard.version>0.8.0</dropwizard.version>
+        <jersey.version>2.16</jersey.version>
+        <crypto.version>0.1.0</crypto.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss z</maven.build.timestamp.format>
     </properties>
 
     <groupId>net.spinetrak</groupId>
     <artifactId>gasguzzler</artifactId>
-    <version>0.1.3</version>
+    <version>0.1.4</version>
 
     <scm>
         <connection>scm:git:git://github.com/spinetrak/gasguzzler.git</connection>
@@ -74,6 +76,16 @@
         </dependency>
         <dependency>
             <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-jackson</artifactId>
+            <version>${dropwizard.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-jersey</artifactId>
+            <version>${dropwizard.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-db</artifactId>
             <version>${dropwizard.version}</version>
         </dependency>
@@ -91,26 +103,59 @@
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-testing</artifactId>
             <version>${dropwizard.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.glassfish.jersey.test-framework</groupId>
+                    <artifactId>project</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-common</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.test-framework.providers</groupId>
+            <artifactId>jersey-test-framework-provider-grizzly2</artifactId>
+            <version>${jersey.version}</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>javax.servlet-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.dropwizard.modules</groupId>
             <artifactId>dropwizard-flyway</artifactId>
-            <version>0.7.0-1</version>
+            <version>${dropwizard.version}-2</version>
         </dependency>
         <dependency>
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-metrics</artifactId>
-            <version>0.7.1</version>
+            <version>${dropwizard.version}</version>
         </dependency>
         <dependency>
             <groupId>com.meltmedia.dropwizard</groupId>
             <artifactId>dropwizard-crypto</artifactId>
-            <version>0.1.0</version>
+            <version>${crypto.version}</version>
         </dependency>
         <dependency>
             <groupId>com.meltmedia.jackson</groupId>
             <artifactId>jackson-crypto</artifactId>
-            <version>0.1.0</version>
+            <version>${crypto.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-annotations</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>postgresql</groupId>
@@ -147,6 +192,7 @@
                 <configuration>
                     <format>xml</format>
                     <maxmem>256m</maxmem>
+                    <check/>
                     <!-- aggregated reports for multi-module projects -->
                     <aggregate>true</aggregate>
                 </configuration>

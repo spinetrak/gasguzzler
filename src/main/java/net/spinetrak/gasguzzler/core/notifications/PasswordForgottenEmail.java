@@ -24,7 +24,8 @@
 
 package net.spinetrak.gasguzzler.core.notifications;
 
-import com.sun.jersey.core.util.MultivaluedMapImpl;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 
 public class PasswordForgottenEmail extends EmailNotification
 {
@@ -39,9 +40,9 @@ public class PasswordForgottenEmail extends EmailNotification
   }
 
   @Override
-  public MultivaluedMapImpl format()
+  public MultivaluedMap format()
   {
-    final MultivaluedMapImpl data = new MultivaluedMapImpl();
+    final MultivaluedMap data = new MultivaluedHashMap();
     data.add("to", to());
     data.add("subject", "Gasguzzler Request");
     data.add("html", getBodyHTML());
