@@ -33,10 +33,11 @@ import net.spinetrak.gasguzzler.dao.UserDAO;
 import net.spinetrak.gasguzzler.security.Authenticator;
 import net.spinetrak.gasguzzler.security.Session;
 import net.spinetrak.gasguzzler.security.SessionAuthFactory;
-import org.junit.Ignore;
+import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
 import org.junit.Rule;
 import org.junit.Test;
 
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
@@ -56,16 +57,17 @@ public class UserResourceTest
 
   @Rule
   public ResourceTestRule resources = ResourceTestRule.builder()
+    .setTestContainerFactory(new GrizzlyWebTestContainerFactory())
     .addResource(new UserResource(
       _userDAO,
       _sessionDAO,
       "admin@example.com"))
     .addProvider(
       AuthFactory.binder(new SessionAuthFactory<>(new Authenticator(_sessionDAO, _userDAO), "gasguzzler", User.class)))
+      //.addProvider(GeneralExceptionMapper.class)
     .build();
 
   @Test
-  @Ignore
   public void create()
   {
     when(_sessionDAO.select(_session)).thenReturn(_session);
@@ -80,7 +82,6 @@ public class UserResourceTest
   }
 
   @Test
-  @Ignore
   public void delete()
   {
     when(_sessionDAO.select(any())).thenReturn(_session);
@@ -93,7 +94,6 @@ public class UserResourceTest
   }
 
   @Test
-  @Ignore
   public void get()
   {
     when(_userDAO.select(0)).thenReturn(_adminUser);
@@ -104,34 +104,42 @@ public class UserResourceTest
   }
 
   @Test
-  @Ignore
   public void getAll()
   {
     when(_sessionDAO.select(any())).thenReturn(_session);
     when(_userDAO.select(_session.getUserid())).thenReturn(_adminUser);
 
-    resources.getJerseyTest().target("/user").
+    final List<User> allUsers = resources.getJerseyTest().target("/user").
       request().header(SessionAuthFactory.TOKEN, "token").header(SessionAuthFactory.USERID, "0")
       .get(new GenericType<List<User>>()
       {
       });
+
+    assertThat(!allUsers.isEmpty());
+    assertThat(allUsers.contains(_adminUser));
   }
 
   @Test
-  @Ignore
   public void getAllThrows401WhenNotAdminRole()
   {
-      when(_sessionDAO.select(_session)).thenReturn(_session);
+    when(_sessionDAO.select(_session)).thenReturn(_session);
 
-    resources.getJerseyTest().target("/user").request()
-      .header(SessionAuthFactory.TOKEN, "token").header(SessionAuthFactory.USERID, "0")
+    try
+    {
+      final List<User> allUsers = resources.getJerseyTest().target("/user").request()
+        .header(SessionAuthFactory.TOKEN, "token").header(SessionAuthFactory.USERID, "0")
         .get(new GenericType<List<User>>()
         {
         });
+      fail("allUsers should be invalid" + allUsers);
+    }
+    catch (final Exception ex_)
+    {
+      assertThat(ex_).isInstanceOf(NotAuthorizedException.class);
+    }
   }
 
   @Test
-  @Ignore
   public void update()
   {
     when(_sessionDAO.select(any())).thenReturn(_session);
@@ -144,18 +152,24 @@ public class UserResourceTest
   }
 
   @Test
-  @Ignore
   public void updateInvalidUser()
   {
-      when(_sessionDAO.select(_session)).thenReturn(_session);
+    when(_sessionDAO.select(_session)).thenReturn(_session);
 
-      final User user = UserTest.getUser();
+    final User user = UserTest.getUser();
 
-    final User updatedUser = resources.getJerseyTest().target("/user/1").request().header(SessionAuthFactory.TOKEN,
-                                                                                          "token").header(
-      SessionAuthFactory.USERID, "0")
-      .put(Entity.entity(user, MediaType.APPLICATION_JSON_TYPE), User.class);
+    try
+    {
+      final User invalidUser = resources.getJerseyTest().target("/user/1").request().header(SessionAuthFactory.TOKEN,
+                                                                                            "token").header(
+        SessionAuthFactory.USERID, "0")
+        .put(Entity.entity(user, MediaType.APPLICATION_JSON_TYPE), User.class);
 
-      fail("Updated _adminUser should be invalid " + updatedUser);
+      fail("invalidUser should be invalid" + invalidUser);
+    }
+    catch (final Exception ex_)
+    {
+      assertThat(ex_).isInstanceOf(NotAuthorizedException.class);
+    }
   }
 }

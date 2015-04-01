@@ -35,7 +35,7 @@ import net.spinetrak.gasguzzler.dao.UserDAO;
 import net.spinetrak.gasguzzler.security.Authenticator;
 import net.spinetrak.gasguzzler.security.Session;
 import net.spinetrak.gasguzzler.security.SessionAuthFactory;
-import org.junit.Ignore;
+import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -56,6 +56,7 @@ public class MetricsResourceTest
 
   @Rule
   public ResourceTestRule resources = ResourceTestRule.builder()
+    .setTestContainerFactory(new GrizzlyWebTestContainerFactory())
     .addResource(new MetricsResource(
       _metricsDAO,
       _sessionDAO))
@@ -65,13 +66,12 @@ public class MetricsResourceTest
 
 
   @Test
-  @Ignore
   public void getAvailableMetrics()
   {
     when(_sessionDAO.select(any())).thenReturn(_session);
     when(_userDAO.select(_session.getUserid())).thenReturn(_adminUser);
 
-    resources.client().target("/metrics").request().header(SessionAuthFactory.TOKEN, "token").header(
+    resources.getJerseyTest().target("/metrics").request().header(SessionAuthFactory.TOKEN, "token").header(
       SessionAuthFactory.USERID, "0").get(new GenericType<List<DataPoint>>()
     {
     });
@@ -80,7 +80,6 @@ public class MetricsResourceTest
   }
 
   @Test
-  @Ignore
   public void getCountMetrics()
   {
     when(_sessionDAO.select(any())).thenReturn(_session);
@@ -96,7 +95,6 @@ public class MetricsResourceTest
   }
 
   @Test
-  @Ignore
   public void getRateMetrics()
   {
     when(_sessionDAO.select(any())).thenReturn(_session);

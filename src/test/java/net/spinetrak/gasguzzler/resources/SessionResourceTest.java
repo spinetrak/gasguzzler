@@ -33,7 +33,7 @@ import net.spinetrak.gasguzzler.dao.UserDAO;
 import net.spinetrak.gasguzzler.security.Authenticator;
 import net.spinetrak.gasguzzler.security.Session;
 import net.spinetrak.gasguzzler.security.SessionAuthFactory;
-import org.junit.Ignore;
+import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -52,6 +52,7 @@ public class SessionResourceTest
 
   @Rule
   public ResourceTestRule resources = ResourceTestRule.builder()
+    .setTestContainerFactory(new GrizzlyWebTestContainerFactory())
     .addResource(new SessionResource(
       _userDAO,
       _sessionDAO))
@@ -60,7 +61,6 @@ public class SessionResourceTest
     .build();
 
   @Test
-  @Ignore
   public void create()
   {
     when(_sessionDAO.select(_session)).thenReturn(_session);
@@ -73,7 +73,6 @@ public class SessionResourceTest
   }
 
   @Test
-  @Ignore
   public void delete()
   {
     when(_userDAO.select(_session.getUserid())).thenReturn(_user);

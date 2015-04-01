@@ -49,7 +49,6 @@ public class SessionAuthFactory<T> extends AuthFactory<Session, T>
   private HttpServletRequest _request;
   private UnauthorizedHandler _unauthorizedHandler = new DefaultUnauthorizedHandler();
 
-
   public SessionAuthFactory(final io.dropwizard.auth.Authenticator<Session, T> authenticator_,
                             final String realm_,
                             final Class<T> clazz_)
@@ -85,7 +84,7 @@ public class SessionAuthFactory<T> extends AuthFactory<Session, T>
   {
     if (null == _request)
     {
-      throw new WebApplicationException(_unauthorizedHandler.buildResponse("", _realm));
+      throw new WebApplicationException(_unauthorizedHandler.buildResponse("session", _realm));
     }
     try
     {
@@ -100,15 +99,15 @@ public class SessionAuthFactory<T> extends AuthFactory<Session, T>
         }
       }
     }
-    catch (AuthenticationException e)
+    catch (final AuthenticationException ex_)
     {
-      LOGGER.warn("Error authenticating credentials", e);
+      LOGGER.warn("Error authenticating credentials", ex_);
       throw new InternalServerErrorException();
     }
 
     if (_required)
     {
-      throw new WebApplicationException(_unauthorizedHandler.buildResponse("", _realm));
+      throw new WebApplicationException(_unauthorizedHandler.buildResponse("session", _realm));
     }
 
     return null;
