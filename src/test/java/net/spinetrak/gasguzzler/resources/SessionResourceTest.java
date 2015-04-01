@@ -38,7 +38,9 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -82,5 +84,21 @@ public class SessionResourceTest
       SessionAuthFactory.USERID, "0").delete();
 
     verify(_sessionDAO, times(2)).select(_session);
+  }
+
+  @Test
+  public void testGetAll()
+  {
+    when(_userDAO.select(_session.getUserid())).thenReturn(UserTest.getAdminUser());
+    when(_sessionDAO.select(_session)).thenReturn(_session);
+
+    final List<Session> sessions = resources.getJerseyTest().target("/session").request().header(
+      SessionAuthFactory.TOKEN, "token").header(
+      SessionAuthFactory.USERID, "0").get(new GenericType<List<Session>>()
+    {
+    });
+
+    assertThat(!sessions.isEmpty());
+    assertThat(sessions.contains(_session));
   }
 }

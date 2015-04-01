@@ -41,10 +41,12 @@ import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
@@ -139,6 +141,14 @@ public class UserResourceTest
     }
   }
 
+  @Test
+  public void testResetPassword()
+  {
+    final Response response = resources.getJerseyTest().target("/user/pwreset").request().post(
+      Entity.entity(UserTest.getUser(), MediaType.APPLICATION_JSON));
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+  
   @Test
   public void update()
   {
