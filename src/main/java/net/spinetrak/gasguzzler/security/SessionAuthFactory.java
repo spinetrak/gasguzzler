@@ -92,6 +92,14 @@ public class SessionAuthFactory<T> extends AuthFactory<Session, T>
       final String userid = _request.getHeader(USERID);
       if (token != null && userid != null)
       {
+        try
+        {
+          final int id = Integer.parseInt(userid);
+        }
+        catch(final NumberFormatException ex_)
+        {
+          throw new WebApplicationException(_unauthorizedHandler.buildResponse("session", _realm));
+        }
         final Optional<T> result = authenticator().authenticate(new Session(Integer.parseInt(userid), token));
         if (result.isPresent())
         {
