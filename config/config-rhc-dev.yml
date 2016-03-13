@@ -54,11 +54,11 @@ database:
       keyDerivation: "pbkdf2"
       keyLength: 256
       iterations: 2000
-  password:
-    salt: "aevWiA=="
-    iv: "dZzSSAyVb3DLQ8DqTqvd0g=="
-    value: "TiV2KtgsLZP/VtP4wS8+1A=="
-    cipher: "aes-256-cbc"
-    keyDerivation: "pbkdf2"
-    keyLength: 256
-    iterations: 2000
+    password:
+      salt: "aevWiA=="
+      iv: "dZzSSAyVb3DLQ8DqTqvd0g=="
+      value: "TiV2KtgsLZP/VtP4wS8+1A=="
+      cipher: "aes-256-cbc"
+      keyDerivation: "pbkdf2"
+      keyLength: 256
+      iterations: 2000
