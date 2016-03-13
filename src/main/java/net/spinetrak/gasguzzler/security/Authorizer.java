@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014-2015 spinetrak
+ * Copyright (c) 2014-2016 spinetrak
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,26 +22,15 @@
  * SOFTWARE.
  */
 
-package net.spinetrak.gasguzzler.dao;
+package net.spinetrak.gasguzzler.security;
 
-import net.spinetrak.gasguzzler.security.Session;
-import org.skife.jdbi.v2.StatementContext;
-import org.skife.jdbi.v2.tweak.ResultSetMapper;
+import net.spinetrak.gasguzzler.core.User;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-public class SessionMapper implements ResultSetMapper<Session>
+public class Authorizer implements io.dropwizard.auth.Authorizer<User>
 {
-
   @Override
-  public Session map(final int i_, final ResultSet resultSet_, final StatementContext statementContext_) throws
-                                                                                                         SQLException
+  public boolean authorize(final User user_, final String role_)
   {
-    final Session session = new Session();
-    session.setUserid(resultSet_.getInt("userid"));
-    session.setToken(resultSet_.getString("token"));
-    session.setCreated(resultSet_.getTimestamp("created"));
-    return session;
+    return user_!= null && role_ != null && role_.equals(user_.getRoleAsString());
   }
 }

@@ -1,9 +1,10 @@
 {
   "created": null,
-  "email": "my@mail.de",
+  "email": "joe@mail.de",
   "password": "063450be3449991e2ae85c11f8ac2721ad252cb4046b6099f2c5bfd688a63eee",
   "role": "USER",
   "updated": null,
-  "userid": 0,
-  "username": "myName"
+  "userid": 1,
+  "username": "JoeRegular",
+  "token": null
 }

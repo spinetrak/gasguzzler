@@ -56,6 +56,7 @@ define(function (require) {
         updateChart: function () {
 
             var userModel = {
+                "Authorization" : "Bearer " +  sessionStorage.getItem("token"),
                 "userid": sessionStorage.getItem("userid"),
                 "token": sessionStorage.getItem("token")
             };

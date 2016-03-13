@@ -30,10 +30,8 @@ import net.spinetrak.gasguzzler.core.Role;
 import net.spinetrak.gasguzzler.core.User;
 import net.spinetrak.gasguzzler.core.notifications.EmailQueue;
 import net.spinetrak.gasguzzler.core.notifications.PasswordForgottenEmail;
-import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
 import net.spinetrak.gasguzzler.security.Authenticator;
-import net.spinetrak.gasguzzler.security.Session;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -48,19 +46,19 @@ import java.util.List;
 public class UserResource
 {
   private final String adminEmail;
-  private final SessionDAO sessionDAO;
   private final UserDAO userDAO;
+  private Authenticator authenticator;
 
-  public UserResource(final UserDAO userDAO_, final SessionDAO sessionDAO_, final String adminEmail_)
+  public UserResource(final UserDAO userDAO_, final Authenticator authenticator_, final String adminEmail_)
   {
     super();
     userDAO = userDAO_;
-    sessionDAO = sessionDAO_;
+    authenticator = authenticator_;
     adminEmail = adminEmail_;
   }
 
   @POST
-  public Session create(final User user_)
+  public User register(final User user_)
   {
     if (null == user_)
     {
@@ -74,19 +72,18 @@ public class UserResource
 
     try
     {
-      final String password = Authenticator.getSecurePassword(user_.getPassword());
+      final String password = authenticator.getSecurePassword(user_.getPassword());
 
       user_.setPassword(password);
       user_.setRole(
         null != user_.getEmail() && adminEmail.toLowerCase().equals(user_.getEmail()) ? Role.ADMIN : Role.USER);
       userDAO.insert(user_);
 
-      final User u = userDAO.select(user_);
+      final User u = userDAO.select(user_.getUsername());
+      u.setToken(authenticator.generateToken(u.getUsername()));
+      u.setPassword("");
+      return u;
 
-      final Session session = new Session(u.getUserid());
-      sessionDAO.insert(session);
-
-      return session;
     }
     catch (final WebApplicationException ex_)
     {
@@ -106,10 +103,6 @@ public class UserResource
     {
       throw new WebApplicationException(Response.Status.UNAUTHORIZED);
     }
-    if (null != sessionDAO.select(user_.getSession()))
-    {
-      sessionDAO.delete(user_);
-    }
     if (null != userDAO.select(user_.getUserid()))
     {
       userDAO.delete(user_);
@@ -121,6 +114,7 @@ public class UserResource
   public User get(@Auth final User user_, @PathParam("userid") final int userid_)
   {
     final User u = userDAO.select(userid_);
+    u.setPassword("");
     if (user_.getUserid() != userid_)
     {
       u.setEmail("private");
@@ -158,9 +152,9 @@ public class UserResource
     try
     {
       final User user = users.get(0);
-      final Session session = new Session(user.getUserid());
-      sessionDAO.insert(session);
-      new EmailQueue().send(new PasswordForgottenEmail(user.getEmail(), user.getUserid(), session.getToken()));
+
+
+      new EmailQueue().send(new PasswordForgottenEmail(user.getEmail(), user.getUserid(), authenticator.generateToken(user.getUsername())));
     }
     catch (final Exception ex_)
     {
@@ -180,12 +174,13 @@ public class UserResource
         throw new WebApplicationException(Response.Status.UNAUTHORIZED);
       }
 
-      final String password = Authenticator.getSecurePassword(modified_.getPassword());
+      final String password = authenticator.getSecurePassword(modified_.getPassword());
       modified_.setPassword(password);
       modified_.setUpdated(new Date());
       modified_.setRole(
         null != modified_.getEmail() && adminEmail.toLowerCase().equals(modified_.getEmail()) ? Role.ADMIN : Role.USER);
       userDAO.update(modified_);
+      modified_.setPassword("");
       return modified_;
     }
     catch (WebApplicationException ex)

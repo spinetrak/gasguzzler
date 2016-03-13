@@ -39,6 +39,7 @@ define(function (require) {
 
         activate: function () {
             var userModel = {
+                "Authorization" : "Bearer " +  sessionStorage.getItem("token"),
                 "userid": sessionStorage.getItem("userid"),
                 "token": sessionStorage.getItem("token")
             };
@@ -50,23 +51,11 @@ define(function (require) {
             }
 
             var userUrl = this.urlRoot + '/api/user';
-            var sessionUrl = this.urlRoot + '/api/session';
             
             var that = this;
 
-            http.get(userUrl, '', userModel).then(function (response) {
+            return http.get(userUrl, '', userModel).then(function (response) {
                     that.users = response;
-                },
-                function (error) {
-                    app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"}).then(function () {
-                        app.trigger("loggedin", false);
-                        document.location.href = "/#user";
-                        window.location.reload(true);
-                    });
-                });
-
-            return http.get(sessionUrl, '', userModel).then(function (response) {
-                    that.sessions = response;
                 },
                 function (error) {
                     app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"}).then(function () {
@@ -80,6 +69,7 @@ define(function (require) {
 
         doDeleteUser: function () {
             var userModel = {
+                "Authorization" : "Bearer " +  sessionStorage.getItem("token"),
                 "userid": sessionStorage.getItem("userid"),
                 "token": sessionStorage.getItem("token")
             };
@@ -90,31 +80,6 @@ define(function (require) {
             return http.remove(url, '', userModel).then(
                 function (response) {
                     app.showMessage("User has been deleted", "Good bye!", ["Ok"], true, {"class": "notice success"}).then(function () {
-                        document.location.href = "/#user";
-                        window.location.reload(true);
-                    });
-                },
-                function (error) {
-                    app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"}).then(function () {
-                        console.log(error);
-                        document.location.href = "/#user";
-                        window.location.reload(true);
-                    });
-                });
-        },
-
-        doDeleteSession: function () {
-            var userModel = {
-                "userid": sessionStorage.getItem("userid"),
-                "token": sessionStorage.getItem("token")
-            };
-
-            var urlRoot = location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
-            var url = urlRoot + '/api/session';
-
-            return http.remove(url, '', userModel).then(
-                function (response) {
-                    app.showMessage("Session has been deleted", "Good bye!", ["Ok"], true, {"class": "notice success"}).then(function () {
                         document.location.href = "/#user";
                         window.location.reload(true);
                     });

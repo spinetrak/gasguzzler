@@ -1,18 +1,18 @@
 /*
  * The MIT License (MIT)
- *  
+ *
  * Copyright (c) 2014-2015 spinetrak
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- *  
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -30,10 +30,8 @@ import com.github.toastshaman.dropwizard.auth.jwt.parser.DefaultJsonWebTokenPars
 import io.dropwizard.auth.AuthDynamicFeature;
 import io.dropwizard.auth.AuthValueFactoryProvider;
 import io.dropwizard.testing.junit.ResourceTestRule;
-import net.spinetrak.gasguzzler.core.DataPoint;
 import net.spinetrak.gasguzzler.core.User;
 import net.spinetrak.gasguzzler.core.UserTest;
-import net.spinetrak.gasguzzler.dao.MetricsDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
 import net.spinetrak.gasguzzler.security.Authenticator;
 import net.spinetrak.gasguzzler.security.AuthenticatorTest;
@@ -43,17 +41,21 @@ import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
 import org.junit.Rule;
 import org.junit.Test;
 
-import javax.ws.rs.core.GenericType;
-import java.util.List;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
 
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-public class MetricsResourceTest
+public class LoginResourceTest
 {
-  private User _adminUser = UserTest.getAdminUser();
-  private MetricsDAO _metricsDAO = mock(MetricsDAO.class);
+  private final User _user = UserTest.getUser();
+  private final User _admin = UserTest.getAdminUser();
   private UserDAO _userDAO = mock(UserDAO.class);
+  private Authenticator authenticator = new Authenticator(_userDAO,"secret".getBytes());
+
 
   @Rule
   public ResourceTestRule rule = ResourceTestRule
@@ -65,50 +67,34 @@ public class MetricsResourceTest
         .setTokenVerifier(new HmacSHA512Verifier(AuthenticatorTest.SECRET_KEY))
         .setRealm("realm")
         .setPrefix("Bearer")
-        .setAuthenticator(new Authenticator(_userDAO,"secret".getBytes()))
+        .setAuthenticator(authenticator)
         .setAuthorizer(new Authorizer())
         .buildAuthFilter()))
     .addProvider(RolesAllowedDynamicFeature.class)
     .addProvider(new AuthValueFactoryProvider.Binder<>(User.class))
-    .addResource(new MetricsResource(
-      _metricsDAO))
+    .addResource(new LoginResource(
+      _userDAO,authenticator))
     .build();
 
-
   @Test
-  public void getAvailableMetrics()
+  public void login()
   {
-    when(_userDAO.select(_adminUser.getUsername())).thenReturn(_adminUser);
+    when(_userDAO.select(_user.getUsername())).thenReturn(UserTest.getUserWithHashedPassword());
 
-    rule.getJerseyTest().target("/metrics").request().header(AUTHORIZATION,
-                                                             "Bearer " + AuthenticatorTest.getAdminUserValidToken()).get(
-      new GenericType<List<DataPoint>>()
-      {
-      });
-    verify(_metricsDAO, times(1)).get();
+    final User user = rule.getJerseyTest().target("/login").request()
+      .post(Entity.entity(_user, MediaType.APPLICATION_JSON_TYPE), User.class);
+    assertThat(user).isEqualTo(_user);
+    assertThat(3 == user.getToken().split(".").length);
   }
 
-  @Test
-  public void getCountMetrics()
-  {
-    when(_userDAO.select(_adminUser.getUsername())).thenReturn(_adminUser);
-    rule.getJerseyTest().target("/metrics/ch.qos.logback.core.Appender.info/counts").request().header(AUTHORIZATION,
-                                                                                                      "Bearer " + AuthenticatorTest.getAdminUserValidToken()).get(
-      new GenericType<List<DataPoint>>()
-      {
-      });
-    verify(_metricsDAO, times(1)).getCount("ch.qos.logback.core.Appender.info");
-  }
 
   @Test
-  public void getRateMetrics()
+  public void delete()
   {
-    when(_userDAO.select(_adminUser.getUsername())).thenReturn(_adminUser);
-    rule.getJerseyTest().target("/metrics/ch.qos.logback.core.Appender.info/rates").request().header(AUTHORIZATION,
-                                                                                                     "Bearer " + AuthenticatorTest.getAdminUserValidToken()).get(
-      new GenericType<List<DataPoint>>()
-      {
-      });
-    verify(_metricsDAO, times(1)).getRate("ch.qos.logback.core.Appender.info");
+    when(_userDAO.select(_user.getUsername())).thenReturn(_user);
+
+    rule.getJerseyTest().target("/session").request().header(AUTHORIZATION,
+                                                                  "Bearer " + AuthenticatorTest.getRegularUserValidToken()).delete();
+
   }
 }

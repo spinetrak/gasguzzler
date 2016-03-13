@@ -32,8 +32,8 @@
         <project.version>0.0.0</project.version>
         <build.number>12345</build.number>
         <build.branch>dev</build.branch>
-        <dropwizard.version>0.8.0</dropwizard.version>
-        <jersey.version>2.16</jersey.version>
+        <dropwizard.version>0.9.2</dropwizard.version>
+        <jersey.version>2.19</jersey.version>
         <crypto.version>0.1.0</crypto.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss z</maven.build.timestamp.format>
@@ -134,7 +134,7 @@
         <dependency>
             <groupId>io.dropwizard.modules</groupId>
             <artifactId>dropwizard-flyway</artifactId>
-            <version>${dropwizard.version}-2</version>
+            <version>0.9.0-1</version>
         </dependency>
         <dependency>
             <groupId>io.dropwizard</groupId>
@@ -145,6 +145,11 @@
             <groupId>com.meltmedia.dropwizard</groupId>
             <artifactId>dropwizard-crypto</artifactId>
             <version>${crypto.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.toastshaman</groupId>
+            <artifactId>dropwizard-auth-jwt</artifactId>
+            <version>0.9.2-0</version>
         </dependency>
         <dependency>
             <groupId>com.meltmedia.jackson</groupId>

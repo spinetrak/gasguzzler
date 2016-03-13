@@ -63,7 +63,7 @@ define(function (require) {
                 return;
             }
 
-            var url = this.urlRoot + '/api/session';
+            var url = this.urlRoot + '/api/login';
 
             return http.post(url, userModel).then(
                 function (response) {

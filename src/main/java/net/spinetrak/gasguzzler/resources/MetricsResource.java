@@ -30,11 +30,10 @@ import net.spinetrak.gasguzzler.core.CountDataPoint;
 import net.spinetrak.gasguzzler.core.RateDataPoint;
 import net.spinetrak.gasguzzler.core.User;
 import net.spinetrak.gasguzzler.dao.MetricsDAO;
-import net.spinetrak.gasguzzler.dao.SessionDAO;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.List;
 
 @Path("/metrics")
@@ -44,44 +43,33 @@ public class MetricsResource
 {
 
   private MetricsDAO metricsDAO;
-  private SessionDAO sessionDAO;
 
-  public MetricsResource(final MetricsDAO metricsDAO_, final SessionDAO sessionDAO_)
+  public MetricsResource(final MetricsDAO metricsDAO_)
   {
     super();
     metricsDAO = metricsDAO_;
-    sessionDAO = sessionDAO_;
   }
 
+  @RolesAllowed("ADMIN")
   @GET
   public List<String> get(@Auth final User user_)
   {
-    if (null != sessionDAO.select(user_.getSession()))
-    {
-      return metricsDAO.get();
-    }
-    throw new WebApplicationException(Response.Status.FORBIDDEN);
+    return metricsDAO.get();
   }
 
+  @RolesAllowed("ADMIN")
   @GET
   @Path("/{name}/counts")
   public List<CountDataPoint> getCounts(@Auth final User user_, @PathParam("name") final String name_)
   {
-    if (null != sessionDAO.select(user_.getSession()))
-    {
-      return metricsDAO.getCount(name_);
-    }
-    throw new WebApplicationException(Response.Status.FORBIDDEN);
+    return metricsDAO.getCount(name_);
   }
 
+  @RolesAllowed("ADMIN")
   @GET
   @Path("/{name}/rates")
   public List<RateDataPoint> getRates(@Auth final User user_, @PathParam("name") final String name_)
   {
-    if (null != sessionDAO.select(user_.getSession()))
-    {
-      return metricsDAO.getRate(name_);
-    }
-    throw new WebApplicationException(Response.Status.FORBIDDEN);
+    return metricsDAO.getRate(name_);
   }
 }

@@ -35,6 +35,9 @@ import net.spinetrak.gasguzzler.security.EncryptedDataSourceFactory;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -106,6 +109,25 @@ public class TrakConfiguration extends Configuration
   protected void addReporter(final DbReporter reporter_)
   {
     reporter = reporter_;
+  }
+
+  private static String jwtTokenSecret = null;
+
+  public byte[] getJwtTokenSecret() throws UnsupportedEncodingException, NoSuchAlgorithmException
+  {
+    return generateTokenSecret().getBytes("UTF-8");
+  }
+
+  private static String generateTokenSecret() throws NoSuchAlgorithmException
+  {
+    if(jwtTokenSecret != null)
+    {
+      return jwtTokenSecret;
+    }
+    SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
+    byte[] salt = new byte[16];
+    sr.nextBytes(salt);
+    return new String(salt);
   }
 
 }

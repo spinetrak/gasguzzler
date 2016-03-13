@@ -24,10 +24,14 @@
 
 package net.spinetrak.gasguzzler;
 
+import com.github.toastshaman.dropwizard.auth.jwt.JWTAuthFilter;
+import com.github.toastshaman.dropwizard.auth.jwt.hmac.HmacSHA512Verifier;
+import com.github.toastshaman.dropwizard.auth.jwt.parser.DefaultJsonWebTokenParser;
 import com.meltmedia.dropwizard.crypto.CryptoBundle;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
-import io.dropwizard.auth.AuthFactory;
+import io.dropwizard.auth.AuthDynamicFeature;
+import io.dropwizard.auth.AuthValueFactoryProvider;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.flyway.FlywayBundle;
 import io.dropwizard.flyway.FlywayFactory;
@@ -35,27 +39,27 @@ import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.jdbi.bundles.DBIExceptionsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import net.spinetrak.gasguzzler.admin.SessionHealthCheck;
 import net.spinetrak.gasguzzler.admin.UserHealthCheck;
 import net.spinetrak.gasguzzler.core.User;
 import net.spinetrak.gasguzzler.dao.MetricsDAO;
-import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
 import net.spinetrak.gasguzzler.jobs.EmailNotificationJob;
-import net.spinetrak.gasguzzler.jobs.SessionCleanupJob;
 import net.spinetrak.gasguzzler.metrics.DbReporter;
 import net.spinetrak.gasguzzler.resources.BuildInfoResource;
 import net.spinetrak.gasguzzler.resources.MetricsResource;
-import net.spinetrak.gasguzzler.resources.SessionResource;
+import net.spinetrak.gasguzzler.resources.LoginResource;
 import net.spinetrak.gasguzzler.resources.UserResource;
 import net.spinetrak.gasguzzler.security.AdminSecurityHandler;
 import net.spinetrak.gasguzzler.security.Authenticator;
+import net.spinetrak.gasguzzler.security.Authorizer;
 import net.spinetrak.gasguzzler.security.HttpRedirectFilter;
-import net.spinetrak.gasguzzler.security.SessionAuthFactory;
 import org.flywaydb.core.Flyway;
+import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.skife.jdbi.v2.DBI;
 
 import javax.servlet.DispatcherType;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;
 
@@ -102,7 +106,8 @@ public class Trak extends Application<TrakConfiguration>
 
   @Override
   public void run(final TrakConfiguration configuration_,
-                  final Environment environment_) throws ClassNotFoundException
+                  final Environment environment_) throws ClassNotFoundException, UnsupportedEncodingException,
+                                                         NoSuchAlgorithmException
   {
 
     final Flyway flyway = configuration_.getFlywayFactory().build(
@@ -113,29 +118,37 @@ public class Trak extends Application<TrakConfiguration>
     final DBI jdbi = new DBIFactory().build(environment_, configuration_.getDataSourceFactory(), "postgres");
 
     final UserDAO userDAO = jdbi.onDemand(UserDAO.class);
-    final SessionDAO sessionDAO = jdbi.onDemand(SessionDAO.class);
     final MetricsDAO metricsDAO = jdbi.onDemand(MetricsDAO.class);
 
     configuration_.addDAO("userDAO", userDAO);
-    configuration_.addDAO("sessionDAO", sessionDAO);
     configuration_.addDAO("metricsDAO", metricsDAO);
-
-    environment_.lifecycle().scheduledExecutorService("sessionCleanupJob").build().scheduleAtFixedRate(
-      new SessionCleanupJob(sessionDAO), 0,
-      30,
-      TimeUnit.MINUTES);
 
     environment_.lifecycle().scheduledExecutorService("emailNotificationJob").build().scheduleAtFixedRate(
       new EmailNotificationJob(configuration_.getEmailService()), 0,
       1,
       TimeUnit.MINUTES);
 
+
+    final byte[] secret =                                      configuration_.getJwtTokenSecret();
+    final Authenticator authenticator =  new Authenticator(userDAO,secret);
+
     environment_.jersey().register(new BuildInfoResource());
-    environment_.jersey().register(new UserResource(userDAO, sessionDAO, configuration_.getAdmin().getEmail()));
-    environment_.jersey().register(new SessionResource(userDAO, sessionDAO));
-    environment_.jersey().register(new MetricsResource(metricsDAO, sessionDAO));
-    environment_.jersey().register(
-      AuthFactory.binder(new SessionAuthFactory<>(new Authenticator(sessionDAO, userDAO), "gasguzzler", User.class)));
+    environment_.jersey().register(new UserResource(userDAO, authenticator, configuration_.getAdmin().getEmail()));
+    environment_.jersey().register(new LoginResource(userDAO, authenticator));
+    environment_.jersey().register(new MetricsResource(metricsDAO));
+
+    environment_.jersey().register(new AuthDynamicFeature(
+      new JWTAuthFilter.Builder<User>()
+        .setTokenParser(new DefaultJsonWebTokenParser())
+        .setTokenVerifier(new HmacSHA512Verifier(secret))
+        .setRealm("realm")
+        .setPrefix("Bearer")
+        .setAuthenticator(authenticator)
+        .setAuthorizer(new Authorizer())
+        .buildAuthFilter()));
+    environment_.jersey().register(new AuthValueFactoryProvider.Binder<>(User.class));
+    environment_.jersey().register(RolesAllowedDynamicFeature.class);
+
 
     if (configuration_.isHttps())
     {
@@ -143,7 +156,6 @@ public class Trak extends Application<TrakConfiguration>
         .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
     }
     environment_.healthChecks().register("users", new UserHealthCheck(userDAO));
-    environment_.healthChecks().register("sessions", new SessionHealthCheck(sessionDAO));
 
     environment_.admin().setSecurityHandler(
       new AdminSecurityHandler(configuration_.getAdmin().getUsername(), configuration_.getAdmin().getPassword()));

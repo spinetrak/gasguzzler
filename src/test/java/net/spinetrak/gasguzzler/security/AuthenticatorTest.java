@@ -24,48 +24,75 @@
 
 package net.spinetrak.gasguzzler.security;
 
+import com.github.toastshaman.dropwizard.auth.jwt.hmac.HmacSHA512Signer;
+import com.github.toastshaman.dropwizard.auth.jwt.model.JsonWebToken;
+import com.github.toastshaman.dropwizard.auth.jwt.model.JsonWebTokenClaim;
+import com.github.toastshaman.dropwizard.auth.jwt.model.JsonWebTokenHeader;
 import com.google.common.base.Optional;
 import io.dropwizard.auth.AuthenticationException;
 import net.spinetrak.gasguzzler.core.User;
 import net.spinetrak.gasguzzler.core.UserTest;
-import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
+import org.joda.time.DateTime;
 import org.junit.Test;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 
+import static com.github.toastshaman.dropwizard.auth.jwt.JsonWebTokenUtils.bytesOf;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class AuthenticatorTest
 {
-  private SessionDAO _sessionDAO = mock(SessionDAO.class);
   private User _user = UserTest.getUser();
   private UserDAO _userDAO = mock(UserDAO.class);
+  private static final String ORDINARY_USER = "ordinary-guy";
+  public static final byte[] SECRET_KEY = bytesOf("MySecretKey");
+
+  public static String getRegularUserValidToken() {
+    final JsonWebToken token =  getJWT(UserTest.getUser().getUsername());
+    return new HmacSHA512Signer(SECRET_KEY).sign(token);
+  }
+
+  public static String getAdminUserValidToken() {
+    final JsonWebToken token =  getJWT(UserTest.getAdminUser().getUsername());
+    return new HmacSHA512Signer(SECRET_KEY).sign(token);
+  }
+
+  private static JsonWebToken getJWT(final String user_)
+{
+  return JsonWebToken.builder()
+    .header(JsonWebTokenHeader.HS512())
+    .claim(JsonWebTokenClaim.builder().subject(user_).build())
+    .build();
+}
+  private static JsonWebToken getInvalidJWT(final String user_)
+  {
+    return JsonWebToken.builder()
+      .header(JsonWebTokenHeader.HS512())
+      .claim(JsonWebTokenClaim.builder().subject(user_).expiration(new DateTime(0)).build())
+      .build();
+  }
 
   @Test
   public void authenticateReturnsUserForValidSession() throws AuthenticationException
   {
     try
     {
-      when(_userDAO.select(_user)).thenReturn(_user);
+      when(_userDAO.select(_user.getUsername())).thenReturn(_user);
 
       _userDAO.insert(_user);
-      final User user = _userDAO.select(_user);
+      final User user = _userDAO.select(_user.getUsername());
 
-      final Session session = new Session(user.getUserid());
-      _sessionDAO.insert(session);
+      final Authenticator authenticator = new Authenticator(_userDAO, "secret".getBytes());
 
-
-      final Authenticator authenticator = new Authenticator(_sessionDAO, _userDAO);
-
-      final Optional<User> result = authenticator.authenticate(session);
+      final Optional<User> result = authenticator.authenticate(getJWT(UserTest.getUser().getUsername()));
       assertTrue(result.isPresent());
 
-      final Authenticator authenticator1 = new Authenticator();
-      authenticator1.authenticate(session);
+      final Authenticator authenticator1 = new Authenticator(_userDAO, "secret".getBytes());
+      authenticator1.authenticate(null);
       fail("Expected exception");
     }
     catch (final AuthenticationException ex_)
@@ -74,12 +101,23 @@ public class AuthenticatorTest
     }
   }
 
-  @Test(expected = AuthenticationException.class)
+  @Test
   public void authenticateThrowsAuthenticationExceptionForInvalidCredentials() throws AuthenticationException
   {
-    final Authenticator authenticator = new Authenticator();
+    try
+    {
+      when(_userDAO.select(_user.getUsername())).thenReturn(_user);
 
-    authenticator.authenticate(new Session(1234, "failToken"));
+      final Authenticator authenticator = new Authenticator(_userDAO, "secret".getBytes());
+
+      final JsonWebToken jwt = getInvalidJWT(_user.getUsername());
+      authenticator.authenticate(jwt);
+      fail("Expected exception");
+    }
+    catch (final AuthenticationException ex_)
+    {
+      assertEquals(ex_.getMessage(), "com.github.toastshaman.dropwizard.auth.jwt.exceptions.TokenExpiredException: The token has expired");
+    }
   }
 
 
@@ -88,14 +126,15 @@ public class AuthenticatorTest
   {
     try
     {
-      final String password = Authenticator.getSecurePassword("password");
+      final Authenticator authenticator = new Authenticator(_userDAO, "secret".getBytes());
+      final String password = authenticator.getSecurePassword("password");
       assertNotEquals(password, "password");
       assertTrue("Got unexpected length of " + password.length(), 220 >= password.length());
-      final String password2 = Authenticator.getSecurePassword("password");
+      final String password2 = authenticator.getSecurePassword("password");
       assertNotEquals(password, password2);
 
-      assertTrue(Authenticator.validatePassword("password", password));
-      assertTrue(Authenticator.validatePassword("password", password2));
+      assertTrue(authenticator.validatePassword("password", password));
+      assertTrue(authenticator.validatePassword("password", password2));
 
     }
     catch (final NoSuchAlgorithmException | InvalidKeySpecException e)

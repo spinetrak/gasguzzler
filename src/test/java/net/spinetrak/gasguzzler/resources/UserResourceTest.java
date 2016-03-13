@@ -24,138 +24,171 @@
 
 package net.spinetrak.gasguzzler.resources;
 
-import io.dropwizard.auth.AuthFactory;
+import com.github.toastshaman.dropwizard.auth.jwt.JWTAuthFilter;
+import com.github.toastshaman.dropwizard.auth.jwt.hmac.HmacSHA512Verifier;
+import com.github.toastshaman.dropwizard.auth.jwt.parser.DefaultJsonWebTokenParser;
+import io.dropwizard.auth.AuthDynamicFeature;
+import io.dropwizard.auth.AuthValueFactoryProvider;
 import io.dropwizard.testing.junit.ResourceTestRule;
 import net.spinetrak.gasguzzler.core.User;
 import net.spinetrak.gasguzzler.core.UserTest;
-import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
 import net.spinetrak.gasguzzler.security.Authenticator;
-import net.spinetrak.gasguzzler.security.Session;
-import net.spinetrak.gasguzzler.security.SessionAuthFactory;
-import org.junit.Ignore;
+import net.spinetrak.gasguzzler.security.AuthenticatorTest;
+import net.spinetrak.gasguzzler.security.Authorizer;
+import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
+import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
 import org.junit.Rule;
 import org.junit.Test;
 
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 
+import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.fail;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class UserResourceTest
 {
   private final User _adminUser = UserTest.getAdminUser();
-  private final Session _session = new Session(0, "token");
-  private SessionDAO _sessionDAO = mock(SessionDAO.class);
   private UserDAO _userDAO = mock(UserDAO.class);
+  private Authenticator _authenticator = new Authenticator(_userDAO,"secret".getBytes());
 
   @Rule
-  public ResourceTestRule resources = ResourceTestRule.builder()
+  public ResourceTestRule rule = ResourceTestRule
+    .builder()
+    .setTestContainerFactory(new GrizzlyWebTestContainerFactory())
+    .addProvider(new AuthDynamicFeature(
+      new JWTAuthFilter.Builder<User>()
+        .setTokenParser(new DefaultJsonWebTokenParser())
+        .setTokenVerifier(new HmacSHA512Verifier(AuthenticatorTest.SECRET_KEY))
+        .setRealm("realm")
+        .setPrefix("Bearer")
+        .setAuthenticator(_authenticator)
+        .setAuthorizer(new Authorizer())
+        .buildAuthFilter()))
+    .addProvider(RolesAllowedDynamicFeature.class)
+    .addProvider(new AuthValueFactoryProvider.Binder<>(User.class))
     .addResource(new UserResource(
       _userDAO,
-      _sessionDAO,
+      _authenticator,
       "admin@example.com"))
-    .addProvider(
-      AuthFactory.binder(new SessionAuthFactory<>(new Authenticator(_sessionDAO, _userDAO), "gasguzzler", User.class)))
     .build();
 
   @Test
-  @Ignore
-  public void create()
+  public void register()
   {
-    when(_sessionDAO.select(_session)).thenReturn(_session);
     when(_userDAO.select(anyString(), anyString())).thenReturn(new ArrayList<>());
-    when(_userDAO.select(_adminUser)).thenReturn(_adminUser);
+    when(_userDAO.select(_adminUser.getUsername())).thenReturn(_adminUser);
 
 
-    final Session mysession = resources.getJerseyTest().target("/user").request(MediaType.APPLICATION_JSON)
-      .post(Entity.entity(UserTest.getUser(), MediaType.APPLICATION_JSON), Session.class);
-    assertThat(mysession).isNotEqualTo(_session);
-    assertThat(mysession.getUserid()).isEqualTo(_session.getUserid());
+    final User user = rule.getJerseyTest().target("/user").request(MediaType.APPLICATION_JSON)
+      .post(Entity.entity(UserTest.getAdminUser(), MediaType.APPLICATION_JSON), User.class);
+    assertThat(user).isEqualTo(_adminUser);
+    assertThat(3 == user.getToken().split(".").length);
   }
 
+
   @Test
-  @Ignore
   public void delete()
   {
-    when(_sessionDAO.select(any())).thenReturn(_session);
-    when(_userDAO.select(_session.getUserid())).thenReturn(_adminUser);
+    when(_userDAO.select(_adminUser.getUserid())).thenReturn(_adminUser);
 
-    resources.getJerseyTest().target("/user/0").request().header(SessionAuthFactory.TOKEN, "token").header(
-      SessionAuthFactory.USERID, "0").delete();
+    rule.getJerseyTest().target("/user/0").request().header(AUTHORIZATION,
+                                                                 "Bearer " + AuthenticatorTest.getAdminUserValidToken()).delete();
 
-    verify(_sessionDAO, times(2)).select(_session);
+    verify(_userDAO, times(1)).select(_adminUser.getUsername());
   }
 
   @Test
-  @Ignore
   public void get()
   {
-    when(_userDAO.select(0)).thenReturn(_adminUser);
-    when(_sessionDAO.select(_session)).thenReturn(_session);
+    when(_userDAO.select(_adminUser.getUsername())).thenReturn(_adminUser);
+    when(_userDAO.select(_adminUser.getUserid())).thenReturn(_adminUser);
 
-    assertThat(resources.getJerseyTest().target("/user/0").request().header(SessionAuthFactory.TOKEN, "token").header(
-      SessionAuthFactory.USERID, "0").get(User.class)).isEqualTo(_adminUser);
+    assertThat(rule.getJerseyTest().target("/user/0").request().header(AUTHORIZATION,
+                                                                            "Bearer " + AuthenticatorTest.getAdminUserValidToken()).get(User.class)).isEqualTo(_adminUser);
   }
 
   @Test
-  @Ignore
   public void getAll()
   {
-    when(_sessionDAO.select(any())).thenReturn(_session);
-    when(_userDAO.select(_session.getUserid())).thenReturn(_adminUser);
+    when(_userDAO.select(_adminUser.getUsername())).thenReturn(_adminUser);
 
-    resources.getJerseyTest().target("/user").
-      request().header(SessionAuthFactory.TOKEN, "token").header(SessionAuthFactory.USERID, "0")
+    final List<User> allUsers = rule.getJerseyTest().target("/user").
+      request().header(AUTHORIZATION,
+                       "Bearer " + AuthenticatorTest.getAdminUserValidToken())
       .get(new GenericType<List<User>>()
       {
       });
+
+    assertThat(!allUsers.isEmpty());
+    assertThat(allUsers.contains(_adminUser));
   }
 
   @Test
-  @Ignore
   public void getAllThrows401WhenNotAdminRole()
   {
-      when(_sessionDAO.select(_session)).thenReturn(_session);
-
-    resources.getJerseyTest().target("/user").request()
-      .header(SessionAuthFactory.TOKEN, "token").header(SessionAuthFactory.USERID, "0")
+    try
+    {
+      final List<User> allUsers = rule.getJerseyTest().target("/user").request()
+        .header(AUTHORIZATION,
+                "Bearer " + AuthenticatorTest.getRegularUserValidToken())
         .get(new GenericType<List<User>>()
         {
         });
+      fail("allUsers should be invalid" + allUsers);
+    }
+    catch (final Exception ex_)
+    {
+      assertThat(ex_).isInstanceOf(NotAuthorizedException.class);
+    }
   }
 
   @Test
-  @Ignore
+  public void testResetPassword()
+  {
+    final Response response = rule.getJerseyTest().target("/user/pwreset").request().post(
+      Entity.entity(UserTest.getUser(), MediaType.APPLICATION_JSON));
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+  
+  @Test
   public void update()
   {
-    when(_sessionDAO.select(any())).thenReturn(_session);
-    when(_userDAO.select(_session.getUserid())).thenReturn(_adminUser);
+    when(_userDAO.select(_adminUser.getUsername())).thenReturn(_adminUser);
 
-    assertThat(resources.getJerseyTest().target("/user/0").request().header(SessionAuthFactory.TOKEN, "token").header(
-      SessionAuthFactory.USERID, "0")
-                 .put(Entity.entity(UserTest.getUser(), MediaType.APPLICATION_JSON_TYPE), User.class)).isEqualTo(
-      UserTest.getUser());
+    final User updated = rule.getJerseyTest().target("/user/0").request().header(AUTHORIZATION,
+                                                                            "Bearer " + AuthenticatorTest.getAdminUserValidToken())
+                 .put(Entity.entity(UserTest.getAdminUser(), MediaType.APPLICATION_JSON_TYPE), User.class);
+
+    assertEquals(UserTest.getAdminUser(),updated);
   }
 
   @Test
-  @Ignore
   public void updateInvalidUser()
   {
-      when(_sessionDAO.select(_session)).thenReturn(_session);
+    final User user = UserTest.getUser();
 
-      final User user = UserTest.getUser();
+    try
+    {
+      final User invalidUser = rule.getJerseyTest().target("/user/1").request().header(AUTHORIZATION,
+                                                                                            "Bearer " + AuthenticatorTest.getRegularUserValidToken())
+        .put(Entity.entity(user, MediaType.APPLICATION_JSON_TYPE), User.class);
 
-    final User updatedUser = resources.getJerseyTest().target("/user/1").request().header(SessionAuthFactory.TOKEN,
-                                                                                          "token").header(
-      SessionAuthFactory.USERID, "0")
-      .put(Entity.entity(user, MediaType.APPLICATION_JSON_TYPE), User.class);
-
-      fail("Updated _adminUser should be invalid " + updatedUser);
+      fail("invalidUser should be invalid" + invalidUser);
+    }
+    catch (final Exception ex_)
+    {
+      assertThat(ex_).isInstanceOf(NotAuthorizedException.class);
+    }
   }
+
 }

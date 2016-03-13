@@ -56,7 +56,7 @@ public class UserDAOTest
     }
     _userDAO.insert(user);
 
-    final User u = _userDAO.select(user);
+    final User u = _userDAO.select(user.getUsername());
     user.setUserid(u.getUserid());
     assertEquals(user, u);
 
