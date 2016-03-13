@@ -81,7 +81,7 @@ public class UserResource
         null != user_.getEmail() && adminEmail.toLowerCase().equals(user_.getEmail()) ? Role.ADMIN : Role.USER);
       userDAO.insert(user_);
 
-      final User u = userDAO.select(user_);
+      final User u = userDAO.select(user_.getUsername());
 
       final Session session = new Session(u.getUserid());
       sessionDAO.insert(session);

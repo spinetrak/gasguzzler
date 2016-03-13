@@ -32,6 +32,7 @@ import net.spinetrak.gasguzzler.core.User;
 import net.spinetrak.gasguzzler.dao.MetricsDAO;
 import net.spinetrak.gasguzzler.dao.SessionDAO;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -53,6 +54,7 @@ public class MetricsResource
     sessionDAO = sessionDAO_;
   }
 
+  @RolesAllowed("ADMIN")
   @GET
   public List<String> get(@Auth final User user_)
   {
@@ -63,6 +65,7 @@ public class MetricsResource
     throw new WebApplicationException(Response.Status.FORBIDDEN);
   }
 
+  @RolesAllowed("ADMIN")
   @GET
   @Path("/{name}/counts")
   public List<CountDataPoint> getCounts(@Auth final User user_, @PathParam("name") final String name_)
@@ -74,6 +77,7 @@ public class MetricsResource
     throw new WebApplicationException(Response.Status.FORBIDDEN);
   }
 
+  @RolesAllowed("ADMIN")
   @GET
   @Path("/{name}/rates")
   public List<RateDataPoint> getRates(@Auth final User user_, @PathParam("name") final String name_)

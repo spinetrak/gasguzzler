@@ -31,9 +31,10 @@ import net.spinetrak.gasguzzler.security.Session;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
+import java.security.Principal;
 import java.util.Date;
 
-public class User
+public class User implements Principal
 {
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
   private Date created;
@@ -89,6 +90,15 @@ public class User
     return false;
 
   }
+
+  @Override
+  @JsonIgnore
+  public String getName()
+  {
+    return username;
+  }
+
+
 
   public Date getCreated()
   {

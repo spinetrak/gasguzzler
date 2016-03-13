@@ -24,15 +24,21 @@
 
 package net.spinetrak.gasguzzler.resources;
 
-import io.dropwizard.auth.AuthFactory;
+import com.github.toastshaman.dropwizard.auth.jwt.JWTAuthFilter;
+import com.github.toastshaman.dropwizard.auth.jwt.hmac.HmacSHA512Verifier;
+import com.github.toastshaman.dropwizard.auth.jwt.parser.DefaultJsonWebTokenParser;
+import io.dropwizard.auth.AuthDynamicFeature;
+import io.dropwizard.auth.AuthValueFactoryProvider;
 import io.dropwizard.testing.junit.ResourceTestRule;
 import net.spinetrak.gasguzzler.core.User;
 import net.spinetrak.gasguzzler.core.UserTest;
 import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
 import net.spinetrak.gasguzzler.security.Authenticator;
+import net.spinetrak.gasguzzler.security.AuthenticatorTest;
+import net.spinetrak.gasguzzler.security.Authorizer;
 import net.spinetrak.gasguzzler.security.Session;
-import net.spinetrak.gasguzzler.security.SessionAuthFactory;
+import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
 import org.junit.Rule;
 import org.junit.Test;
@@ -42,63 +48,78 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
+import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class SessionResourceTest
 {
-  private final Session _session = new Session(0, "token");
+  private final Session _session = new Session(1, "token");
   private final User _user = UserTest.getUser();
+  private final User _admin = UserTest.getAdminUser();
   private SessionDAO _sessionDAO = mock(SessionDAO.class);
   private UserDAO _userDAO = mock(UserDAO.class);
 
+
   @Rule
-  public ResourceTestRule resources = ResourceTestRule.builder()
+  public ResourceTestRule rule = ResourceTestRule
+    .builder()
     .setTestContainerFactory(new GrizzlyWebTestContainerFactory())
+    .addProvider(new AuthDynamicFeature(
+      new JWTAuthFilter.Builder<User>()
+        .setTokenParser(new DefaultJsonWebTokenParser())
+        .setTokenVerifier(new HmacSHA512Verifier(AuthenticatorTest.SECRET_KEY))
+        .setRealm("realm")
+        .setPrefix("Bearer")
+        .setAuthenticator(new Authenticator(_sessionDAO, _userDAO))
+        .setAuthorizer(new Authorizer())
+        .buildAuthFilter()))
+    .addProvider(RolesAllowedDynamicFeature.class)
+    .addProvider(new AuthValueFactoryProvider.Binder<>(User.class))
     .addResource(new SessionResource(
       _userDAO,
       _sessionDAO))
-    .addProvider(
-      AuthFactory.binder(new SessionAuthFactory<>(new Authenticator(_sessionDAO, _userDAO), "gasguzzler", User.class)))
     .build();
 
   @Test
   public void create()
   {
     when(_sessionDAO.select(_session)).thenReturn(_session);
-    when(_userDAO.select(_user)).thenReturn(UserTest.getUserWithHashedPassword());
+    when(_userDAO.select(_user.getUsername())).thenReturn(UserTest.getUserWithHashedPassword());
 
-    final Session mysession = resources.getJerseyTest().target("/session").request()
+    final Session mysession = rule.getJerseyTest().target("/session").request()
       .post(Entity.entity(_user, MediaType.APPLICATION_JSON_TYPE), Session.class);
     assertThat(mysession).isNotEqualTo(_session);
     assertThat(mysession.getUserid()).isEqualTo(_session.getUserid());
   }
 
+
   @Test
   public void delete()
   {
-    when(_userDAO.select(_session.getUserid())).thenReturn(_user);
+    when(_userDAO.select(_user.getUsername())).thenReturn(_user);
     when(_sessionDAO.select(_session)).thenReturn(_session);
 
-    resources.getJerseyTest().target("/session").request().header(SessionAuthFactory.TOKEN, "token").header(
-      SessionAuthFactory.USERID, "0").delete();
+    rule.getJerseyTest().target("/session").request().header(AUTHORIZATION,
+                                                                  "Bearer " + AuthenticatorTest.getRegularUserValidToken()).delete();
 
-    verify(_sessionDAO, times(2)).select(_session);
   }
 
   @Test
   public void testGetAll()
   {
-    when(_userDAO.select(_session.getUserid())).thenReturn(UserTest.getAdminUser());
+    when(_userDAO.select(_admin.getUsername())).thenReturn(UserTest.getAdminUser());
     when(_sessionDAO.select(_session)).thenReturn(_session);
 
-    final List<Session> sessions = resources.getJerseyTest().target("/session").request().header(
-      SessionAuthFactory.TOKEN, "token").header(
-      SessionAuthFactory.USERID, "0").get(new GenericType<List<Session>>()
-    {
-    });
+    final List<Session> sessions = rule.getJerseyTest().target("/session").request().header(AUTHORIZATION,
+                                                                                                 "Bearer " + AuthenticatorTest.getAdminUserValidToken()).get(
+      new GenericType<List<Session>>()
+      {
+      });
 
     assertThat(!sessions.isEmpty());
     assertThat(sessions.contains(_session));
   }
+
 }

@@ -42,9 +42,9 @@ public interface UserDAO
   @SqlUpdate("insert into st_user (username, password, email, role) values (:u.username, :u.password, :u.email, :u.roleAsString)")
   void insert(@BindBean("u") final User user_);
 
-  @SqlQuery("select * from st_user where username = :u.username")
+  @SqlQuery("select * from st_user where username = :username")
   @Mapper(UserMapper.class)
-  User select(@BindBean("u") final User user_);
+  User select(@Bind("username") final String username_);
 
   @SqlQuery("select * from st_user where userid = :userid")
   @Mapper(UserMapper.class)

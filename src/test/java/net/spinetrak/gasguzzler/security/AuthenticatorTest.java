@@ -24,6 +24,10 @@
 
 package net.spinetrak.gasguzzler.security;
 
+import com.github.toastshaman.dropwizard.auth.jwt.hmac.HmacSHA512Signer;
+import com.github.toastshaman.dropwizard.auth.jwt.model.JsonWebToken;
+import com.github.toastshaman.dropwizard.auth.jwt.model.JsonWebTokenClaim;
+import com.github.toastshaman.dropwizard.auth.jwt.model.JsonWebTokenHeader;
 import com.google.common.base.Optional;
 import io.dropwizard.auth.AuthenticationException;
 import net.spinetrak.gasguzzler.core.User;
@@ -35,6 +39,7 @@ import org.junit.Test;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 
+import static com.github.toastshaman.dropwizard.auth.jwt.JsonWebTokenUtils.bytesOf;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -44,16 +49,36 @@ public class AuthenticatorTest
   private SessionDAO _sessionDAO = mock(SessionDAO.class);
   private User _user = UserTest.getUser();
   private UserDAO _userDAO = mock(UserDAO.class);
+  private static final String ORDINARY_USER = "ordinary-guy";
+  public static final byte[] SECRET_KEY = bytesOf("MySecretKey");
+
+  public static String getRegularUserValidToken() {
+    final JsonWebToken token =  getJWT(UserTest.getUser().getUsername());
+    return new HmacSHA512Signer(SECRET_KEY).sign(token);
+  }
+
+  public static String getAdminUserValidToken() {
+    final JsonWebToken token =  getJWT(UserTest.getAdminUser().getUsername());
+    return new HmacSHA512Signer(SECRET_KEY).sign(token);
+  }
+
+  private static JsonWebToken getJWT(final String user_)
+  {
+    return JsonWebToken.builder()
+      .header(JsonWebTokenHeader.HS512())
+      .claim(JsonWebTokenClaim.builder().subject(user_).build())
+      .build();
+  }
 
   @Test
   public void authenticateReturnsUserForValidSession() throws AuthenticationException
   {
     try
     {
-      when(_userDAO.select(_user)).thenReturn(_user);
+      when(_userDAO.select(_user.getUsername())).thenReturn(_user);
 
       _userDAO.insert(_user);
-      final User user = _userDAO.select(_user);
+      final User user = _userDAO.select(_user.getUsername());
 
       final Session session = new Session(user.getUserid());
       _sessionDAO.insert(session);
@@ -61,11 +86,11 @@ public class AuthenticatorTest
 
       final Authenticator authenticator = new Authenticator(_sessionDAO, _userDAO);
 
-      final Optional<User> result = authenticator.authenticate(session);
+      final Optional<User> result = authenticator.authenticate(getJWT(UserTest.getUser().getUsername()));
       assertTrue(result.isPresent());
 
       final Authenticator authenticator1 = new Authenticator();
-      authenticator1.authenticate(session);
+      authenticator1.authenticate(null);
       fail("Expected exception");
     }
     catch (final AuthenticationException ex_)
@@ -77,9 +102,11 @@ public class AuthenticatorTest
   @Test(expected = AuthenticationException.class)
   public void authenticateThrowsAuthenticationExceptionForInvalidCredentials() throws AuthenticationException
   {
-    final Authenticator authenticator = new Authenticator();
+    when(_userDAO.select(_user.getUsername())).thenReturn(_user);
 
-    authenticator.authenticate(new Session(1234, "failToken"));
+    final Authenticator authenticator = new Authenticator(_sessionDAO,_userDAO);
+
+    authenticator.authenticate(null);
   }
 
 

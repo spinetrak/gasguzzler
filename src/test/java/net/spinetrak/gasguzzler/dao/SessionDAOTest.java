@@ -57,7 +57,7 @@ public class SessionDAOTest
     }
 
     _userDAO.insert(user);
-    final User u = _userDAO.select(user);
+    final User u = _userDAO.select(user.getUsername());
 
     final Session session = new Session(u.getUserid());
     _sessionDAO.insert(session);

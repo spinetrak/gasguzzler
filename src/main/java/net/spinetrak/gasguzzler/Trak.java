@@ -24,10 +24,14 @@
 
 package net.spinetrak.gasguzzler;
 
+import com.github.toastshaman.dropwizard.auth.jwt.JWTAuthFilter;
+import com.github.toastshaman.dropwizard.auth.jwt.hmac.HmacSHA512Verifier;
+import com.github.toastshaman.dropwizard.auth.jwt.parser.DefaultJsonWebTokenParser;
 import com.meltmedia.dropwizard.crypto.CryptoBundle;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
-import io.dropwizard.auth.AuthFactory;
+import io.dropwizard.auth.AuthDynamicFeature;
+import io.dropwizard.auth.AuthValueFactoryProvider;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.flyway.FlywayBundle;
 import io.dropwizard.flyway.FlywayFactory;
@@ -50,12 +54,15 @@ import net.spinetrak.gasguzzler.resources.SessionResource;
 import net.spinetrak.gasguzzler.resources.UserResource;
 import net.spinetrak.gasguzzler.security.AdminSecurityHandler;
 import net.spinetrak.gasguzzler.security.Authenticator;
+import net.spinetrak.gasguzzler.security.Authorizer;
 import net.spinetrak.gasguzzler.security.HttpRedirectFilter;
-import net.spinetrak.gasguzzler.security.SessionAuthFactory;
 import org.flywaydb.core.Flyway;
+import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.skife.jdbi.v2.DBI;
 
 import javax.servlet.DispatcherType;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;
 
@@ -102,7 +109,8 @@ public class Trak extends Application<TrakConfiguration>
 
   @Override
   public void run(final TrakConfiguration configuration_,
-                  final Environment environment_) throws ClassNotFoundException
+                  final Environment environment_) throws ClassNotFoundException, UnsupportedEncodingException,
+                                                         NoSuchAlgorithmException
   {
 
     final Flyway flyway = configuration_.getFlywayFactory().build(
@@ -134,8 +142,19 @@ public class Trak extends Application<TrakConfiguration>
     environment_.jersey().register(new UserResource(userDAO, sessionDAO, configuration_.getAdmin().getEmail()));
     environment_.jersey().register(new SessionResource(userDAO, sessionDAO));
     environment_.jersey().register(new MetricsResource(metricsDAO, sessionDAO));
-    environment_.jersey().register(
-      AuthFactory.binder(new SessionAuthFactory<>(new Authenticator(sessionDAO, userDAO), "gasguzzler", User.class)));
+
+    environment_.jersey().register(new AuthDynamicFeature(
+      new JWTAuthFilter.Builder<User>()
+        .setTokenParser(new DefaultJsonWebTokenParser())
+        .setTokenVerifier(new HmacSHA512Verifier(configuration_.getJwtTokenSecret()))
+        .setRealm("realm")
+        .setPrefix("Bearer")
+        .setAuthenticator(new Authenticator(sessionDAO,userDAO))
+        .setAuthorizer(new Authorizer())
+        .buildAuthFilter()));
+    environment_.jersey().register(new AuthValueFactoryProvider.Binder<>(User.class));
+    environment_.jersey().register(RolesAllowedDynamicFeature.class);
+
 
     if (configuration_.isHttps())
     {

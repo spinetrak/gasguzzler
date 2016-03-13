@@ -26,13 +26,13 @@ package net.spinetrak.gasguzzler.resources;
 
 
 import io.dropwizard.auth.Auth;
-import net.spinetrak.gasguzzler.core.Role;
 import net.spinetrak.gasguzzler.core.User;
 import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
 import net.spinetrak.gasguzzler.security.Authenticator;
 import net.spinetrak.gasguzzler.security.Session;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -61,7 +61,7 @@ public class SessionResource
   {
     try
     {
-      final User u = userDAO.select(user_);
+      final User u = userDAO.select(user_.getUsername());
       if (null == u)
       {
         throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -96,14 +96,10 @@ public class SessionResource
     }
   }
 
+  @RolesAllowed("ADMIN")
   @GET
-  public List<Session> getAll(@Auth final User principal_)
+  public List<Session> getAll(@Auth final User user_)
   {
-    if (principal_.getRole() != Role.ADMIN)
-    {
-      throw new WebApplicationException(Response.Status.UNAUTHORIZED);
-    }
-
     return sessionDAO.select();
   }
 }

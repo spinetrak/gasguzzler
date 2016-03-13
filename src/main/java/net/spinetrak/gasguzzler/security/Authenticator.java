@@ -25,6 +25,7 @@
 package net.spinetrak.gasguzzler.security;
 
 
+import com.github.toastshaman.dropwizard.auth.jwt.model.JsonWebToken;
 import com.google.common.base.Optional;
 import io.dropwizard.auth.AuthenticationException;
 import net.spinetrak.gasguzzler.core.User;
@@ -44,7 +45,7 @@ import java.security.spec.InvalidKeySpecException;
  * This is an example authenticator that takes the credentials extracted from the request by the SecurityProvider
  * and authenticates the principle
  */
-public class Authenticator implements io.dropwizard.auth.Authenticator<Session, User>
+public class Authenticator implements io.dropwizard.auth.Authenticator<JsonWebToken, User>
 {
   private final static Logger LOGGER = LoggerFactory.getLogger(Authenticator.class.getName());
   
@@ -129,20 +130,16 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<Session, 
   }
 
   @Override
-  public Optional<User> authenticate(final Session session_) throws AuthenticationException
+  public Optional<User> authenticate(final JsonWebToken credentials_) throws AuthenticationException
   {
-    LOGGER.info("Authenticating {}", session_);
-    if ((null == session_) || (null == sessionDAO) || (null == sessionDAO.select(session_)))
+    LOGGER.info("Authenticating {}", credentials_);
+    if (null == credentials_)
     {
       throw new AuthenticationException("Invalid credentials");
     }
     else
     {
-      final User user = userDAO.select(session_.getUserid());
-      if (null != user)
-      {
-        user.setSession(session_);
-      }
+      final User user = userDAO.select(credentials_.claim().subject());
       return Optional.fromNullable(user);
     }
   }
