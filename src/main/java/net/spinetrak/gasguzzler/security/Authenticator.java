@@ -25,12 +25,15 @@
 package net.spinetrak.gasguzzler.security;
 
 
+import com.github.toastshaman.dropwizard.auth.jwt.exceptions.TokenExpiredException;
 import com.github.toastshaman.dropwizard.auth.jwt.model.JsonWebToken;
+import com.github.toastshaman.dropwizard.auth.jwt.validator.ExpiryValidator;
 import com.google.common.base.Optional;
 import io.dropwizard.auth.AuthenticationException;
 import net.spinetrak.gasguzzler.core.User;
 import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
+import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,15 +54,18 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<JsonWebTo
   
   private SessionDAO sessionDAO;
   private UserDAO userDAO;
+  private ExpiryValidator validator;
 
   public Authenticator(final SessionDAO sessionDAO_, final UserDAO userDAO_)
   {
+    this();
     sessionDAO = sessionDAO_;
     userDAO = userDAO_;
   }
 
   public Authenticator()
   {
+    validator = new ExpiryValidator(Duration.standardMinutes(10));
   }
 
   public static String getSecurePassword(final String password_) throws NoSuchAlgorithmException,
@@ -139,6 +145,14 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<JsonWebTo
     }
     else
     {
+      try
+      {
+        validator.validate(credentials_);
+      }
+      catch(TokenExpiredException ex_)
+      {
+        throw new AuthenticationException(ex_);
+      }
       final User user = userDAO.select(credentials_.claim().subject());
       return Optional.fromNullable(user);
     }

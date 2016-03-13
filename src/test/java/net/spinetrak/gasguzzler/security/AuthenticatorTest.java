@@ -34,6 +34,7 @@ import net.spinetrak.gasguzzler.core.User;
 import net.spinetrak.gasguzzler.core.UserTest;
 import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
+import org.joda.time.DateTime;
 import org.junit.Test;
 
 import java.security.NoSuchAlgorithmException;
@@ -63,10 +64,17 @@ public class AuthenticatorTest
   }
 
   private static JsonWebToken getJWT(final String user_)
+{
+  return JsonWebToken.builder()
+    .header(JsonWebTokenHeader.HS512())
+    .claim(JsonWebTokenClaim.builder().subject(user_).build())
+    .build();
+}
+  private static JsonWebToken getInvalidJWT(final String user_)
   {
     return JsonWebToken.builder()
       .header(JsonWebTokenHeader.HS512())
-      .claim(JsonWebTokenClaim.builder().subject(user_).build())
+      .claim(JsonWebTokenClaim.builder().subject(user_).expiration(new DateTime(0)).build())
       .build();
   }
 
@@ -99,14 +107,23 @@ public class AuthenticatorTest
     }
   }
 
-  @Test(expected = AuthenticationException.class)
+  @Test
   public void authenticateThrowsAuthenticationExceptionForInvalidCredentials() throws AuthenticationException
   {
-    when(_userDAO.select(_user.getUsername())).thenReturn(_user);
+    try
+    {
+      when(_userDAO.select(_user.getUsername())).thenReturn(_user);
 
-    final Authenticator authenticator = new Authenticator(_sessionDAO,_userDAO);
+      final Authenticator authenticator = new Authenticator(_sessionDAO, _userDAO);
 
-    authenticator.authenticate(null);
+      final JsonWebToken jwt = getInvalidJWT(_user.getUsername());
+      authenticator.authenticate(jwt);
+      fail("Expected exception");
+    }
+    catch (final AuthenticationException ex_)
+    {
+      assertEquals(ex_.getMessage(), "com.github.toastshaman.dropwizard.auth.jwt.exceptions.TokenExpiredException: The token has expired");
+    }
   }
 
 
