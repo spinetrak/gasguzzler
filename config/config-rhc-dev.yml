@@ -54,6 +54,7 @@ database:
       keyDerivation: "pbkdf2"
       keyLength: 256
       iterations: 2000
+      encrypted: true
     password:
       salt: "aevWiA=="
       iv: "dZzSSAyVb3DLQ8DqTqvd0g=="
@@ -62,3 +63,4 @@ database:
       keyDerivation: "pbkdf2"
       keyLength: 256
       iterations: 2000
+      encrypted: true
