@@ -53,9 +53,9 @@ database:
     iterations: 2000
     encrypted: true
   password:
-    salt: "aevWiA=="
-    iv: "dZzSSAyVb3DLQ8DqTqvd0g=="
-    value: "TiV2KtgsLZP/VtP4wS8+1A=="
+    salt: "i16kpw=="
+    iv: "C4KyRTkEGeluJHy2KTVAMg=="
+    value: "3W6MmV1CGgQnTuZ6B9n20w=="
     cipher: "aes-256-cbc"
     keyDerivation: "pbkdf2"
     keyLength: 256
