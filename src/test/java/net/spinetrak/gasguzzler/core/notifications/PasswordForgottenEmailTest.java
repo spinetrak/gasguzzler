@@ -52,8 +52,6 @@ public class PasswordForgottenEmailTest
       final MultivaluedMap map = email.format();
       assertNotNull(map);
       assertEquals("[foo@bar.net]", map.get("to").toString());
-      assertTrue(email.getPasswordResetLink().endsWith(
-        "/#user?t=" + authenticator.generateToken(user.getUsername()) + "&i=" + user.getUserid()));
     }
     catch (Exception ex_)
     {
