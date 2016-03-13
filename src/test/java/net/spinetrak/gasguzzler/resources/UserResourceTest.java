@@ -32,12 +32,10 @@ import io.dropwizard.auth.AuthValueFactoryProvider;
 import io.dropwizard.testing.junit.ResourceTestRule;
 import net.spinetrak.gasguzzler.core.User;
 import net.spinetrak.gasguzzler.core.UserTest;
-import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
 import net.spinetrak.gasguzzler.security.Authenticator;
 import net.spinetrak.gasguzzler.security.AuthenticatorTest;
 import net.spinetrak.gasguzzler.security.Authorizer;
-import net.spinetrak.gasguzzler.security.Session;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
 import org.junit.Rule;
@@ -60,10 +58,8 @@ import static org.mockito.Mockito.*;
 public class UserResourceTest
 {
   private final User _adminUser = UserTest.getAdminUser();
-  private final Session _session = new Session(0, "token");
-  private SessionDAO _sessionDAO = mock(SessionDAO.class);
   private UserDAO _userDAO = mock(UserDAO.class);
-
+  private Authenticator _authenticator = new Authenticator(_userDAO,"secret".getBytes());
 
   @Rule
   public ResourceTestRule rule = ResourceTestRule
@@ -75,37 +71,34 @@ public class UserResourceTest
         .setTokenVerifier(new HmacSHA512Verifier(AuthenticatorTest.SECRET_KEY))
         .setRealm("realm")
         .setPrefix("Bearer")
-        .setAuthenticator(new Authenticator(_sessionDAO, _userDAO))
+        .setAuthenticator(_authenticator)
         .setAuthorizer(new Authorizer())
         .buildAuthFilter()))
     .addProvider(RolesAllowedDynamicFeature.class)
     .addProvider(new AuthValueFactoryProvider.Binder<>(User.class))
     .addResource(new UserResource(
       _userDAO,
-      _sessionDAO,
+      _authenticator,
       "admin@example.com"))
     .build();
 
   @Test
-  public void create()
+  public void register()
   {
-    when(_sessionDAO.select(_session)).thenReturn(_session);
     when(_userDAO.select(anyString(), anyString())).thenReturn(new ArrayList<>());
     when(_userDAO.select(_adminUser.getUsername())).thenReturn(_adminUser);
 
 
-    final Session mysession = rule.getJerseyTest().target("/user").request(MediaType.APPLICATION_JSON)
-      .post(Entity.entity(UserTest.getAdminUser(), MediaType.APPLICATION_JSON), Session.class);
-    assertThat(mysession).isNotEqualTo(_session);
-    assertThat(mysession.getUserid()).isEqualTo(_session.getUserid());
+    final String token = rule.getJerseyTest().target("/user").request(MediaType.APPLICATION_JSON)
+      .post(Entity.entity(UserTest.getAdminUser(), MediaType.APPLICATION_JSON), String.class);
+    assertThat(token).isNotEqualTo("");
   }
 
 
   @Test
   public void delete()
   {
-    when(_sessionDAO.select(any())).thenReturn(_session);
-    when(_userDAO.select(_session.getUserid())).thenReturn(_adminUser);
+    when(_userDAO.select(_adminUser.getUserid())).thenReturn(_adminUser);
 
     rule.getJerseyTest().target("/user/0").request().header(AUTHORIZATION,
                                                                  "Bearer " + AuthenticatorTest.getAdminUserValidToken()).delete();
@@ -142,8 +135,6 @@ public class UserResourceTest
   @Test
   public void getAllThrows401WhenNotAdminRole()
   {
-    when(_sessionDAO.select(_session)).thenReturn(_session);
-
     try
     {
       final List<User> allUsers = rule.getJerseyTest().target("/user").request()
@@ -183,8 +174,6 @@ public class UserResourceTest
   @Test
   public void updateInvalidUser()
   {
-    when(_sessionDAO.select(_session)).thenReturn(_session);
-
     final User user = UserTest.getUser();
 
     try

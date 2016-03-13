@@ -26,13 +26,16 @@ package net.spinetrak.gasguzzler.security;
 
 
 import com.github.toastshaman.dropwizard.auth.jwt.exceptions.TokenExpiredException;
+import com.github.toastshaman.dropwizard.auth.jwt.hmac.HmacSHA512Signer;
 import com.github.toastshaman.dropwizard.auth.jwt.model.JsonWebToken;
+import com.github.toastshaman.dropwizard.auth.jwt.model.JsonWebTokenClaim;
+import com.github.toastshaman.dropwizard.auth.jwt.model.JsonWebTokenHeader;
 import com.github.toastshaman.dropwizard.auth.jwt.validator.ExpiryValidator;
 import com.google.common.base.Optional;
 import io.dropwizard.auth.AuthenticationException;
 import net.spinetrak.gasguzzler.core.User;
-import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
+import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,24 +54,24 @@ import java.security.spec.InvalidKeySpecException;
 public class Authenticator implements io.dropwizard.auth.Authenticator<JsonWebToken, User>
 {
   private final static Logger LOGGER = LoggerFactory.getLogger(Authenticator.class.getName());
-  
-  private SessionDAO sessionDAO;
+
   private UserDAO userDAO;
   private ExpiryValidator validator;
+  private byte [] secret;
 
-  public Authenticator(final SessionDAO sessionDAO_, final UserDAO userDAO_)
+  public Authenticator(final UserDAO userDAO_,final byte[] secret_)
   {
-    this();
-    sessionDAO = sessionDAO_;
+    this(secret_);
     userDAO = userDAO_;
   }
 
-  public Authenticator()
+  public Authenticator(final byte[] secret_)
   {
     validator = new ExpiryValidator(Duration.standardMinutes(10));
+    secret = secret_;
   }
 
-  public static String getSecurePassword(final String password_) throws NoSuchAlgorithmException,
+  public String getSecurePassword(final String password_) throws NoSuchAlgorithmException,
                                                                  InvalidKeySpecException
   {
     int iterations = 1000;
@@ -81,10 +84,14 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<JsonWebTo
     return iterations + ":" + toHex(salt) + ":" + toHex(hash);
   }
 
-  public static boolean validatePassword(final String originalPassword_, final String storedPassword_) throws
+  public boolean validatePassword(final String originalPassword_, final String storedPassword_) throws
                                                                                          NoSuchAlgorithmException,
                                                                                          InvalidKeySpecException
   {
+    if(originalPassword_ == null || storedPassword_ == null)
+    {
+      return false;
+    }
     String[] parts = storedPassword_.split(":");
     int iterations = Integer.parseInt(parts[0]);
     byte[] salt = fromHex(parts[1]);
@@ -102,7 +109,7 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<JsonWebTo
     return diff == 0;
   }
 
-  private static byte[] fromHex(final String hex_) throws NoSuchAlgorithmException
+  private byte[] fromHex(final String hex_) throws NoSuchAlgorithmException
   {
     byte[] bytes = new byte[hex_.length() / 2];
     for (int i = 0; i < bytes.length; i++)
@@ -112,7 +119,7 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<JsonWebTo
     return bytes;
   }
 
-  private static String getSalt() throws NoSuchAlgorithmException
+  private String getSalt() throws NoSuchAlgorithmException
   {
     SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
     byte[] salt = new byte[16];
@@ -120,7 +127,7 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<JsonWebTo
     return new String(salt);
   }
 
-  private static String toHex(final byte[] array_) throws NoSuchAlgorithmException
+  private String toHex(final byte[] array_) throws NoSuchAlgorithmException
   {
     BigInteger bi = new BigInteger(1, array_);
     String hex = bi.toString(16);
@@ -133,6 +140,23 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<JsonWebTo
     {
       return hex;
     }
+  }
+
+  public String generateToken(final String username_)
+  {
+    final HmacSHA512Signer signer = new HmacSHA512Signer(secret);
+    final JsonWebToken token = JsonWebToken.builder()
+      .header(JsonWebTokenHeader.HS512())
+      .claim(JsonWebTokenClaim.builder()
+               .subject(username_)
+               .issuedAt(DateTime.now())
+               .expiration(new DateTime(DateTime.now().plusWeeks(2)))
+               .issuer("http://www.spinetrak.net")
+               .notBefore(DateTime.now())
+               .build())
+      .build();
+    final String signedToken = signer.sign(token);
+    return signedToken;
   }
 
   @Override

@@ -34,12 +34,10 @@ import net.spinetrak.gasguzzler.core.DataPoint;
 import net.spinetrak.gasguzzler.core.User;
 import net.spinetrak.gasguzzler.core.UserTest;
 import net.spinetrak.gasguzzler.dao.MetricsDAO;
-import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
 import net.spinetrak.gasguzzler.security.Authenticator;
 import net.spinetrak.gasguzzler.security.AuthenticatorTest;
 import net.spinetrak.gasguzzler.security.Authorizer;
-import net.spinetrak.gasguzzler.security.Session;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
 import org.junit.Rule;
@@ -49,16 +47,12 @@ import javax.ws.rs.core.GenericType;
 import java.util.List;
 
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 public class MetricsResourceTest
 {
-  private final Session _session = new Session(0, "token");
   private User _adminUser = UserTest.getAdminUser();
-  private User _regularUser = UserTest.getUser();
   private MetricsDAO _metricsDAO = mock(MetricsDAO.class);
-  private SessionDAO _sessionDAO = mock(SessionDAO.class);
   private UserDAO _userDAO = mock(UserDAO.class);
 
   @Rule
@@ -71,21 +65,19 @@ public class MetricsResourceTest
         .setTokenVerifier(new HmacSHA512Verifier(AuthenticatorTest.SECRET_KEY))
         .setRealm("realm")
         .setPrefix("Bearer")
-        .setAuthenticator(new Authenticator(_sessionDAO, _userDAO))
+        .setAuthenticator(new Authenticator(_userDAO,"secret".getBytes()))
         .setAuthorizer(new Authorizer())
         .buildAuthFilter()))
     .addProvider(RolesAllowedDynamicFeature.class)
     .addProvider(new AuthValueFactoryProvider.Binder<>(User.class))
     .addResource(new MetricsResource(
-      _metricsDAO,
-      _sessionDAO))
+      _metricsDAO))
     .build();
 
 
   @Test
   public void getAvailableMetrics()
   {
-    when(_sessionDAO.select(any())).thenReturn(_session);
     when(_userDAO.select(_adminUser.getUsername())).thenReturn(_adminUser);
 
     rule.getJerseyTest().target("/metrics").request().header(AUTHORIZATION,
@@ -99,7 +91,6 @@ public class MetricsResourceTest
   @Test
   public void getCountMetrics()
   {
-    when(_sessionDAO.select(any())).thenReturn(_session);
     when(_userDAO.select(_adminUser.getUsername())).thenReturn(_adminUser);
     rule.getJerseyTest().target("/metrics/ch.qos.logback.core.Appender.info/counts").request().header(AUTHORIZATION,
                                                                                                       "Bearer " + AuthenticatorTest.getAdminUserValidToken()).get(
@@ -112,7 +103,6 @@ public class MetricsResourceTest
   @Test
   public void getRateMetrics()
   {
-    when(_sessionDAO.select(any())).thenReturn(_session);
     when(_userDAO.select(_adminUser.getUsername())).thenReturn(_adminUser);
     rule.getJerseyTest().target("/metrics/ch.qos.logback.core.Appender.info/rates").request().header(AUTHORIZATION,
                                                                                                      "Bearer " + AuthenticatorTest.getAdminUserValidToken()).get(

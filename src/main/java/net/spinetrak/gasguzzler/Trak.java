@@ -39,14 +39,11 @@ import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.jdbi.bundles.DBIExceptionsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import net.spinetrak.gasguzzler.admin.SessionHealthCheck;
 import net.spinetrak.gasguzzler.admin.UserHealthCheck;
 import net.spinetrak.gasguzzler.core.User;
 import net.spinetrak.gasguzzler.dao.MetricsDAO;
-import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
 import net.spinetrak.gasguzzler.jobs.EmailNotificationJob;
-import net.spinetrak.gasguzzler.jobs.SessionCleanupJob;
 import net.spinetrak.gasguzzler.metrics.DbReporter;
 import net.spinetrak.gasguzzler.resources.BuildInfoResource;
 import net.spinetrak.gasguzzler.resources.MetricsResource;
@@ -121,35 +118,32 @@ public class Trak extends Application<TrakConfiguration>
     final DBI jdbi = new DBIFactory().build(environment_, configuration_.getDataSourceFactory(), "postgres");
 
     final UserDAO userDAO = jdbi.onDemand(UserDAO.class);
-    final SessionDAO sessionDAO = jdbi.onDemand(SessionDAO.class);
     final MetricsDAO metricsDAO = jdbi.onDemand(MetricsDAO.class);
 
     configuration_.addDAO("userDAO", userDAO);
-    configuration_.addDAO("sessionDAO", sessionDAO);
     configuration_.addDAO("metricsDAO", metricsDAO);
-
-    environment_.lifecycle().scheduledExecutorService("sessionCleanupJob").build().scheduleAtFixedRate(
-      new SessionCleanupJob(sessionDAO), 0,
-      30,
-      TimeUnit.MINUTES);
 
     environment_.lifecycle().scheduledExecutorService("emailNotificationJob").build().scheduleAtFixedRate(
       new EmailNotificationJob(configuration_.getEmailService()), 0,
       1,
       TimeUnit.MINUTES);
 
+
+    final byte[] secret =                                      configuration_.getJwtTokenSecret();
+    final Authenticator authenticator =  new Authenticator(userDAO,secret);
+
     environment_.jersey().register(new BuildInfoResource());
-    environment_.jersey().register(new UserResource(userDAO, sessionDAO, configuration_.getAdmin().getEmail()));
-    environment_.jersey().register(new SessionResource(userDAO, sessionDAO));
-    environment_.jersey().register(new MetricsResource(metricsDAO, sessionDAO));
+    environment_.jersey().register(new UserResource(userDAO, authenticator, configuration_.getAdmin().getEmail()));
+    environment_.jersey().register(new SessionResource(userDAO, authenticator));
+    environment_.jersey().register(new MetricsResource(metricsDAO));
 
     environment_.jersey().register(new AuthDynamicFeature(
       new JWTAuthFilter.Builder<User>()
         .setTokenParser(new DefaultJsonWebTokenParser())
-        .setTokenVerifier(new HmacSHA512Verifier(configuration_.getJwtTokenSecret()))
+        .setTokenVerifier(new HmacSHA512Verifier(secret))
         .setRealm("realm")
         .setPrefix("Bearer")
-        .setAuthenticator(new Authenticator(sessionDAO,userDAO))
+        .setAuthenticator(authenticator)
         .setAuthorizer(new Authorizer())
         .buildAuthFilter()));
     environment_.jersey().register(new AuthValueFactoryProvider.Binder<>(User.class));
@@ -162,7 +156,6 @@ public class Trak extends Application<TrakConfiguration>
         .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
     }
     environment_.healthChecks().register("users", new UserHealthCheck(userDAO));
-    environment_.healthChecks().register("sessions", new SessionHealthCheck(sessionDAO));
 
     environment_.admin().setSecurityHandler(
       new AdminSecurityHandler(configuration_.getAdmin().getUsername(), configuration_.getAdmin().getPassword()));

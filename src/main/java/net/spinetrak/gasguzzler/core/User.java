@@ -27,7 +27,6 @@ package net.spinetrak.gasguzzler.core;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import net.spinetrak.gasguzzler.security.Session;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
@@ -47,8 +46,6 @@ public class User implements Principal
   @NotNull
   @JsonProperty
   private Role role;
-  @JsonIgnore
-  private Session session;
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
   private Date updated;
   @NotNull
@@ -126,11 +123,6 @@ public class User implements Principal
     return role.name();
   }
 
-  public Session getSession()
-  {
-    return session;
-  }
-
   public Date getUpdated()
   {
     return updated;
@@ -164,11 +156,6 @@ public class User implements Principal
   public void setRole(final Role role_)
   {
     role = role_;
-  }
-
-  public void setSession(final Session session_)
-  {
-    session = session_;
   }
 
   public void setUpdated(final Date updated_)

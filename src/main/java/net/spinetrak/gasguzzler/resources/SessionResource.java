@@ -25,39 +25,35 @@
 package net.spinetrak.gasguzzler.resources;
 
 
-import io.dropwizard.auth.Auth;
 import net.spinetrak.gasguzzler.core.User;
-import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
 import net.spinetrak.gasguzzler.security.Authenticator;
-import net.spinetrak.gasguzzler.security.Session;
 
-import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.List;
 
-@Path("/session")
+
+@Path("/")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class SessionResource
 {
-
-  private SessionDAO sessionDAO;
   private UserDAO userDAO;
+  private Authenticator authenticator;
 
-  public SessionResource(final UserDAO userDAO_, final SessionDAO sessionDAO_)
+  public SessionResource(final UserDAO userDAO_, final Authenticator authenticator_)
   {
     super();
     userDAO = userDAO_;
-    sessionDAO = sessionDAO_;
+    authenticator = authenticator_;
   }
 
+  @Path("/login")
   @POST
-  public Session create(final User user_)
+  public String login(final User user_)
   {
     try
     {
@@ -68,17 +64,13 @@ public class SessionResource
       }
       final String storedPassword = u.getPassword();
       final String suppliedPassword = user_.getPassword();
-      if (null == storedPassword || null == suppliedPassword || !Authenticator.validatePassword(suppliedPassword,
-                                                                                                storedPassword))
+      if (!authenticator.validatePassword(suppliedPassword,
+                                          storedPassword))
       {
         throw new WebApplicationException(Response.Status.NOT_FOUND);
       }
 
-      sessionDAO.delete(u);
-      final Session session = new Session(u.getUserid());
-      sessionDAO.insert(session);
-
-      return session;
+      return authenticator.generateToken(u.getUsername());
     }
     catch (NoSuchAlgorithmException | InvalidKeySpecException ex_)
     {
@@ -86,20 +78,4 @@ public class SessionResource
     }
   }
 
-  @DELETE
-  public void delete(@Auth final User user_)
-  {
-    final Session session = sessionDAO.select(user_.getSession());
-    if (null != session)
-    {
-      sessionDAO.delete(session);
-    }
-  }
-
-  @RolesAllowed("ADMIN")
-  @GET
-  public List<Session> getAll(@Auth final User user_)
-  {
-    return sessionDAO.select();
-  }
 }

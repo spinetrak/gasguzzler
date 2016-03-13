@@ -32,7 +32,6 @@ import com.google.common.base.Optional;
 import io.dropwizard.auth.AuthenticationException;
 import net.spinetrak.gasguzzler.core.User;
 import net.spinetrak.gasguzzler.core.UserTest;
-import net.spinetrak.gasguzzler.dao.SessionDAO;
 import net.spinetrak.gasguzzler.dao.UserDAO;
 import org.joda.time.DateTime;
 import org.junit.Test;
@@ -47,7 +46,6 @@ import static org.mockito.Mockito.when;
 
 public class AuthenticatorTest
 {
-  private SessionDAO _sessionDAO = mock(SessionDAO.class);
   private User _user = UserTest.getUser();
   private UserDAO _userDAO = mock(UserDAO.class);
   private static final String ORDINARY_USER = "ordinary-guy";
@@ -88,16 +86,12 @@ public class AuthenticatorTest
       _userDAO.insert(_user);
       final User user = _userDAO.select(_user.getUsername());
 
-      final Session session = new Session(user.getUserid());
-      _sessionDAO.insert(session);
-
-
-      final Authenticator authenticator = new Authenticator(_sessionDAO, _userDAO);
+      final Authenticator authenticator = new Authenticator(_userDAO, "secret".getBytes());
 
       final Optional<User> result = authenticator.authenticate(getJWT(UserTest.getUser().getUsername()));
       assertTrue(result.isPresent());
 
-      final Authenticator authenticator1 = new Authenticator();
+      final Authenticator authenticator1 = new Authenticator(_userDAO, "secret".getBytes());
       authenticator1.authenticate(null);
       fail("Expected exception");
     }
@@ -114,7 +108,7 @@ public class AuthenticatorTest
     {
       when(_userDAO.select(_user.getUsername())).thenReturn(_user);
 
-      final Authenticator authenticator = new Authenticator(_sessionDAO, _userDAO);
+      final Authenticator authenticator = new Authenticator(_userDAO, "secret".getBytes());
 
       final JsonWebToken jwt = getInvalidJWT(_user.getUsername());
       authenticator.authenticate(jwt);
@@ -132,14 +126,15 @@ public class AuthenticatorTest
   {
     try
     {
-      final String password = Authenticator.getSecurePassword("password");
+      final Authenticator authenticator = new Authenticator(_userDAO, "secret".getBytes());
+      final String password = authenticator.getSecurePassword("password");
       assertNotEquals(password, "password");
       assertTrue("Got unexpected length of " + password.length(), 220 >= password.length());
-      final String password2 = Authenticator.getSecurePassword("password");
+      final String password2 = authenticator.getSecurePassword("password");
       assertNotEquals(password, password2);
 
-      assertTrue(Authenticator.validatePassword("password", password));
-      assertTrue(Authenticator.validatePassword("password", password2));
+      assertTrue(authenticator.validatePassword("password", password));
+      assertTrue(authenticator.validatePassword("password", password2));
 
     }
     catch (final NoSuchAlgorithmException | InvalidKeySpecException e)

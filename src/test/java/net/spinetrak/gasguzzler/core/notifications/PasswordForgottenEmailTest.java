@@ -24,7 +24,9 @@
 
 package net.spinetrak.gasguzzler.core.notifications;
 
-import net.spinetrak.gasguzzler.security.Session;
+import net.spinetrak.gasguzzler.core.User;
+import net.spinetrak.gasguzzler.core.UserTest;
+import net.spinetrak.gasguzzler.security.Authenticator;
 import org.junit.Test;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -36,17 +38,26 @@ public class PasswordForgottenEmailTest
   @Test
   public void testPasswordForgottenEmail()
   {
-    final Session session = new Session(0);
-    final PasswordForgottenEmail email = new PasswordForgottenEmail("foo@bar.net", session.getUserid(),
-                                                                    session.getToken());
-    email.setEmailService(new EmailService());
-    assertNotNull(email);
-    assertEquals("foo@bar.net", email.to());
-    assertEquals("foo@bar.net", email.toString());
+    try
+    {
+      final Authenticator authenticator = new Authenticator("secret".getBytes("UTF-8"));
+      final User user = UserTest.getUser();
+      final PasswordForgottenEmail email = new PasswordForgottenEmail("foo@bar.net", user.getUserid(),
+                                                                      authenticator.generateToken(user.getUsername()));
+      email.setEmailService(new EmailService());
+      assertNotNull(email);
+      assertEquals("foo@bar.net", email.to());
+      assertEquals("foo@bar.net", email.toString());
 
-    final MultivaluedMap map = email.format();
-    assertNotNull(map);
-    assertEquals("[foo@bar.net]", map.get("to").toString());
-    assertTrue(email.getPasswordResetLink().endsWith("/#user?t=" + session.getToken() + "&i=" + session.getUserid()));
+      final MultivaluedMap map = email.format();
+      assertNotNull(map);
+      assertEquals("[foo@bar.net]", map.get("to").toString());
+      assertTrue(email.getPasswordResetLink().endsWith(
+        "/#user?t=" + authenticator.generateToken(user.getUsername()) + "&i=" + user.getUserid()));
+    }
+    catch (Exception ex_)
+    {
+      fail(ex_.getMessage());
+    }
   }
 }
