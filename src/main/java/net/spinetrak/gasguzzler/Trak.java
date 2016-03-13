@@ -47,7 +47,7 @@ import net.spinetrak.gasguzzler.jobs.EmailNotificationJob;
 import net.spinetrak.gasguzzler.metrics.DbReporter;
 import net.spinetrak.gasguzzler.resources.BuildInfoResource;
 import net.spinetrak.gasguzzler.resources.MetricsResource;
-import net.spinetrak.gasguzzler.resources.SessionResource;
+import net.spinetrak.gasguzzler.resources.LoginResource;
 import net.spinetrak.gasguzzler.resources.UserResource;
 import net.spinetrak.gasguzzler.security.AdminSecurityHandler;
 import net.spinetrak.gasguzzler.security.Authenticator;
@@ -134,7 +134,7 @@ public class Trak extends Application<TrakConfiguration>
 
     environment_.jersey().register(new BuildInfoResource());
     environment_.jersey().register(new UserResource(userDAO, authenticator, configuration_.getAdmin().getEmail()));
-    environment_.jersey().register(new SessionResource(userDAO, authenticator));
+    environment_.jersey().register(new LoginResource(userDAO, authenticator));
     environment_.jersey().register(new MetricsResource(metricsDAO));
 
     environment_.jersey().register(new AuthDynamicFeature(

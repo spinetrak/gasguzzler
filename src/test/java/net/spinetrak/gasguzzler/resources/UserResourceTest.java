@@ -89,9 +89,10 @@ public class UserResourceTest
     when(_userDAO.select(_adminUser.getUsername())).thenReturn(_adminUser);
 
 
-    final String token = rule.getJerseyTest().target("/user").request(MediaType.APPLICATION_JSON)
-      .post(Entity.entity(UserTest.getAdminUser(), MediaType.APPLICATION_JSON), String.class);
-    assertThat(token).isNotEqualTo("");
+    final User user = rule.getJerseyTest().target("/user").request(MediaType.APPLICATION_JSON)
+      .post(Entity.entity(UserTest.getAdminUser(), MediaType.APPLICATION_JSON), User.class);
+    assertThat(user).isEqualTo(_adminUser);
+    assertThat(3 == user.getToken().split(".").length);
   }
 
 

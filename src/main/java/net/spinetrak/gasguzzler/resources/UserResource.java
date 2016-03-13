@@ -58,7 +58,7 @@ public class UserResource
   }
 
   @POST
-  public String register(final User user_)
+  public User register(final User user_)
   {
     if (null == user_)
     {
@@ -80,8 +80,9 @@ public class UserResource
       userDAO.insert(user_);
 
       final User u = userDAO.select(user_.getUsername());
-
-      return authenticator.generateToken(u.getUsername());
+      u.setToken(authenticator.generateToken(u.getUsername()));
+      u.setPassword("");
+      return u;
 
     }
     catch (final WebApplicationException ex_)
@@ -113,6 +114,7 @@ public class UserResource
   public User get(@Auth final User user_, @PathParam("userid") final int userid_)
   {
     final User u = userDAO.select(userid_);
+    u.setPassword("");
     if (user_.getUserid() != userid_)
     {
       u.setEmail("private");
@@ -178,6 +180,7 @@ public class UserResource
       modified_.setRole(
         null != modified_.getEmail() && adminEmail.toLowerCase().equals(modified_.getEmail()) ? Role.ADMIN : Role.USER);
       userDAO.update(modified_);
+      modified_.setPassword("");
       return modified_;
     }
     catch (WebApplicationException ex)

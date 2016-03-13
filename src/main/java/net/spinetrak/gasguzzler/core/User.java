@@ -54,6 +54,9 @@ public class User implements Principal
   @NotEmpty
   @JsonProperty
   private String username;
+  @JsonProperty
+  private String token;
+
 
   public User()
   {
@@ -96,7 +99,6 @@ public class User implements Principal
   }
 
 
-
   public Date getCreated()
   {
     return created;
@@ -132,6 +134,8 @@ public class User implements Principal
   {
     return userid;
   }
+
+  public String getToken() {return token;}
 
   public String getUsername()
   {
@@ -172,4 +176,7 @@ public class User implements Principal
   {
     username = username_;
   }
+
+  public void setToken(final String token_) {token = token_;}
+
 }

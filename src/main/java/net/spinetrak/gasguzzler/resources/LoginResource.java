@@ -25,6 +25,7 @@
 package net.spinetrak.gasguzzler.resources;
 
 
+import io.dropwizard.auth.Auth;
 import net.spinetrak.gasguzzler.core.User;
 import net.spinetrak.gasguzzler.dao.UserDAO;
 import net.spinetrak.gasguzzler.security.Authenticator;
@@ -39,12 +40,12 @@ import java.security.spec.InvalidKeySpecException;
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class SessionResource
+public class LoginResource
 {
   private UserDAO userDAO;
   private Authenticator authenticator;
 
-  public SessionResource(final UserDAO userDAO_, final Authenticator authenticator_)
+  public LoginResource(final UserDAO userDAO_, final Authenticator authenticator_)
   {
     super();
     userDAO = userDAO_;
@@ -53,7 +54,7 @@ public class SessionResource
 
   @Path("/login")
   @POST
-  public String login(final User user_)
+  public User login(final User user_)
   {
     try
     {
@@ -70,12 +71,24 @@ public class SessionResource
         throw new WebApplicationException(Response.Status.NOT_FOUND);
       }
 
-      return authenticator.generateToken(u.getUsername());
+      u.setToken(authenticator.generateToken(u.getUsername()));
+      u.setPassword("");
+      return u;
     }
     catch (NoSuchAlgorithmException | InvalidKeySpecException ex_)
     {
       throw new WebApplicationException(Response.Status.NOT_FOUND);
     }
+  }
+
+  @Path("/logout")
+  @DELETE
+  public User logout(@Auth final User user_)
+  {
+    final User u = userDAO.select(user_.getUsername());
+    u.setToken(authenticator.generateToken(u.getUsername()));
+    u.setPassword("");
+    return u;
   }
 
 }

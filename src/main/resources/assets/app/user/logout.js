@@ -35,6 +35,7 @@ define(function (require) {
 
         activate: function () {
             var userModel = {
+                "Authorization" : "Bearer " +  sessionStorage.getItem("token"),
                 "userid": sessionStorage.getItem("userid"),
                 "token": sessionStorage.getItem("token")
             };
@@ -49,11 +50,12 @@ define(function (require) {
         doLogout: function () {
 
             var userModel = {
+                "Authorization" : "Bearer " +  sessionStorage.getItem("token"),
                 "userid": sessionStorage.getItem("userid"),
                 "token": sessionStorage.getItem("token")
             };
 
-            var url = this.urlRoot + '/api/session';
+            var url = this.urlRoot + '/api/logout';
 
             return http.remove(url, '', userModel).then(
                 function (response) {
@@ -75,6 +77,7 @@ define(function (require) {
         doDelete: function () {
 
             var userModel = {
+                "Authorization" : "Bearer " +  sessionStorage.getItem("token"),
                 "userid": sessionStorage.getItem("userid"),
                 "token": sessionStorage.getItem("token")
             };

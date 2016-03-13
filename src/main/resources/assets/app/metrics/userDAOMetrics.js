@@ -58,6 +58,7 @@ define(function (require) {
         updateUserDAOChart: function () {
 
             var userModel = {
+                "Authorization" : "Bearer " +  sessionStorage.getItem("token"),
                 "userid": sessionStorage.getItem("userid"),
                 "token": sessionStorage.getItem("token")
             };

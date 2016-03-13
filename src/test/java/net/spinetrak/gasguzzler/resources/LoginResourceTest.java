@@ -49,7 +49,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class SessionResourceTest
+public class LoginResourceTest
 {
   private final User _user = UserTest.getUser();
   private final User _admin = UserTest.getAdminUser();
@@ -72,7 +72,7 @@ public class SessionResourceTest
         .buildAuthFilter()))
     .addProvider(RolesAllowedDynamicFeature.class)
     .addProvider(new AuthValueFactoryProvider.Binder<>(User.class))
-    .addResource(new SessionResource(
+    .addResource(new LoginResource(
       _userDAO,authenticator))
     .build();
 
@@ -81,10 +81,10 @@ public class SessionResourceTest
   {
     when(_userDAO.select(_user.getUsername())).thenReturn(UserTest.getUserWithHashedPassword());
 
-    final String token = rule.getJerseyTest().target("/login").request()
-      .post(Entity.entity(_user, MediaType.APPLICATION_JSON_TYPE), String.class);
-    assertThat(token).isNotEqualTo("");
-    assertThat(3 == token.split(".").length);
+    final User user = rule.getJerseyTest().target("/login").request()
+      .post(Entity.entity(_user, MediaType.APPLICATION_JSON_TYPE), User.class);
+    assertThat(user).isEqualTo(_user);
+    assertThat(3 == user.getToken().split(".").length);
   }
 
 
