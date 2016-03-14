@@ -80,7 +80,7 @@ public class UserResource
       userDAO.insert(user_);
 
       final User u = userDAO.select(user_.getUsername());
-      u.setToken(authenticator.generateToken(u.getUsername()));
+      u.setToken(authenticator.generateJWTToken(u.getUsername()));
       u.setPassword("");
       return u;
 
@@ -154,7 +154,7 @@ public class UserResource
       final User user = users.get(0);
 
 
-      new EmailQueue().send(new PasswordForgottenEmail(user.getEmail(), user.getUserid(), authenticator.generateToken(user.getUsername())));
+      new EmailQueue().send(new PasswordForgottenEmail(user.getEmail(), user.getUserid(), authenticator.generateTempJWTToken(user.getUsername())));
     }
     catch (final Exception ex_)
     {

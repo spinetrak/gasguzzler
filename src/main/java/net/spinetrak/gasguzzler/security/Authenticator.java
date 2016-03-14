@@ -142,7 +142,17 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<JsonWebTo
     }
   }
 
-  public String generateToken(final String username_)
+  public String generateJWTToken(final String username_)
+  {
+    return generateToken(username_,new DateTime(DateTime.now().plusWeeks(2)));
+  }
+
+  public String generateTempJWTToken(final String username_)
+  {
+    return generateToken(username_,new DateTime(DateTime.now().plusMinutes(30)));
+  }
+
+  private String generateToken(final String username_, final DateTime expiration_)
   {
     final HmacSHA512Signer signer = new HmacSHA512Signer(secret);
     final JsonWebToken token = JsonWebToken.builder()
@@ -150,7 +160,7 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<JsonWebTo
       .claim(JsonWebTokenClaim.builder()
                .subject(username_)
                .issuedAt(DateTime.now())
-               .expiration(new DateTime(DateTime.now().plusWeeks(2)))
+               .expiration(expiration_)
                .issuer("http://www.spinetrak.net")
                .notBefore(DateTime.now())
                .build())

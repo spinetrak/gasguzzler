@@ -93,7 +93,7 @@ public class LoginResourceTest
   {
     when(_userDAO.select(_user.getUsername())).thenReturn(_user);
 
-    rule.getJerseyTest().target("/session").request().header(AUTHORIZATION,
+    rule.getJerseyTest().target("/logout").request().header(AUTHORIZATION,
                                                                   "Bearer " + AuthenticatorTest.getRegularUserValidToken()).delete();
 
   }

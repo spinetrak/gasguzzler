@@ -71,7 +71,7 @@ public class LoginResource
         throw new WebApplicationException(Response.Status.NOT_FOUND);
       }
 
-      u.setToken(authenticator.generateToken(u.getUsername()));
+      u.setToken(authenticator.generateJWTToken(u.getUsername()));
       u.setPassword("");
       return u;
     }
@@ -86,7 +86,7 @@ public class LoginResource
   public User logout(@Auth final User user_)
   {
     final User u = userDAO.select(user_.getUsername());
-    u.setToken(authenticator.generateToken(u.getUsername()));
+    u.setToken("");
     u.setPassword("");
     return u;
   }
