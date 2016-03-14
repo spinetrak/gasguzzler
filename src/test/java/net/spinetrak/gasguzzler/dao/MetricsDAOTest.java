@@ -57,7 +57,7 @@ public class MetricsDAOTest
 
     assertTrue(!dataPoints1.isEmpty());
 
-    final List<String> dataPoints2 = _metricsDAO.get();
+    final List<String> dataPoints2 = _metricsDAO.select();
     assertTrue(!dataPoints2.isEmpty());
 
     final int deleted = _metricsDAO.delete("test");

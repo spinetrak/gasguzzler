@@ -85,7 +85,7 @@ public class MetricsResourceTest
       new GenericType<List<DataPoint>>()
       {
       });
-    verify(_metricsDAO, times(1)).get();
+    verify(_metricsDAO, times(1)).select();
   }
 
   @Test

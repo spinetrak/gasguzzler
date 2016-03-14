@@ -44,7 +44,7 @@ public interface MetricsDAO
   int deleteStale(@Bind("old") final long time_);
 
   @SqlQuery("select distinct m_name from st_metrics where m_count > 0")
-  List<String> get();
+  List<String> select();
 
   @SqlQuery("select m_timestamp, m_count from st_metrics where m_name = :name order by m_timestamp")
   @Mapper(CountMetricsMapper.class)

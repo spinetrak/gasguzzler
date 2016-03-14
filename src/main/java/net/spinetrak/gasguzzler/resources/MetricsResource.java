@@ -54,7 +54,7 @@ public class MetricsResource
   @GET
   public List<String> get(@Auth final User user_)
   {
-    return metricsDAO.get();
+    return metricsDAO.select();
   }
 
   @RolesAllowed("ADMIN")
