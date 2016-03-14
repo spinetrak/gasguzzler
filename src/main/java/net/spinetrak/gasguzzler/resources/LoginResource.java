@@ -42,8 +42,8 @@ import java.security.spec.InvalidKeySpecException;
 @Consumes(MediaType.APPLICATION_JSON)
 public class LoginResource
 {
-  private UserDAO userDAO;
   private Authenticator authenticator;
+  private UserDAO userDAO;
 
   public LoginResource(final UserDAO userDAO_, final Authenticator authenticator_)
   {

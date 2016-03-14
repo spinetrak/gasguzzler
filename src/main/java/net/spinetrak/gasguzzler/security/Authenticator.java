@@ -54,12 +54,11 @@ import java.security.spec.InvalidKeySpecException;
 public class Authenticator implements io.dropwizard.auth.Authenticator<JsonWebToken, User>
 {
   private final static Logger LOGGER = LoggerFactory.getLogger(Authenticator.class.getName());
-
+  private byte[] secret;
   private UserDAO userDAO;
   private ExpiryValidator validator;
-  private byte [] secret;
 
-  public Authenticator(final UserDAO userDAO_,final byte[] secret_)
+  public Authenticator(final UserDAO userDAO_, final byte[] secret_)
   {
     this(secret_);
     userDAO = userDAO_;
@@ -69,6 +68,39 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<JsonWebTo
   {
     validator = new ExpiryValidator(Duration.standardMinutes(10));
     secret = secret_;
+  }
+
+  @Override
+  public Optional<User> authenticate(final JsonWebToken credentials_) throws AuthenticationException
+  {
+    LOGGER.info("Authenticating {}", credentials_);
+    if (null == credentials_)
+    {
+      throw new AuthenticationException("Invalid credentials");
+    }
+    else
+    {
+      try
+      {
+        validator.validate(credentials_);
+      }
+      catch (TokenExpiredException ex_)
+      {
+        throw new AuthenticationException(ex_);
+      }
+      final User user = userDAO.select(credentials_.claim().subject());
+      return Optional.fromNullable(user);
+    }
+  }
+
+  public String generateJWTToken(final String username_)
+  {
+    return generateToken(username_, new DateTime(DateTime.now().plusWeeks(2)));
+  }
+
+  public String generateTempJWTToken(final String username_)
+  {
+    return generateToken(username_, new DateTime(DateTime.now().plusMinutes(30)));
   }
 
   public String getSecurePassword(final String password_) throws NoSuchAlgorithmException,
@@ -85,10 +117,10 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<JsonWebTo
   }
 
   public boolean validatePassword(final String originalPassword_, final String storedPassword_) throws
-                                                                                         NoSuchAlgorithmException,
-                                                                                         InvalidKeySpecException
+                                                                                                NoSuchAlgorithmException,
+                                                                                                InvalidKeySpecException
   {
-    if(originalPassword_ == null || storedPassword_ == null)
+    if (originalPassword_ == null || storedPassword_ == null)
     {
       return false;
     }
@@ -119,6 +151,23 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<JsonWebTo
     return bytes;
   }
 
+  private String generateToken(final String username_, final DateTime expiration_)
+  {
+    final HmacSHA512Signer signer = new HmacSHA512Signer(secret);
+    final JsonWebToken token = JsonWebToken.builder()
+      .header(JsonWebTokenHeader.HS512())
+      .claim(JsonWebTokenClaim.builder()
+               .subject(username_)
+               .issuedAt(DateTime.now())
+               .expiration(expiration_)
+               .issuer("http://www.spinetrak.net")
+               .notBefore(DateTime.now())
+               .build())
+      .build();
+    final String signedToken = signer.sign(token);
+    return signedToken;
+  }
+
   private String getSalt() throws NoSuchAlgorithmException
   {
     SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
@@ -139,56 +188,6 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<JsonWebTo
     else
     {
       return hex;
-    }
-  }
-
-  public String generateJWTToken(final String username_)
-  {
-    return generateToken(username_,new DateTime(DateTime.now().plusWeeks(2)));
-  }
-
-  public String generateTempJWTToken(final String username_)
-  {
-    return generateToken(username_,new DateTime(DateTime.now().plusMinutes(30)));
-  }
-
-  private String generateToken(final String username_, final DateTime expiration_)
-  {
-    final HmacSHA512Signer signer = new HmacSHA512Signer(secret);
-    final JsonWebToken token = JsonWebToken.builder()
-      .header(JsonWebTokenHeader.HS512())
-      .claim(JsonWebTokenClaim.builder()
-               .subject(username_)
-               .issuedAt(DateTime.now())
-               .expiration(expiration_)
-               .issuer("http://www.spinetrak.net")
-               .notBefore(DateTime.now())
-               .build())
-      .build();
-    final String signedToken = signer.sign(token);
-    return signedToken;
-  }
-
-  @Override
-  public Optional<User> authenticate(final JsonWebToken credentials_) throws AuthenticationException
-  {
-    LOGGER.info("Authenticating {}", credentials_);
-    if (null == credentials_)
-    {
-      throw new AuthenticationException("Invalid credentials");
-    }
-    else
-    {
-      try
-      {
-        validator.validate(credentials_);
-      }
-      catch(TokenExpiredException ex_)
-      {
-        throw new AuthenticationException(ex_);
-      }
-      final User user = userDAO.select(credentials_.claim().subject());
-      return Optional.fromNullable(user);
     }
   }
 }

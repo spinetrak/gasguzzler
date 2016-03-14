@@ -31,6 +31,6 @@ public class Authorizer implements io.dropwizard.auth.Authorizer<User>
   @Override
   public boolean authorize(final User user_, final String role_)
   {
-    return user_!= null && role_ != null && role_.equals(user_.getRoleAsString());
+    return user_ != null && role_ != null && role_.equals(user_.getRoleAsString());
   }
 }

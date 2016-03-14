@@ -46,6 +46,8 @@ public class User implements Principal
   @NotNull
   @JsonProperty
   private Role role;
+  @JsonProperty
+  private String token;
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
   private Date updated;
   @NotNull
@@ -54,14 +56,13 @@ public class User implements Principal
   @NotEmpty
   @JsonProperty
   private String username;
-  @JsonProperty
-  private String token;
 
 
   public User()
   {
     setRole(Role.USER);
   }
+
   @Override
   public boolean equals(final Object object_)
   {
@@ -91,14 +92,6 @@ public class User implements Principal
 
   }
 
-  @Override
-  @JsonIgnore
-  public String getName()
-  {
-    return username;
-  }
-
-
   public Date getCreated()
   {
     return created;
@@ -107,6 +100,13 @@ public class User implements Principal
   public String getEmail()
   {
     return email;
+  }
+
+  @Override
+  @JsonIgnore
+  public String getName()
+  {
+    return username;
   }
 
   public String getPassword()
@@ -125,6 +125,11 @@ public class User implements Principal
     return role.name();
   }
 
+  public String getToken()
+  {
+    return token;
+  }
+
   public Date getUpdated()
   {
     return updated;
@@ -134,8 +139,6 @@ public class User implements Principal
   {
     return userid;
   }
-
-  public String getToken() {return token;}
 
   public String getUsername()
   {
@@ -162,6 +165,11 @@ public class User implements Principal
     role = role_;
   }
 
+  public void setToken(final String token_)
+  {
+    token = token_;
+  }
+
   public void setUpdated(final Date updated_)
   {
     updated = updated_;
@@ -176,7 +184,5 @@ public class User implements Principal
   {
     username = username_;
   }
-
-  public void setToken(final String token_) {token = token_;}
 
 }

@@ -57,44 +57,6 @@ public class UserResource
     adminEmail = adminEmail_;
   }
 
-  @POST
-  public User register(final User user_)
-  {
-    if (null == user_)
-    {
-      throw new WebApplicationException(Response.Status.BAD_REQUEST);
-    }
-
-    if (!userDAO.select(user_.getUsername(), user_.getEmail()).isEmpty())
-    {
-      throw new WebApplicationException(Response.Status.NOT_ACCEPTABLE);
-    }
-
-    try
-    {
-      final String password = authenticator.getSecurePassword(user_.getPassword());
-
-      user_.setPassword(password);
-      user_.setRole(
-        null != user_.getEmail() && adminEmail.toLowerCase().equals(user_.getEmail()) ? Role.ADMIN : Role.USER);
-      userDAO.insert(user_);
-
-      final User u = userDAO.select(user_.getUsername());
-      u.setToken(authenticator.generateJWTToken(u.getUsername()));
-      u.setPassword("");
-      return u;
-
-    }
-    catch (final WebApplicationException ex_)
-    {
-      throw ex_;
-    }
-    catch (final Exception ex_)
-    {
-      throw new WebApplicationException(ex_, Response.Status.INTERNAL_SERVER_ERROR);
-    }
-  }
-
   @DELETE
   @Path("/{userid}")
   public void delete(@Auth final User user_, @PathParam("userid") final int userid_)
@@ -134,6 +96,44 @@ public class UserResource
   }
 
   @POST
+  public User register(final User user_)
+  {
+    if (null == user_)
+    {
+      throw new WebApplicationException(Response.Status.BAD_REQUEST);
+    }
+
+    if (!userDAO.select(user_.getUsername(), user_.getEmail()).isEmpty())
+    {
+      throw new WebApplicationException(Response.Status.NOT_ACCEPTABLE);
+    }
+
+    try
+    {
+      final String password = authenticator.getSecurePassword(user_.getPassword());
+
+      user_.setPassword(password);
+      user_.setRole(
+        null != user_.getEmail() && adminEmail.toLowerCase().equals(user_.getEmail()) ? Role.ADMIN : Role.USER);
+      userDAO.insert(user_);
+
+      final User u = userDAO.select(user_.getUsername());
+      u.setToken(authenticator.generateJWTToken(u.getUsername()));
+      u.setPassword("");
+      return u;
+
+    }
+    catch (final WebApplicationException ex_)
+    {
+      throw ex_;
+    }
+    catch (final Exception ex_)
+    {
+      throw new WebApplicationException(ex_, Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @POST
   @Path("/pwreset")
   public void resetPassword(final User user_)
   {
@@ -154,7 +154,8 @@ public class UserResource
       final User user = users.get(0);
 
 
-      new EmailQueue().send(new PasswordForgottenEmail(user.getEmail(), user.getUserid(), authenticator.generateTempJWTToken(user.getUsername())));
+      new EmailQueue().send(new PasswordForgottenEmail(user.getEmail(), user.getUserid(),
+                                                       authenticator.generateTempJWTToken(user.getUsername())));
     }
     catch (final Exception ex_)
     {
