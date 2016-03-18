@@ -112,7 +112,7 @@ public class DbReporter extends ScheduledReporter
 
   private void report(final DataPoint dataPoint_)
   {
-    final long cutoff = new Date().getTime() - TimeUnit.MILLISECONDS.convert(45, TimeUnit.DAYS);
+    final long cutoff = new Date().getTime() - TimeUnit.MILLISECONDS.convert(15, TimeUnit.DAYS);
     _dao.deleteStale(cutoff);
     _dao.insert(dataPoint_);
   }
