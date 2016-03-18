@@ -25,7 +25,7 @@
 define(function (require) {
     var router = require('plugins/router');
 
-    var routeArr = [
+    var adminArr = [
         {route: '', title: 'Home', moduleId: 'home/home', nav: true},
         {route: 'stats', title: 'Stats', moduleId: 'site/stats', nav: true},
         {route: 'user', title: 'You', moduleId: 'user/user', nav: true},
@@ -35,10 +35,29 @@ define(function (require) {
         {route: 'metrics', title: 'Metrics', moduleId: 'metrics/metrics', nav: true}
     ];
 
+    var userArr = [
+        {route: '', title: 'Home', moduleId: 'home/home', nav: true},
+        {route: 'stats', title: 'Stats', moduleId: 'site/stats', nav: true},
+        {route: 'user', title: 'You', moduleId: 'user/user', nav: true},
+        {route: 'user', title: 'Profile', moduleId: 'user/profile', nav: false},
+        {route: 'user', title: 'Your Account', moduleId: 'user/account', nav: false}
+    ];
+
+
     return {
         router: router,
         activate: function () {
-            router.map(routeArr).buildNavigationModel();
+
+            var userid = sessionStorage.getItem("userid");
+            var token = sessionStorage.getItem("token");
+
+            if(userid && token && token != "") {
+                router.map(adminArr).buildNavigationModel();
+            }
+            else
+            {
+                router.map(userArr).buildNavigationModel();
+            }
             return router.activate();
         }
     };
