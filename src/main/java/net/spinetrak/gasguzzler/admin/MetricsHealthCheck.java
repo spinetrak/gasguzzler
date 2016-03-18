@@ -22,29 +22,27 @@
  * SOFTWARE.
  */
 
-define(function (require) {
-    var http = require('plugins/http'),
-        app = require('durandal/app'),
-        system = require('durandal/system'),
-        shell = require('services/shell'),
-        router = require('plugins/router'),
-        ko = require('knockout');
+package net.spinetrak.gasguzzler.admin;
 
-    return {
-        logMetrics: ko.observable(),
-        jettyMetrics: ko.observable(),
-        jerseyMetrics: ko.observable(),
-        sessionDAOMetrics: ko.observable(),
-        userDAOMetrics: ko.observable(),
-        jvmMetrics: ko.observable(),
+import com.codahale.metrics.health.HealthCheck;
+import net.spinetrak.gasguzzler.dao.MetricsDAO;
 
-        activate: function () {
-            this.logMetrics('metrics/logMetrics');
-            this.jettyMetrics('metrics/jettyMetrics');
-            this.jerseyMetrics('metrics/jerseyMetrics');
-            this.sessionDAOMetrics('metrics/sessionDAOMetrics');
-            this.userDAOMetrics('metrics/userDAOMetrics');
-            this.jvmMetrics('metrics/jvmMetrics');
-        }
-    };
-});
+public class MetricsHealthCheck extends HealthCheck
+{
+  final private MetricsDAO _metricsDAO;
+
+  public MetricsHealthCheck(final MetricsDAO metricsDAO_)
+  {
+    _metricsDAO = metricsDAO_;
+  }
+
+  @Override
+  protected Result check() throws Exception
+  {
+    if (_metricsDAO.select().isEmpty())
+    {
+      return Result.unhealthy("No metrics in the metrics DB.");
+    }
+    return Result.healthy();
+  }
+}

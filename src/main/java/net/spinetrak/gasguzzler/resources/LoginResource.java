@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014-2015 spinetrak
+ * Copyright (c) 2014-2016 spinetrak
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,8 +42,8 @@ import java.security.spec.InvalidKeySpecException;
 @Consumes(MediaType.APPLICATION_JSON)
 public class LoginResource
 {
-  private UserDAO userDAO;
   private Authenticator authenticator;
+  private UserDAO userDAO;
 
   public LoginResource(final UserDAO userDAO_, final Authenticator authenticator_)
   {
@@ -71,7 +71,7 @@ public class LoginResource
         throw new WebApplicationException(Response.Status.NOT_FOUND);
       }
 
-      u.setToken(authenticator.generateToken(u.getUsername()));
+      u.setToken(authenticator.generateJWTToken(u.getUsername()));
       u.setPassword("");
       return u;
     }
@@ -86,7 +86,7 @@ public class LoginResource
   public User logout(@Auth final User user_)
   {
     final User u = userDAO.select(user_.getUsername());
-    u.setToken(authenticator.generateToken(u.getUsername()));
+    u.setToken("");
     u.setPassword("");
     return u;
   }

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014-2015 spinetrak
+ * Copyright (c) 2014-2016 spinetrak
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -93,7 +93,7 @@ public class LoginResourceTest
   {
     when(_userDAO.select(_user.getUsername())).thenReturn(_user);
 
-    rule.getJerseyTest().target("/session").request().header(AUTHORIZATION,
+    rule.getJerseyTest().target("/logout").request().header(AUTHORIZATION,
                                                                   "Bearer " + AuthenticatorTest.getRegularUserValidToken()).delete();
 
   }

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *  
- * Copyright (c) 2014-2015 spinetrak
+ * Copyright (c) 2014-2016 spinetrak
  *  
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,7 @@ public class PasswordForgottenEmailTest
       final Authenticator authenticator = new Authenticator("secret".getBytes("UTF-8"));
       final User user = UserTest.getUser();
       final PasswordForgottenEmail email = new PasswordForgottenEmail("foo@bar.net", user.getUserid(),
-                                                                      authenticator.generateToken(user.getUsername()));
+                                                                      authenticator.generateTempJWTToken(user.getUsername()));
       email.setEmailService(new EmailService());
       assertNotNull(email);
       assertEquals("foo@bar.net", email.to());

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014-2015 spinetrak
+ * Copyright (c) 2014-2016 spinetrak
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -46,8 +46,8 @@ import net.spinetrak.gasguzzler.dao.UserDAO;
 import net.spinetrak.gasguzzler.jobs.EmailNotificationJob;
 import net.spinetrak.gasguzzler.metrics.DbReporter;
 import net.spinetrak.gasguzzler.resources.BuildInfoResource;
-import net.spinetrak.gasguzzler.resources.MetricsResource;
 import net.spinetrak.gasguzzler.resources.LoginResource;
+import net.spinetrak.gasguzzler.resources.MetricsResource;
 import net.spinetrak.gasguzzler.resources.UserResource;
 import net.spinetrak.gasguzzler.security.AdminSecurityHandler;
 import net.spinetrak.gasguzzler.security.Authenticator;
@@ -129,8 +129,8 @@ public class Trak extends Application<TrakConfiguration>
       TimeUnit.MINUTES);
 
 
-    final byte[] secret =                                      configuration_.getJwtTokenSecret();
-    final Authenticator authenticator =  new Authenticator(userDAO,secret);
+    final byte[] secret = configuration_.getJwtTokenSecret();
+    final Authenticator authenticator = new Authenticator(userDAO, secret);
 
     environment_.jersey().register(new BuildInfoResource());
     environment_.jersey().register(new UserResource(userDAO, authenticator, configuration_.getAdmin().getEmail()));

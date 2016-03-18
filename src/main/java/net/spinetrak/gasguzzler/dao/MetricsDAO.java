@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014-2015 spinetrak
+ * Copyright (c) 2014-2016 spinetrak
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +44,7 @@ public interface MetricsDAO
   int deleteStale(@Bind("old") final long time_);
 
   @SqlQuery("select distinct m_name from st_metrics where m_count > 0")
-  List<String> get();
+  List<String> select();
 
   @SqlQuery("select m_timestamp, m_count from st_metrics where m_name = :name order by m_timestamp")
   @Mapper(CountMetricsMapper.class)

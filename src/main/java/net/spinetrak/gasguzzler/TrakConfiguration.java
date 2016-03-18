@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014-2015 spinetrak
+ * Copyright (c) 2014-2016 spinetrak
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,6 +43,7 @@ import java.util.Map;
 
 public class TrakConfiguration extends Configuration
 {
+  private static String jwtTokenSecret = null;
   @Valid
   @NotNull
   @JsonProperty
@@ -65,6 +66,18 @@ public class TrakConfiguration extends Configuration
   @JsonProperty
   private Boolean isHttps = false;
   private DbReporter reporter;
+
+  private static String generateTokenSecret() throws NoSuchAlgorithmException
+  {
+    if (jwtTokenSecret != null)
+    {
+      return jwtTokenSecret;
+    }
+    SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
+    byte[] salt = new byte[16];
+    sr.nextBytes(salt);
+    return new String(salt);
+  }
 
   public AdminUser getAdmin()
   {
@@ -91,6 +104,11 @@ public class TrakConfiguration extends Configuration
     return flyway;
   }
 
+  public byte[] getJwtTokenSecret() throws UnsupportedEncodingException, NoSuchAlgorithmException
+  {
+    return generateTokenSecret().getBytes("UTF-8");
+  }
+
   public DbReporter getReporter()
   {
     return reporter;
@@ -109,25 +127,6 @@ public class TrakConfiguration extends Configuration
   protected void addReporter(final DbReporter reporter_)
   {
     reporter = reporter_;
-  }
-
-  private static String jwtTokenSecret = null;
-
-  public byte[] getJwtTokenSecret() throws UnsupportedEncodingException, NoSuchAlgorithmException
-  {
-    return generateTokenSecret().getBytes("UTF-8");
-  }
-
-  private static String generateTokenSecret() throws NoSuchAlgorithmException
-  {
-    if(jwtTokenSecret != null)
-    {
-      return jwtTokenSecret;
-    }
-    SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
-    byte[] salt = new byte[16];
-    sr.nextBytes(salt);
-    return new String(salt);
   }
 
 }

@@ -3,8 +3,8 @@
   "email": "joe@mail.de",
   "password": "063450be3449991e2ae85c11f8ac2721ad252cb4046b6099f2c5bfd688a63eee",
   "role": "USER",
+  "token": null,
   "updated": null,
   "userid": 1,
-  "username": "JoeRegular",
-  "token": null
+  "username": "JoeRegular"
 }

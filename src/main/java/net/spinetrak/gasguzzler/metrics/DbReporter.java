@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014-2015 spinetrak
+ * Copyright (c) 2014-2016 spinetrak
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -112,7 +112,7 @@ public class DbReporter extends ScheduledReporter
 
   private void report(final DataPoint dataPoint_)
   {
-    final long cutoff = new Date().getTime() - TimeUnit.MILLISECONDS.convert(45, TimeUnit.DAYS);
+    final long cutoff = new Date().getTime() - TimeUnit.MILLISECONDS.convert(15, TimeUnit.DAYS);
     _dao.deleteStale(cutoff);
     _dao.insert(dataPoint_);
   }

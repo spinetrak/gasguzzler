@@ -44,18 +44,18 @@ database:
   driverClass: "org.postgresql.Driver"
   url: "jdbc:postgresql://@OPENSHIFT_POSTGRESQL_DB_HOST@:@OPENSHIFT_POSTGRESQL_DB_PORT@/gasguzzlerdev"
   user:
-    salt: "jjn9zA=="
-    iv: "QCU267m/vgUwWQuaZ3fgYg=="
-    value: "bRaeYNCwN5E5TPCRaNNxSg=="
+    salt: "cZCGzA=="
+    iv: "rO71UT3II7pPlq/mj05vOg=="
+    value: "KBkcnf0W932ojveLrxcPRA=="
     cipher: "aes-256-cbc"
     keyDerivation: "pbkdf2"
     keyLength: 256
     iterations: 2000
     encrypted: true
   password:
-    salt: "2ueivw=="
-    iv: "qEUj187Tsff+u71cZsq/dA=="
-    value: "21NCUzj/xcJpc36ydTyUWw=="
+    salt: "i16kpw=="
+    iv: "C4KyRTkEGeluJHy2KTVAMg=="
+    value: "3W6MmV1CGgQnTuZ6B9n20w=="
     cipher: "aes-256-cbc"
     keyDerivation: "pbkdf2"
     keyLength: 256
