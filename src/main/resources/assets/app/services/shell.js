@@ -50,8 +50,9 @@ define(function (require) {
 
             var userid = sessionStorage.getItem("userid");
             var token = sessionStorage.getItem("token");
+            var role = sessionStorage.getItem("role");
 
-            if(userid && token && token != "") {
+            if(userid && token && role && role == "ADMIN") {
                 router.map(adminArr).buildNavigationModel();
             }
             else

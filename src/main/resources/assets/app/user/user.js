@@ -36,10 +36,12 @@ define(function (require) {
             if (response) {
                 sessionStorage.setItem("token", response.token);
                 sessionStorage.setItem("userid", response.userid);
+                sessionStorage.setItem("role", response.role);
                 sessionStorage.removeItem("forgotPassword");
             }
         }
         else {
+            sessionStorage.removeItem("role");
             sessionStorage.removeItem("token");
             sessionStorage.removeItem("userid");
         }
@@ -50,6 +52,7 @@ define(function (require) {
             sessionStorage.setItem("forgotPassword", "true");
             sessionStorage.removeItem("token");
             sessionStorage.removeItem("userid");
+            sessionStorage.removeItem("role");
         }
         else {
             sessionStorage.removeItem("forgotPassword");
