@@ -32,8 +32,6 @@ define(function (require) {
 
     return {
         users: ko.observableArray(),
-        sessions: ko.observableArray(),
-
         urlRoot: location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : ''),
 
 
@@ -67,6 +65,7 @@ define(function (require) {
 
         },
 
+
         doDeleteUser: function () {
             var userModel = {
                 "Authorization" : "Bearer " +  sessionStorage.getItem("token"),
@@ -93,9 +92,51 @@ define(function (require) {
                 });
         },
 
+        doUpdateUser: function () {
+
+            var myemail = this.email;
+            var myusername = this.username;
+            var myuserid = this.userid;
+            var myrole = this.role;
+
+            var dataModel = {
+                "username": myusername,
+                "email": myemail,
+                "userid": myuserid,
+                "role": myrole
+            };
+            var headerModel = {
+                "Authorization" : "Bearer " +  sessionStorage.getItem("token"),
+            };
+
+            if (!myusername || myusername.length < 3 || !myemail || myemail.length < 5) {
+                app.showMessage("Please make sure that you have entered a valid username and email", "Error!", ["Ok"], true, {"class": "notice error"});
+                return;
+            }
+
+            var urlRoot = location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
+            var url = urlRoot + '/api/user/' + myuserid;
+
+            return http.put(url, dataModel, headerModel).then(
+                function (response) {
+                    app.showMessage("User has been updated", "Success!", ["Ok"], true, {"class": "notice success"}).then(function () {
+                        document.location.href = "/#user";
+                        window.location.reload(true);
+                    });
+                },
+                function (error) {
+                    app.showMessage(error.responseText, error.statusText, ["Ok"], true, {"class": "notice error"}).then(function () {
+                        console.log(error);
+                        document.location.href = "/#user";
+                        window.location.reload(true);
+                    });
+                });
+        },
+
         doValidateEmail: function (email) {
             var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             return re.test(email);
         }
+
     };
 });

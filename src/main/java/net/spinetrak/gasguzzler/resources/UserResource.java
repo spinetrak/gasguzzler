@@ -176,10 +176,22 @@ public class UserResource
       }
 
       final String password = authenticator.getSecurePassword(modified_.getPassword());
-      modified_.setPassword(password);
+      if(password != null)
+      {
+        modified_.setPassword(password);
+      }
+      else
+      {
+        final User u = userDAO.select(userid_);
+        modified_.setPassword(u.getPassword());
+      }
       modified_.setUpdated(new Date());
-      modified_.setRole(
-        null != modified_.getEmail() && adminEmail.toLowerCase().equals(modified_.getEmail()) ? Role.ADMIN : Role.USER);
+      if(null == modified_.getRole())
+      {
+        modified_.setRole(
+          null != modified_.getEmail() && adminEmail.toLowerCase().equals(
+            modified_.getEmail()) ? Role.ADMIN : Role.USER);
+      }
       userDAO.update(modified_);
       modified_.setPassword("");
       return modified_;

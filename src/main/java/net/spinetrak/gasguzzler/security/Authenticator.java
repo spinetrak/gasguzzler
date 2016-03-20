@@ -106,6 +106,10 @@ public class Authenticator implements io.dropwizard.auth.Authenticator<JsonWebTo
   public String getSecurePassword(final String password_) throws NoSuchAlgorithmException,
                                                                  InvalidKeySpecException
   {
+    if(password_ == null)
+    {
+      return null;
+    }
     int iterations = 1000;
     char[] chars = password_.toCharArray();
     byte[] salt = getSalt().getBytes();
